@@ -64,12 +64,16 @@ function security_column_content($plugin_link, $plugin_version) {
       echo no_info();
       break;
     case 400:
+      // TODO: behave sensibly in this scenario
       echo("Argument Error");
       break;
     case 500:
+      // TODO: behave sensibly in this scenario
       echo("Server Error");
       break;
     default:
+      // TODO: behave sensibly in this scenario
+      // possible to get a redirect??
       echo("Unknown");
   };
 
