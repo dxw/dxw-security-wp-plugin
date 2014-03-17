@@ -123,6 +123,6 @@ function insert_at($index, $element, $array) {
   $array =
     array_slice($array, 0, $index, true) +
     $element +
-    array_slice($array, $index + 1 , count($array) - 1, true);
+    array_slice($array, $index , count($array) - 1, true);
   return $array;
 }
