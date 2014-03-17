@@ -7,9 +7,13 @@
 // Author: dxw
 // Author URI: http://dxw.com/
 
+if (!defined('API_ROOT')) {
+  define('API_ROOT', 'https://security.dxw.com/api');
+}
+
 
 function GetPluginReview($plugin_url, $plugin_version) {
-  $api_root = "http://localhost:3000";
+  $api_root = API_ROOT;
   $api_path = "/reviews";
   $query = http_build_query(
     array(
@@ -25,7 +29,7 @@ function GetPluginReview($plugin_url, $plugin_version) {
   //     "query" => $query
   //   )
   // );
-  $url = $api_root . '/' . $api_path . '?' . $query;
+  $url = $api_root . $api_path . '?' . $query;
 
   $result = wp_remote_get($url);
   return $result;
