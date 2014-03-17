@@ -1,4 +1,4 @@
-.column-Security a { display: block; width: 0; height: 0; padding: 0 0 15px 15px; overflow: hidden; }
+.column-Security .status { display: block; width: 0; height: 0; padding: 0 0 15px 15px; overflow: hidden; }
 .column-Security .potentially_unsafe { background-color: #FF4000; } /*orangered*/
 .column-Security .use_with_caution { background-color: #FFD800; } /*gold*/
 .column-Security .no_issues_found { background-color: #208820; } /*forestgreen*/
