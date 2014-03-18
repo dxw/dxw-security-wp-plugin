@@ -3,3 +3,12 @@
 .column-Security .use_with_caution { background-color: #FFD800; } /*gold*/
 .column-Security .no_issues_found { background-color: #208820; } /*forestgreen*/
 .column-Security .no_info { background-color: #D3D3D3; } /*lightgray*/
+
+/* The following are equivalent various "update" classes. When we use less, these should be @extends */
+.plugin-review-tr .plugin-review { border: 0; padding: 0; -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.1); box-shadow: inset 0 -1px 0 rgba(0,0,0,.1); }
+
+.plugin-review .review-message { background-color: #f7f7f7; background-color: rgba(0,0,0,.03); border: 0; font-size: 13px; font-weight: 400; margin: 6px 12px 12px; padding: 6px 12px; }
+.plugin-review .review-message ul { list-style: disc inside none; padding-left: 20px; }
+
+.active_plugin.plugin-review-tr .plugin-review { border-left: 4px solid #2ea2cc; background-color: #f7fcfe;}
+.active_plugin.update_plugin.plugin-review-tr .plugin-review { border-left: 4px solid #d54e21; background-color: #fefaf7;}
