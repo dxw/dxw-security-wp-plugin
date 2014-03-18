@@ -35,55 +35,105 @@ class Dxw_Security_Column {
   var $dxw_security_failures = 0;
 
   public function __construct() {
-    add_filter('manage_plugins_columns', function($columns) {
-      return insert_at(1, array(DXW_SECURITY_COLUMN_NAME => ""), $columns);
-    });
+    add_filter('plugin_row_meta', function( $plugin_meta, $plugin_file, $plugin_data, $status) {
 
-    add_action('manage_plugins_custom_column',function($column_name, $plugin_file, $plugin_data){
-      if($column_name == DXW_SECURITY_COLUMN_NAME) {
-        $plugin_version = $plugin_data['Version'];
-        $this->security_column_content($plugin_file, $plugin_version);
-      };
-    }, 11, 3);
+      $plugin_meta[] = $this->security_plugin_meta($plugin_file, $plugin_data);
+      return $plugin_meta;
+    }, 10, 4);
   }
 
-
-  function security_column_content($plugin_file, $plugin_version) {
-    if ( $this->dxw_security_failures >= DXW_SECURITY_FAILURE_lIMIT ) {
-      echo $this->fatal_error();
-      return;
-    }
-
+  function security_plugin_meta($plugin_file, $plugin_data) {
+    $plugin_version = $plugin_data['Version'];
     $response = $this->get_plugin_review_response($plugin_file, $plugin_version);
+
+    $review_link = DXW_SECURITY_PLUGINS_URL;
 
     if ( is_wp_error($response) ) {
       # TODO: in future we should provide some way for users to give us back some useful information when they get this error
-      echo $this->fatal_error();
+      $message = "An error occurred - please try again later";
 
     } else {
 
       switch ( $response['response']['code'] ) {
         case 200:
           $review = json_decode( $response['body'] )->review;
-          echo $this->display_status_icon($plugin_file, $review);
+
+          $recommendation = $review->recommendation;
+          $review_link = $review->review_link;
+
+          switch ($recommendation) {
+            case 'green':
+              $message = "No issues found";
+              break;
+            case 'yellow':
+              $message = "Use with caution";
+              $this->add_review_reason($plugin_file);
+              break;
+            case 'red':
+              $message = "Potentially unsafe";
+              $this->add_review_reason($plugin_file);
+              break;
+            // default:
+            //   TODO: error??? This is definitely an exception case;
+          };
           break;
         case 404:
-          echo $this->no_info();
+          $message = "No info";
           break;
         // TODO: Perhaps the following won't ever happen? Will just be caught by WP_Error?
         //   Perhaps we should behave differently in different cases
         case 400:
-          echo $this->fatal_error();
+          $message = "An error occurred - please try again later";
           break;
         case 500:
-          echo $this->fatal_error();
+          $message = "An error occurred - please try again later";
           break;
         default:
           // A redirect would end up here - is it possible to get one??
-          echo $this->fatal_error();
+          $message = "An error occurred - please try again later";
       };
+
+      return "dxw Security review: <a href='{$review_link}'>{$message}</a>";
     };
   }
+
+
+  // function security_column_content($plugin_file, $plugin_version) {
+  //   if ( $this->dxw_security_failures >= DXW_SECURITY_FAILURE_lIMIT ) {
+  //     echo $this->fatal_error();
+  //     return;
+  //   }
+
+  //   $response = $this->get_plugin_review_response($plugin_file, $plugin_version);
+
+  //   if ( is_wp_error($response) ) {
+  //     # TODO: in future we should provide some way for users to give us back some useful information when they get this error
+  //     echo $this->fatal_error();
+
+  //   } else {
+
+  //     switch ( $response['response']['code'] ) {
+  //       case 200:
+  //         $review = json_decode( $response['body'] )->review;
+  //         echo $this->display_status_icon($plugin_file, $review);
+  //         break;
+  //       case 404:
+  //         echo $this->no_info();
+  //         break;
+  //       // TODO: Perhaps the following won't ever happen? Will just be caught by WP_Error?
+  //       //   Perhaps we should behave differently in different cases
+  //       case 400:
+  //         echo $this->fatal_error();
+  //         break;
+  //       case 500:
+  //         echo $this->fatal_error();
+  //         break;
+  //       default:
+  //         // A redirect would end up here - is it possible to get one??
+  //         echo $this->fatal_error();
+  //     };
+  //   };
+  // }
 
   private function get_plugin_review_response($plugin_file, $plugin_version) {
     $response = $this->retrieve_plugin_review_response($plugin_file, $plugin_version);
@@ -131,26 +181,71 @@ class Dxw_Security_Column {
     return $plugin_file . $plugin_version;
   }
 
-  private function add_review_failure_reason($plugin_file) {
+  private function add_review_reason($plugin_file) {
     // add_action( "after_plugin_row_$plugin_file", function ($file, $plugin_data) {
     add_action( "after_plugin_row_$plugin_file", function($plugin_file, $plugin_data, $status) {
       // TODO: repeated...
       $plugin_version = $plugin_data['Version'];
 
-      $review_response = $this->get_plugin_review_response($plugin_file, $plugin_version);
+      $response = $this->get_plugin_review_response($plugin_file, $plugin_version);
 
-      // TODO: repeated...
-      $review = json_decode( $review_response['body'] )->review;
+      if ( is_wp_error($response) ) {
+        // Do nothing - shouldn't get here
 
-      $reason = $review->reason;
+      } else {
 
-      // TODO: Make both of the following into links
-      if (!$reason) { $reason = "See the dxw Security website for details"; };
+        switch ( $response['response']['code'] ) {
+          case 200:
+            $review = json_decode( $response['body'] )->review;
 
-      $class = $this->row_class($plugin_file, $plugin_data);
+            $recommendation = $review->recommendation;
+            $review_link = $review->review_link;
+            $reason = $review->reason;
+
+            switch ($recommendation) {
+              case 'green':
+                // Do nothing - shouldn't get here
+                break;
+              case 'yellow':
+                $message = "Use with caution";
+                $box_class = "use_with_caution";
+                break;
+              case 'red':
+                $message = "Potentially unsafe";
+                $box_class = "potentially_unsafe";
+                break;
+              // default:
+              //   TODO: error??? This is definitely an exception case;
+            };
+            break;
+          case 404:
+            // Do nothing - shouldn't get here
+            break;
+          // TODO: Perhaps the following won't ever happen? Will just be caught by WP_Error?
+          //   Perhaps we should behave differently in different cases
+          case 400:
+            // Do nothing - shouldn't get here
+            break;
+          case 500:
+            // Do nothing - shouldn't get here
+            break;
+          default:
+            // A redirect would end up here - is it possible to get one??
+            // Do nothing - shouldn't get here
+        };
+      };
+
+      // Defaults:
+      if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
+      if ( empty($reason) ) { $reason = "See the dxw Security website for details"; }
+
+      $row_class = $this->row_class($plugin_file, $plugin_data);
 
       // Presumably colspanchange is something to do with responsiveness
-      echo("<tr class='plugin-review-tr {$class}'><td colspan='4' class='plugin-review colspanchange'><div class='review-message'>");
+      echo("<tr class='plugin-review-tr {$row_class}'>");
+      echo("  <td colspan='4' class='plugin-review colspanchange'>");
+      echo("    <div class='review-message {$box_class}'>");
+      echo("      <a href='{$review_link}'><h4>dxw Security review: {$message}</h4></a>");
       print_r($reason);
       echo("</div></td></tr>");
     }, 10, 3);
@@ -165,23 +260,23 @@ class Dxw_Security_Column {
     return $class;
   }
 
-  private function display_status_icon($plugin_file, $review) {
-    $link = $review->review_link;
-    $recommendation = $review->recommendation;
+  // private function display_status_icon($plugin_file, $review) {
+  //   $link = $review->review_link;
+  //   $recommendation = $review->recommendation;
 
-    switch ($recommendation) {
-      case 'green':
-        return $this->no_issues_found($link);
-      case 'yellow':
-        $this->add_review_failure_reason($plugin_file);
-        return $this->use_with_caution($link);
-      case 'red':
-        $this->add_review_failure_reason($plugin_file);
-        return $this->potentially_unsafe($link);
-      // default:
-      //   TODO: error??? This is definitely an exception case;
-    };
-  }
+  //   switch ($recommendation) {
+  //     case 'green':
+  //       return $this->no_issues_found($link);
+  //     case 'yellow':
+  //       $this->add_review_failure_reason($plugin_file);
+  //       return $this->use_with_caution($link);
+  //     case 'red':
+  //       $this->add_review_failure_reason($plugin_file);
+  //       return $this->potentially_unsafe($link);
+  //     // default:
+  //     //   TODO: error??? This is definitely an exception case;
+  //   };
+  // }
 
   private function no_issues_found($link) {
     return $this->status_icon($link, "&#10003;", "status no_issues_found", "No issues found");
