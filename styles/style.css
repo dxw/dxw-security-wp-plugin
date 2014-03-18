@@ -1,11 +1,3 @@
-/* not used - remove later: */
-.column-Security .status { display: block; width: 0; height: 0; padding: 0 0 15px 15px; overflow: hidden; }
-.column-Security .potentially_unsafe { background-color: #FF4000; } /*orangered*/
-.column-Security .use_with_caution { background-color: #FFD800; } /*gold*/
-.column-Security .no_issues_found { background-color: #208820; } /*forestgreen*/
-.column-Security .no_info { background-color: #D3D3D3; } /*lightgray*/
-
-
 /* The following are equivalent various "update" classes. When we use less, these should be @extends */
 .plugin-review-tr .plugin-review { border: 0; padding: 0; -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.1); box-shadow: inset 0 -1px 0 rgba(0,0,0,.1); }
 
