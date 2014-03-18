@@ -29,11 +29,12 @@ add_action( 'admin_enqueue_scripts', function($hook) {
   wp_enqueue_style( 'dxw-security-plugin-styles', $stylesheet_url );
 } );
 
-add_action('admin_init', function() { new Dxw_Security_Column; });
+add_action('admin_init', function() { new Dxw_Security_Review_Data; });
 
-class Dxw_Security_Column {
+// TODO: this name is wrong...
+class Dxw_Security_Review_Data {
   // Track the number of failed requests so that we can stop trying after a certain number.
-  public $dxw_security_failures = 0;
+  public $dxw_security_failed_requests = 0;
 
   # TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
   public $review_statuses = array(
@@ -51,12 +52,21 @@ class Dxw_Security_Column {
   }
 
   function security_plugin_meta($plugin_file, $plugin_data) {
-    $response = $this->get_plugin_review_response($plugin_file, $plugin_data);
+    // TODO: this isn't very dry...
+    // Stop making requests after a certain number of failures
+    if ( $this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT ) {
+      $review_link = DXW_SECURITY_PLUGINS_URL;
+      $message = "An error occurred - please try again later";
+      return "dxw Security recommendation: <a href='{$review_link}'>{$message}</a>";
+    }
+
+    $api = new Dxw_Security_Api($plugin_file, $plugin_data);
+    $response = $api->get_plugin_review_response();
 
     if ( is_wp_error($response) ) {
       # TODO: in future we should provide some way for users to give us back some useful information when they get this error
       $message = "An error occurred - please try again later";
-
+      $dxw_security_failed_requests++;
     } else {
 
       switch ( $response['response']['code'] ) {
@@ -72,17 +82,11 @@ class Dxw_Security_Column {
         case 404:
           $message = "No info";
           break;
-        // TODO: Perhaps the following won't ever happen? Will just be caught by WP_Error?
-        //   Perhaps we should behave differently in different cases
-        case 400:
-          $message = "An error occurred - please try again later";
-          break;
-        case 500:
-          $message = "An error occurred - please try again later";
-          break;
+        // TODO: handle other codes individually?
         default:
           // A redirect would end up here - is it possible to get one??
           $message = "An error occurred - please try again later";
+          $dxw_security_failed_requests++;
       };
 
       if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
@@ -91,61 +95,17 @@ class Dxw_Security_Column {
     };
   }
 
-
-  private function get_plugin_review_response($plugin_file, $plugin_data) {
-    $plugin_version = $plugin_data['Version'];
-    $response = $this->retrieve_plugin_review_response($plugin_file, $plugin_version);
-
-    if($response === false) {
-
-      $api_root = DXW_SECURITY_API_ROOT;
-      $api_path = "/reviews";
-
-      # TODO: Currently this only handles codex plugins
-      $plugin_url = 'http://wordpress.org/plugins/' . explode('/',$plugin_file)[0] . '/';
-
-      $query = http_build_query(
-        array(
-          'codex_link'=>$plugin_url,
-          'version'=>$plugin_version
-        )
-      );
-      // this should exist in core, but doesn't seem to:
-      // $url = http_build_url(
-      //   array(
-      //     "host"  => $api_root,
-      //     "path"  => $api_path,
-      //     "query" => $query
-      //   )
-      // );
-      $url = $api_root . $api_path . '?' . $query;
-
-      $response = wp_remote_get($url);
-      $this->cache_plugin_review_response($plugin_file, $plugin_version, $response);
-    }
-
-    return $response;
-  }
-
-  private function cache_plugin_review_response($plugin_file, $plugin_version, $response) {
-    $slug = $this->plugin_review_response_slug($plugin_file, $plugin_version);
-    set_transient( $slug, $response, DAY_IN_SECONDS );
-  }
-  private function retrieve_plugin_review_response($plugin_file, $plugin_version) {
-    $slug = $this->plugin_review_response_slug($plugin_file, $plugin_version);
-    return get_transient($slug);
-  }
-  private function plugin_review_response_slug($plugin_file, $plugin_version) {
-    return $plugin_file . $plugin_version;
-  }
-
   private function add_review_reason($plugin_file) {
     // add_action( "after_plugin_row_$plugin_file", function ($file, $plugin_data) {
     add_action( "after_plugin_row_$plugin_file", function($plugin_file, $plugin_data, $status) {
-      $response = $this->get_plugin_review_response($plugin_file, $plugin_data);
+      // TODO: do we need to do the "Stop making requests after a certain number of failures" thing here too?
 
+      $api = new Dxw_Security_Api($plugin_file, $plugin_data);
+      $response = $api->get_plugin_review_response();
+
+      // TODO: What should we do in the error cases below? Displaying nothing would probably be fine...
       if ( is_wp_error($response) ) {
-        // Do nothing - shouldn't get here
+        // Shouldn't get here, but it IS possible.
 
       } else {
 
@@ -161,19 +121,12 @@ class Dxw_Security_Column {
             $reason = $review->reason;
             break;
           case 404:
-            // Do nothing - shouldn't get here
+            // Shouldn't get here, but it IS possible.
             break;
-          // TODO: Perhaps the following won't ever happen? Will just be caught by WP_Error?
-          //   Perhaps we should behave differently in different cases
-          case 400:
-            // Do nothing - shouldn't get here
-            break;
-          case 500:
-            // Do nothing - shouldn't get here
-            break;
+          // TODO: handle other codes individually?
           default:
             // A redirect would end up here - is it possible to get one??
-            // Do nothing - shouldn't get here
+            // Shouldn't get here, but it IS possible.
         };
       };
 
@@ -205,6 +158,64 @@ class Dxw_Security_Column {
     return $class;
   }
 }
+
+# TODO - not sure this is the right name: this is for getting one specific plugin...
+class Dxw_Security_Api {
+  public $plugin_file;
+  public $plugin_version;
+
+  public function __construct($plugin_file, $plugin_data) {
+    $this->plugin_file = $plugin_file;
+    $this->plugin_version = $plugin_data['Version'];
+  }
+
+  public function get_plugin_review_response() {
+    $response = $this->retrieve_plugin_review_response();
+
+    if($response === false) {
+
+      $api_root = DXW_SECURITY_API_ROOT;
+      $api_path = "/reviews";
+
+      # TODO: Currently this only handles codex plugins
+      $plugin_url = 'http://wordpress.org/plugins/' . explode('/',$this->plugin_file)[0] . '/';
+
+      $query = http_build_query(
+        array(
+          'codex_link'=>$plugin_url,
+          'version'=>$this->plugin_version
+        )
+      );
+      // this should exist in core, but doesn't seem to:
+      // $url = http_build_url(
+      //   array(
+      //     "host"  => $api_root,
+      //     "path"  => $api_path,
+      //     "query" => $query
+      //   )
+      // );
+      $url = $api_root . $api_path . '?' . $query;
+
+      $response = wp_remote_get($url);
+      $this->cache_plugin_review_response($response);
+    }
+
+    return $response;
+  }
+
+  private function cache_plugin_review_response($response) {
+    $slug = $this->plugin_review_response_slug();
+    set_transient( $slug, $response, DAY_IN_SECONDS );
+  }
+  private function retrieve_plugin_review_response() {
+    $slug = $this->plugin_review_response_slug();
+    return get_transient($slug);
+  }
+  private function plugin_review_response_slug() {
+    return $this->plugin_file . $this->plugin_version;
+  }
+}
+
 
 // CURRENTLY NOT USED - ditch it if it's not useful
 // Surely this already exists???
