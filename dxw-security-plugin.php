@@ -27,6 +27,10 @@ add_action( 'admin_enqueue_scripts', function($hook) {
 
   $stylesheet_url = plugins_url( '/styles/style.css' , __FILE__ );
   wp_enqueue_style( 'dxw-security-plugin-styles', $stylesheet_url );
+
+  // TODO: This seems like a really inefficient way to include one line of js...
+  $script_url = plugins_url( '/scripts/script.js' , __FILE__ );
+  wp_enqueue_script( 'dxw-security-plugin-scripts', $script_url );
 } );
 
 add_action('admin_init', function() { new Dxw_Security_Review_Data; });
