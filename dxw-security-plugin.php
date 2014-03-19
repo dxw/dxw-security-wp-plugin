@@ -34,13 +34,14 @@ add_action('admin_init', function() { new Dxw_Security_Review_Data; });
 // TODO: this name is wrong...
 class Dxw_Security_Review_Data {
   // Track the number of failed requests so that we can stop trying after a certain number.
+  // This should apply per page load, but ideally this behaviour might be better handled by the API class (?)
   public $dxw_security_failed_requests = 0;
 
   // TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
   public $review_statuses = array(
-    'green'  => array( 'message' => "No issues found",  'slug' => "no_issues_found", 'failure' => false, 'icon_fallback' => "&#10003;"),
-    'yellow' => array( 'message' => "Use with caution", 'slug' => "use_with_caution", 'failure' => true, 'icon_fallback' => "?"),
-    'red'    => array( 'message' => "Potentially unsafe", 'slug' => "potentially_unsafe", 'failure' => true, 'icon_fallback' => "&#10007;"),
+    'green'  => array( 'message' => "No issues found",  'slug' => "no-issues-found", 'failure' => false, 'icon_fallback' => "&#10003;"),
+    'yellow' => array( 'message' => "Use with caution", 'slug' => "use-with-caution", 'failure' => true, 'icon_fallback' => "?"),
+    'red'    => array( 'message' => "Potentially unsafe", 'slug' => "potentially-unsafe", 'failure' => true, 'icon_fallback' => "&#10007;"),
   );
 
   public function __construct() {
@@ -66,10 +67,12 @@ class Dxw_Security_Review_Data {
 
         $status = $this->review_statuses[$review->recommendation];
         $message = $status['message'];
+        $slug = $status['slug'];
         if ( $status['failure'] ) { $this->add_review_reason($plugin_file); }
 
       } catch ( Dxw_Security_NotFound $e ) {
         $message = "No info";
+        $slug = "no-info";
       } catch ( Dxw_Security_Error $e ) {
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
         $message = "An error occurred - please try again later";
@@ -78,9 +81,11 @@ class Dxw_Security_Review_Data {
       }
     }
     if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
+    // TODO: fallback icon for errors?
+    if ( empty($slug) ) { $slug = ""; }
 
     // TODO: title text on this link?
-    return "dxw Security recommendation: <a href='{$review_link}'>{$message}</a>";
+    return "<span class='icon-{$slug}'></span> dxw Security recommendation: <a href='{$review_link}'>{$message}</a>";
   }
 
   private function add_review_reason($plugin_file) {
@@ -101,11 +106,11 @@ class Dxw_Security_Review_Data {
         // TODO: Needs to be a bit more Defensive? We're currently trusting that this will only ever get called with "red" or "yellow" recommendations...
         $status = $this->review_statuses[$review->recommendation];
         $message = $status['message'];
-        $box_class = $status['slug'];
+        $slug = $status['slug'];
 
         $row_class = $this->row_class($plugin_file, $plugin_data);
 
-        $this->review_info_box($row_class, $box_class, $review_link, $reason, $message);
+        $this->review_info_box($row_class, $slug, $review_link, $reason, $message);
 
       // TODO: What should we do in the error cases below? Displaying nothing would probably be fine...
       } catch ( Dxw_Security_NotFound $e ) {
@@ -118,7 +123,7 @@ class Dxw_Security_Review_Data {
     }, 10, 3);
   }
 
-  private function review_info_box($row_class, $box_class, $review_link, $reason, $message) {
+  private function review_info_box($row_class, $slug, $review_link, $reason, $message) {
     if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
 
     // TODO: title text on these links?
@@ -126,8 +131,8 @@ class Dxw_Security_Review_Data {
     // Presumably colspanchange is something to do with responsiveness
     echo("<tr class='plugin-review-tr {$row_class}'>");
     echo("  <td colspan='4' class='plugin-review colspanchange'>");
-    echo("    <div class='review-message {$box_class}'>");
-    echo("      <a href='{$review_link}'><h4>dxw Security recommendation: {$message}</h4></a>");
+    echo("    <div class='review-message {$slug}'>");
+    echo("      <a href='{$review_link}'><h4><span class='icon-{$slug}'></span> dxw Security recommendation: {$message}</h4></a>");
     if ( empty($reason) ) {
       echo("<a href='{$review_link}'>See the dxw Security website for details</a>");
     } else {
@@ -235,8 +240,6 @@ class Dxw_Security_Api {
   }
   private function retrieve_plugin_review() {
     $slug = $this->plugin_review_slug();
-Whippet::print_r(get_transient($slug));
-
     return get_transient($slug);
   }
   private function plugin_review_slug() {
