@@ -11,9 +11,6 @@
 if (!defined('DXW_SECURITY_API_ROOT')) {
   define('DXW_SECURITY_API_ROOT', 'https://security.dxw.com/api');
 }
-if (!defined('DXW_SECURITY_COLUMN_NAME')) {
-  define('DXW_SECURITY_COLUMN_NAME', 'Security');
-}
 
 // CONSTANTS:
 // How many failed requests will we tolerate?
@@ -36,7 +33,7 @@ class Dxw_Security_Review_Data {
   // Track the number of failed requests so that we can stop trying after a certain number.
   public $dxw_security_failed_requests = 0;
 
-  # TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
+  // TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
   public $review_statuses = array(
     'green'  => array( 'message' => "No issues found",  'slug' => "no_issues_found", 'failure' => false, 'icon_fallback' => "&#10003;"),
     'yellow' => array( 'message' => "Use with caution", 'slug' => "use_with_caution", 'failure' => true, 'icon_fallback' => "?"),
@@ -52,101 +49,86 @@ class Dxw_Security_Review_Data {
   }
 
   function security_plugin_meta($plugin_file, $plugin_data) {
-    // TODO: this isn't very dry...
-    // Stop making requests after a certain number of failures
+    // Stop making requests after a certain number of failures:
     if ( $this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT ) {
-      $review_link = DXW_SECURITY_PLUGINS_URL;
       $message = "An error occurred - please try again later";
-      return "dxw Security recommendation: <a href='{$review_link}'>{$message}</a>";
-    }
-
-    $api = new Dxw_Security_Api($plugin_file, $plugin_data);
-    $response = $api->get_plugin_review_response();
-
-    if ( is_wp_error($response) ) {
-      # TODO: in future we should provide some way for users to give us back some useful information when they get this error
-      $message = "An error occurred - please try again later";
-      $dxw_security_failed_requests++;
     } else {
 
-      switch ( $response['response']['code'] ) {
-        case 200:
-          $review = json_decode( $response['body'] )->review;
+      $api = new Dxw_Security_Api($plugin_file, $plugin_data);
 
-          $status = $this->review_statuses[$review->recommendation];
-          $message = $status['message'];
-          $review_link = $review->review_link;
+      try {
+        $review = $api->get_plugin_review();
 
-          if ( $status['failure'] ) { $this->add_review_reason($plugin_file); }
-          break;
-        case 404:
-          $message = "No info";
-          break;
-        // TODO: handle other codes individually?
-        default:
-          // A redirect would end up here - is it possible to get one??
-          $message = "An error occurred - please try again later";
-          $dxw_security_failed_requests++;
-      };
+        $review_link = $review->review_link;
 
-      if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
+        $status = $this->review_statuses[$review->recommendation];
+        $message = $status['message'];
+        if ( $status['failure'] ) { $this->add_review_reason($plugin_file); }
 
-      return "dxw Security recommendation: <a href='{$review_link}'>{$message}</a>";
-    };
+      } catch ( Dxw_Security_NotFound $e ) {
+        $message = "No info";
+      } catch ( Dxw_Security_Error $e ) {
+        // TODO: in future we should provide some way for users to give us back some useful information when they get an error
+        $message = "An error occurred - please try again later";
+
+        $this->dxw_security_failed_requests++;
+      }
+    }
+    if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
+
+    return "dxw Security recommendation: <a href='{$review_link}'>{$message}</a>";
   }
 
   private function add_review_reason($plugin_file) {
     // add_action( "after_plugin_row_$plugin_file", function ($file, $plugin_data) {
     add_action( "after_plugin_row_$plugin_file", function($plugin_file, $plugin_data, $status) {
+
       // TODO: do we need to do the "Stop making requests after a certain number of failures" thing here too?
+      //   In theory we should only get successes here, but it's in principle possible to get failures - see below.
 
       $api = new Dxw_Security_Api($plugin_file, $plugin_data);
-      $response = $api->get_plugin_review_response();
+
+      try {
+        $review = $api->get_plugin_review();
+
+        $review_link = $review->review_link;
+        $reason = $review->reason;
+
+        // TODO: Needs to be a bit more Defensive? We're currently trusting that this will only ever get called with "red" or "yellow" recommendations...
+        $status = $this->review_statuses[$review->recommendation];
+        $message = $status['message'];
+        $box_class = $status['slug'];
+
+        $row_class = $this->row_class($plugin_file, $plugin_data);
+
+        $this->review_info_box($row_class, $box_class, $review_link, $reason, $message);
 
       // TODO: What should we do in the error cases below? Displaying nothing would probably be fine...
-      if ( is_wp_error($response) ) {
-        // Shouldn't get here, but it IS possible.
-
-      } else {
-
-        switch ( $response['response']['code'] ) {
-          case 200:
-            $review = json_decode( $response['body'] )->review;
-
-            // TODO: Defensive programming? We're currently trusting that this will only ever get called with "red" or "yellow" recommendations
-            $status = $this->review_statuses[$review->recommendation];
-            $message = $status['message'];
-            $box_class = $status['slug'];
-            $review_link = $review->review_link;
-            $reason = $review->reason;
-            break;
-          case 404:
-            // Shouldn't get here, but it IS possible.
-            break;
-          // TODO: handle other codes individually?
-          default:
-            // A redirect would end up here - is it possible to get one??
-            // Shouldn't get here, but it IS possible.
-        };
-      };
-
-      if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
-
-      $row_class = $this->row_class($plugin_file, $plugin_data);
-
-      // Presumably colspanchange is something to do with responsiveness
-      echo("<tr class='plugin-review-tr {$row_class}'>");
-      echo("  <td colspan='4' class='plugin-review colspanchange'>");
-      echo("    <div class='review-message {$box_class}'>");
-      echo("      <a href='{$review_link}'><h4>dxw Security recommendation: {$message}</h4></a>");
-      if ( empty($reason) ) {
-        echo("<a href='{$review_link}'>See the dxw Security website for details</a>");
-      } else {
-        print_r($reason);
-        echo("<a href='{$review_link}'> Read more...</a>");
+      } catch ( Dxw_Security_NotFound $e ) {
+        // Shouldn't get here, but it's theoretically possible, if the API starts behaving badly....
+      } catch ( Dxw_Security_Error $e ) {
+        // TODO: in future we should provide some way for users to give us back some useful information when they get this error
+        // Shouldn't get here, but it's theoretically possible - e.g. if the cache expires AND the service goes down in-between the first request and this one...
       }
-      echo("</div></td></tr>");
+
     }, 10, 3);
+  }
+
+  private function review_info_box($row_class, $box_class, $review_link, $reason, $message) {
+    if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
+
+    // Presumably colspanchange is something to do with responsiveness
+    echo("<tr class='plugin-review-tr {$row_class}'>");
+    echo("  <td colspan='4' class='plugin-review colspanchange'>");
+    echo("    <div class='review-message {$box_class}'>");
+    echo("      <a href='{$review_link}'><h4>dxw Security recommendation: {$message}</h4></a>");
+    if ( empty($reason) ) {
+      echo("<a href='{$review_link}'>See the dxw Security website for details</a>");
+    } else {
+      print_r($reason);
+      echo("<a href='{$review_link}'> Read more...</a>");
+    }
+    echo("</div></td></tr>");
   }
 
   private function row_class($plugin_file, $plugin_data) {
@@ -159,8 +141,15 @@ class Dxw_Security_Review_Data {
   }
 }
 
-# TODO - not sure this is the right name: this is for getting one specific plugin...
+
+// php doesn't support nested classes
+class Dxw_Security_NotFound extends Exception { }
+class Dxw_Security_Error extends Exception { }
+
+// TODO - not sure this is the right name: this is for getting one specific plugin...
 class Dxw_Security_Api {
+
+
   public $plugin_file;
   public $plugin_version;
 
@@ -169,9 +158,10 @@ class Dxw_Security_Api {
     $this->plugin_version = $plugin_data['Version'];
   }
 
-  public function get_plugin_review_response() {
-    $response = $this->retrieve_plugin_review_response();
+  public function get_plugin_review() {
+    $response = $this->retrieve_plugin_review();
 
+    // TODO: transience returns false if it doesn't have the key, but should we also try to retrieve the result if the cache returned empty?
     if($response === false) {
 
       $api_root = DXW_SECURITY_API_ROOT;
@@ -197,21 +187,44 @@ class Dxw_Security_Api {
       $url = $api_root . $api_path . '?' . $query;
 
       $response = wp_remote_get($url);
-      $this->cache_plugin_review_response($response);
+
+      if ( is_wp_error($response) ) {
+        throw new Dxw_Security_Error( $response->get_error_message() );
+
+      } else {
+
+        switch ( $response['response']['code'] ) {
+          case 200:
+            // TODO: handle the case where we get an unparseable body
+            $review = json_decode( $response['body'] )->review;
+            $this->cache_plugin_review($review);
+            return $review;
+          case 404:
+            throw new Dxw_Security_NotFound();
+            break;
+          default:
+            // TODO: handle other codes individually?
+            // A redirect would end up here - is it possible to get one??
+            throw new Dxw_Security_Error( "Response was {$response['response']['code']}: {$response['body']}" );
+        };
+      }
     }
 
     return $response;
   }
 
-  private function cache_plugin_review_response($response) {
-    $slug = $this->plugin_review_response_slug();
-    set_transient( $slug, $response, DAY_IN_SECONDS );
+  // TODO: we should cache failed requests for less time - or possibly not cache them at all:
+  //   Otherwise if the service goes down briefly, it will appear to stay down until the cache expired.
+  private function cache_plugin_review($response) {
+    $slug = $this->plugin_review_slug();
+    // TODO: How long should this get cached for?
+    set_transient( $slug, $response, HOUR_IN_SECONDS );
   }
-  private function retrieve_plugin_review_response() {
-    $slug = $this->plugin_review_response_slug();
+  private function retrieve_plugin_review() {
+    $slug = $this->plugin_review_slug();
     return get_transient($slug);
   }
-  private function plugin_review_response_slug() {
+  private function plugin_review_slug() {
     return $this->plugin_file . $this->plugin_version;
   }
 }
