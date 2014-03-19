@@ -28,7 +28,7 @@ add_action( 'admin_enqueue_scripts', function($hook) {
   $stylesheet_url = plugins_url( '/styles/style.css' , __FILE__ );
   wp_enqueue_style( 'dxw-security-plugin-styles', $stylesheet_url );
 
-  // TODO: This seems like a really inefficient way to include one line of js...
+  // TODO: This seems like a really inefficient way to include one line of js... Is there a better way?
   $script_url = plugins_url( '/scripts/script.js' , __FILE__ );
   wp_enqueue_script( 'dxw-security-plugin-scripts', $script_url );
 } );
@@ -174,11 +174,8 @@ class Dxw_Security_Api {
 
   public function get_plugin_review() {
     if ( DXW_SECURITY_CACHE_RESPONSES ) {
-    Whippet::print_r("it's true");
       $response = $this->retrieve_plugin_review();
     } else {
-        Whippet::print_r("it's false");
-
       $response = false;
     }
 
