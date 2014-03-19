@@ -11,6 +11,9 @@
 if (!defined('DXW_SECURITY_API_ROOT')) {
   define('DXW_SECURITY_API_ROOT', 'https://security.dxw.com/api');
 }
+if (!defined('DXW_SECURITY_CACHE_RESPONSES')) {
+  define('DXW_SECURITY_CACHE_RESPONSES', true);
+}
 
 // CONSTANTS:
 // How many failed requests will we tolerate?
@@ -76,6 +79,7 @@ class Dxw_Security_Review_Data {
     }
     if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
 
+    // TODO: title text on this link?
     return "dxw Security recommendation: <a href='{$review_link}'>{$message}</a>";
   }
 
@@ -117,6 +121,8 @@ class Dxw_Security_Review_Data {
   private function review_info_box($row_class, $box_class, $review_link, $reason, $message) {
     if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
 
+    // TODO: title text on these links?
+
     // Presumably colspanchange is something to do with responsiveness
     echo("<tr class='plugin-review-tr {$row_class}'>");
     echo("  <td colspan='4' class='plugin-review colspanchange'>");
@@ -149,7 +155,6 @@ class Dxw_Security_Error extends Exception { }
 // TODO - not sure this is the right name: this is for getting one specific plugin...
 class Dxw_Security_Api {
 
-
   public $plugin_file;
   public $plugin_version;
 
@@ -159,7 +164,14 @@ class Dxw_Security_Api {
   }
 
   public function get_plugin_review() {
-    $response = $this->retrieve_plugin_review();
+    if ( DXW_SECURITY_CACHE_RESPONSES ) {
+    Whippet::print_r("it's true");
+      $response = $this->retrieve_plugin_review();
+    } else {
+        Whippet::print_r("it's false");
+
+      $response = false;
+    }
 
     // TODO: transience returns false if it doesn't have the key, but should we also try to retrieve the result if the cache returned empty?
     if($response === false) {
@@ -197,7 +209,10 @@ class Dxw_Security_Api {
           case 200:
             // TODO: handle the case where we get an unparseable body
             $review = json_decode( $response['body'] )->review;
-            $this->cache_plugin_review($review);
+
+            if ( DXW_SECURITY_CACHE_RESPONSES ) {
+              $this->cache_plugin_review($review);
+            }
             return $review;
           case 404:
             throw new Dxw_Security_NotFound();
@@ -213,8 +228,6 @@ class Dxw_Security_Api {
     return $response;
   }
 
-  // TODO: we should cache failed requests for less time - or possibly not cache them at all:
-  //   Otherwise if the service goes down briefly, it will appear to stay down until the cache expired.
   private function cache_plugin_review($response) {
     $slug = $this->plugin_review_slug();
     // TODO: How long should this get cached for?
@@ -222,6 +235,8 @@ class Dxw_Security_Api {
   }
   private function retrieve_plugin_review() {
     $slug = $this->plugin_review_slug();
+Whippet::print_r(get_transient($slug));
+
     return get_transient($slug);
   }
   private function plugin_review_slug() {
