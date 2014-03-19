@@ -2,10 +2,10 @@
 .plugin-review-tr .plugin-review { border: 0; padding: 0; -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.1); box-shadow: inset 0 -1px 0 rgba(0,0,0,.1); }
 
 .plugin-review .review-message { border: 0; font-size: 13px; font-weight: 400; margin: 6px 12px 12px; padding: 6px 12px; }
-.plugin-review .review-message.use_with_caution { background-color: #fcf8f2; }
-.plugin-review .review-message.use_with_caution h4 { color: #f0ad4e;}
-.plugin-review .review-message.potentially_unsafe { background-color: #fcf3ef; }
-.plugin-review .review-message.potentially_unsafe h4 { color: #d54e21;}
+.plugin-review .review-message.use-with-caution { background-color: #fcf8f2; }
+.plugin-review .review-message.use-with-caution h4 { color: #f0ad4e;}
+.plugin-review .review-message.potentially-unsafe { background-color: #fcf3ef; }
+.plugin-review .review-message.potentially-unsafe h4 { color: #d54e21;}
 
 .plugin-review .review-message ul { list-style: disc inside none; padding-left: 20px; }
 
@@ -13,3 +13,40 @@
 .active_plugin.update_plugin.plugin-review-tr .plugin-review { border-left: 4px solid #d54e21; background-color: #fefaf7; }
 
 .plugin-review-tr .plugin-review h4 { margin: 0 0 0.5em 0; }
+
+
+/* icon fonts from icomoon */
+@font-face {
+  font-family: 'dxw-security';
+  src:url('fonts/dxw-security.eot?-ogm5cz');
+  src:url('fonts/dxw-security.eot?#iefix-ogm5cz') format('embedded-opentype'),
+    url('fonts/dxw-security.woff?-ogm5cz') format('woff'),
+    url('fonts/dxw-security.ttf?-ogm5cz') format('truetype'),
+    url('fonts/dxw-security.svg?-ogm5cz#dxw-security') format('svg');
+  font-weight: normal;
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  font-family: 'dxw-security';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-no-issues-found { color: #6cbb3c; } /*'Green Snake'*/
+.icon-no-issues-found:before { content: "\e601"; }
+.icon-use-with-caution { color: #f0ad4e; }
+.icon-use-with-caution:before { content: "\e600"; }
+.icon-potentially-unsafe:before { color: #d54e21;}
+.icon-potentially-unsafe:before { content: "\e602"; }
+.icon-no-info { color: #808080;}
+.icon-no-info:before { content: "\e604";}
