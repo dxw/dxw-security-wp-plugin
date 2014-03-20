@@ -1,15 +1,29 @@
+@wp-red: #d54e21;
+@wp-red-background: #fcf3ef;
+@wp-light-red-background: #fefaf7;
+@red-highlight: #dd714d; // Not a WP colour
+
+@wp-blue: #2ea2cc;
+@wp-light-blue-background: #f7fcfe;
+
+@green: #6cbb3c;  /*'Green Snake'*/
+@amber: #f0ad4e;
+@amber-background: #f8efe2;
+@amber-highlight: #d89b46;
+@grey: #808080;
+
 /* The following are basically the same as the "update" classes.
     Tried to use &:extend with the relevant classes but couldn't get it to work */
 
 .plugin-review-tr {
   &.active_plugin {
     .plugin-review {
-      border-left: 4px solid #2ea2cc;
-      background-color: #f7fcfe;
+      border-left: 4px solid @wp-blue;
+      background-color: @wp-light-blue-background;
     }
     &.update_plugin .plugin-review {
-      border-left: 4px solid #d54e21;
-      background-color: #fefaf7;
+      border-left: 4px solid @wp-red;
+      background-color: @wp-light-red-background;
     }
   }
 
@@ -27,20 +41,27 @@
       padding: 6px 12px;
 
       &.use-with-caution {
-        background-color: #fcf8f2;
-        h4 {
-          color: #f0ad4e;
+        background-color: @amber-background;
+        h4 a {
+          color: @amber;
+          &:hover { color: @amber-highlight; }
         }
       }
       &.potentially-unsafe {
-        background-color: #fcf3ef;
-        h4 {
-          color: #d54e21;
+        background-color: @wp-red-background;
+
+        h4 a {
+          color: @wp-red;
+          &:hover { color: @red-highlight; }
         }
       }
 
       h4 {
         margin: 0 0 0.5em 0;
+      }
+      .review-status-description {
+        font-style: italic;
+        color: gray;
       }
       ul {
         list-style: disc inside none;
@@ -84,18 +105,18 @@
 }
 
 .icon-no-issues-found {
-  color: #6cbb3c;  /*'Green Snake'*/
+  color: @green;
   &:before { content: "\e601"; }
 }
 .icon-use-with-caution {
-  color: #f0ad4e;
+  color: @amber;
   &:before { content: "\e600"; }
 }
 .icon-potentially-unsafe {
-  color: #d54e21;
+  color: @wp-red;
   &:before { content: "\e602"; }
 }
 .icon-no-info {
-  color: #808080;
+  color: @grey;
   &:before  { content: "\e604"; }
 }
