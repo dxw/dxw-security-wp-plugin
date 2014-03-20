@@ -1,3 +1,4 @@
+/*'Green Snake'*/
 /* The following are basically the same as the "update" classes.
     Tried to use &:extend with the relevant classes but couldn't get it to work */
 .plugin-review-tr.active_plugin .plugin-review {
@@ -22,19 +23,29 @@
   padding: 6px 12px;
 }
 .plugin-review-tr .plugin-review .review-message.use-with-caution {
-  background-color: #fcf8f2;
+  background-color: #f8efe2;
 }
-.plugin-review-tr .plugin-review .review-message.use-with-caution h4 {
+.plugin-review-tr .plugin-review .review-message.use-with-caution h4 a {
   color: #f0ad4e;
+}
+.plugin-review-tr .plugin-review .review-message.use-with-caution h4 a:hover {
+  color: #d89b46;
 }
 .plugin-review-tr .plugin-review .review-message.potentially-unsafe {
   background-color: #fcf3ef;
 }
-.plugin-review-tr .plugin-review .review-message.potentially-unsafe h4 {
+.plugin-review-tr .plugin-review .review-message.potentially-unsafe h4 a {
   color: #d54e21;
+}
+.plugin-review-tr .plugin-review .review-message.potentially-unsafe h4 a:hover {
+  color: #dd714d;
 }
 .plugin-review-tr .plugin-review .review-message h4 {
   margin: 0 0 0.5em 0;
+}
+.plugin-review-tr .plugin-review .review-message .review-status-description {
+  font-style: italic;
+  color: gray;
 }
 .plugin-review-tr .plugin-review .review-message ul {
   list-style: disc inside none;
@@ -73,8 +84,6 @@
 }
 .icon-no-issues-found {
   color: #6cbb3c;
-  /*'Green Snake'*/
-
 }
 .icon-no-issues-found:before {
   content: "\e601";
