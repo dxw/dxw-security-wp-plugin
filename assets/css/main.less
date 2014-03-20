@@ -1,0 +1,100 @@
+/* The following are equivalent various "update" classes. When we use less, these should be @extends */
+
+.plugin-review-tr {
+  &.active_plugin {
+    .plugin-review {
+      border-left: 4px solid #2ea2cc;
+      background-color: #f7fcfe;
+    }
+    &.update_plugin .plugin-review {
+      border-left: 4px solid #d54e21;
+      background-color: #fefaf7;
+    }
+  }
+
+  .plugin-review {
+    border: 0;
+    padding: 0;
+    -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.1);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.1);
+
+    .review-message {
+      border: 0;
+      font-size: 13px;
+      font-weight: 400;
+      margin: 6px 12px 12px;
+      padding: 6px 12px;
+
+      &.use-with-caution {
+        background-color: #fcf8f2;
+        h4 {
+          color: #f0ad4e;
+        }
+      }
+      &.potentially-unsafe {
+        background-color: #fcf3ef;
+        h4 {
+          color: #d54e21;
+        }
+      }
+
+      h4 {
+        margin: 0 0 0.5em 0;
+      }
+      ul {
+        list-style: disc inside none;
+        padding-left: 20px;
+      }
+    }
+  }
+}
+
+/* The box-shadow of the element above a plugin-review can't be removed either in the code or in pure css, so it'll have to be done in javascript: */
+.no-border.inactive td, .no-border.inactive th, .no-border.active td, .no-border.active th, .no-border.plugin-update-tr .plugin-update {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+
+/* icon fonts from icomoon */
+@font-face {
+  font-family: 'dxw-security';
+  src:url('fonts/dxw-security.eot?-ogm5cz');
+  src:url('fonts/dxw-security.eot?#iefix-ogm5cz') format('embedded-opentype'),
+    url('fonts/dxw-security.woff?-ogm5cz') format('woff'),
+    url('fonts/dxw-security.ttf?-ogm5cz') format('truetype'),
+    url('fonts/dxw-security.svg?-ogm5cz#dxw-security') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  font-family: 'dxw-security';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-no-issues-found {
+  color: #6cbb3c;  /*'Green Snake'*/
+  &:before { content: "\e601"; }
+}
+.icon-use-with-caution {
+  color: #f0ad4e;
+  &:before { content: "\e600"; }
+}
+.icon-potentially-unsafe:before {
+  color: #d54e21;
+  &:before { content: "\e602"; }
+}
+.icon-no-info {
+  color: #808080;
+  &:before  { content: "\e604"; }
+}
