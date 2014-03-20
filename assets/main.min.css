@@ -84,10 +84,10 @@
 .icon-use-with-caution:before {
   content: "\e600";
 }
-.icon-potentially-unsafe:before {
+.icon-potentially-unsafe {
   color: #d54e21;
 }
-.icon-potentially-unsafe:before:before {
+.icon-potentially-unsafe:before {
   content: "\e602";
 }
 .icon-no-info {
