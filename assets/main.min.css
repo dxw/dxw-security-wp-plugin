@@ -1,4 +1,5 @@
-/* The following are equivalent various "update" classes. When we use less, these should be @extends */
+/* The following are basically the same as the "update" classes.
+    Tried to use &:extend with the relevant classes but couldn't get it to work */
 .plugin-review-tr.active_plugin .plugin-review {
   border-left: 4px solid #2ea2cc;
   background-color: #f7fcfe;
