@@ -25,11 +25,11 @@ define('DXW_SECURITY_PLUGINS_URL', 'https://security.dxw.com/plugins/');
 add_action( 'admin_enqueue_scripts', function($hook) {
   if( 'plugins.php' != $hook ) { return; }
 
-  $stylesheet_url = plugins_url( '/styles/style.css' , __FILE__ );
+  $stylesheet_url = plugins_url( '/assets/main.min.css' , __FILE__ );
   wp_enqueue_style( 'dxw-security-plugin-styles', $stylesheet_url );
 
   // TODO: This seems like a really inefficient way to include one line of js... Is there a better way?
-  $script_url = plugins_url( '/scripts/script.js' , __FILE__ );
+  $script_url = plugins_url( '/assets/main.js' , __FILE__ );
   wp_enqueue_script( 'dxw-security-plugin-scripts', $script_url );
 } );
 
