@@ -7,67 +7,102 @@
 @wp-light-blue-background: #f7fcfe;
 
 @green: #6cbb3c;  /*'Green Snake'*/
-@amber: #f0ad4e;
+@green-background: lighten(#CAE8A2, 15%);
+@green-highlight: darken(@green, 20%);
+
+@amber: #DB9702;
 @amber-background: #f8efe2;
 @amber-highlight: #d89b46;
+
 @grey: #808080;
+@grey-background: #F0F0F0;
+@grey-highlight: darken(@grey, 20%);
 
 /* The following are basically the same as the "update" classes.
     Tried to use &:extend with the relevant classes but couldn't get it to work */
 
-.plugin-review-tr {
-  &.active_plugin {
-    .plugin-review {
-      border-left: 4px solid @wp-blue;
-      background-color: @wp-light-blue-background;
+/* Overwriting thickbox styles with ridiculous specificity */
+
+.review-message, #plugin-inspection-results-inner.review-message {
+  border: 0;
+  font-size: 13px;
+  font-weight: 400;
+  margin: 0 3px 0 0;
+  padding: 12px;
+  min-width: 200px;
+
+  h3 {
+    margin-top: 0;
+  }
+
+  &.use-with-caution {
+    background-color: @amber-background;
+
+    h3 a, h2 a, a {
+      color: @amber;
+      text-decoration: none;
+
+      &:hover { color: @amber-highlight; }
     }
-    &.update_plugin .plugin-review {
-      border-left: 4px solid @wp-red;
-      background-color: @wp-light-red-background;
+  }
+  &.potentially-unsafe {
+    background-color: @wp-red-background;
+
+    h3 a, h2 a, a {
+      color: @wp-red;
+      text-decoration: none;
+
+      &:hover { color: @red-highlight; }
+    }
+  }
+  &.no-issues-found {
+    background-color: @green-background;
+
+    h3 a, h2 a, a {
+      color: @green;
+      text-decoration: none;
+
+      &:hover { color: @green-highlight; }
+    }
+  }
+  &.no-info {
+    background-color: @grey-background;
+
+    h3 a, h2 a, a {
+      color: @grey;
+      text-decoration: none;
+
+      &:hover { color: @grey-highlight; }
     }
   }
 
-  .plugin-review {
-    border: 0;
-    padding: 0;
-    -webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.1);
-    box-shadow: inset 0 -1px 0 rgba(0,0,0,.1);
+  .review-status-description {
+    font-style: italic;
+    color: gray;
+  }
+  ul {
+    list-style: disc inside none;
+    padding-left: 20px;
+  }
 
-    .review-message {
-      border: 0;
-      font-size: 13px;
-      font-weight: 400;
-      margin: 6px 12px 12px;
-      padding: 6px 12px;
+}
 
-      &.use-with-caution {
-        background-color: @amber-background;
-        h4 a {
-          color: @amber;
-          &:hover { color: @amber-highlight; }
-        }
-      }
-      &.potentially-unsafe {
-        background-color: @wp-red-background;
+// Making room for the logo
 
-        h4 a {
-          color: @wp-red;
-          &:hover { color: @red-highlight; }
-        }
-      }
+#plugin-inspection-results-inner.review-message {
+  float: left;
+  width: 100%;
 
-      h4 {
-        margin: 0 0 0.5em 0;
-      }
-      .review-status-description {
-        font-style: italic;
-        color: gray;
-      }
-      ul {
-        list-style: disc inside none;
-        padding-left: 20px;
-      }
-    }
+  #dxw-sec-link {
+    float: right;
+    margin-top: 15px;
+    width: 20%;
+    text-align: right;
+  }
+
+  .inner {
+    float: left;
+    width: 80%;
   }
 }
 
@@ -76,6 +111,8 @@
   -webkit-box-shadow: none;
   box-shadow: none;
 }
+
+
 
 
 /* icon fonts from icomoon */
