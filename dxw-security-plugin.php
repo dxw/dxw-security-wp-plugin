@@ -55,11 +55,16 @@ class Dxw_Security_Review_Data {
   );
 
   public function __construct() {
-    add_filter('plugin_row_meta', function( $plugin_meta, $plugin_file, $plugin_data, $status) {
+    add_filter('manage_plugins_columns', function($columns) {
+      $columns['security_plugin'] = "Security";
+      return $columns;
+    });
 
-      $plugin_meta[] = $this->security_plugin_meta($plugin_file, $plugin_data);
-      return $plugin_meta;
-    }, 10, 4);
+    add_action('manage_plugins_custom_column', function( $column_name, $plugin_file, $plugin_data) {
+      if($column_name == 'security_plugin') {
+        $this->security_plugin_meta($plugin_file, $plugin_data);
+      }
+    }, 10, 3);
   }
 
   function security_plugin_meta($plugin_file, $plugin_data) {
@@ -78,10 +83,11 @@ class Dxw_Security_Review_Data {
         $status = $this->review_statuses[$review->recommendation];
         $message = $status['message'];
         $slug = $status['slug'];
-        if ( $status['failure'] ) { $this->add_review_reason($plugin_file); }
+        //if ( $status['failure'] ) { $this->add_review_reason($plugin_file); }
 
       } catch ( Dxw_Security_NotFound $e ) {
         $message = "Not yet reviewed";
+        $description = "We haven't reviewed this plugin yet";
         $slug = "no-info";
       } catch ( Dxw_Security_Error $e ) {
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
@@ -94,8 +100,39 @@ class Dxw_Security_Review_Data {
     // TODO: fallback icon for errors?
     if ( empty($slug) ) { $slug = ""; }
 
-    // TODO: title text on this link?
-    return "Security review: <a href='{$review_link}'><span class='icon-{$slug}'></span> {$message}</a>";
+    // Add thickbox to the plugin page so that we can get modal windows
+    add_thickbox();
+
+    ?>
+    <div class="review-message <?php echo $slug; ?>">
+      <h3><?php echo "<a href='{$review_link}'><span class='icon-{$slug}'></span> {$message}</a>"; ?></h3>
+
+      <a href="#TB_inline?width=600&height=250&inlineId=plugin-inspection-results" title="<?php echo $plugin_data['Name']; ?>" class="thickbox">More information</a>
+
+      <div id="plugin-inspection-results" style="display:none;">
+        <div id="plugin-inspection-results-inner" class="review-message <?php echo $slug; ?>">
+          <div class="inner">
+            <h2><a href="<?php echo $review_link ?>"><span class="icon-<?php echo $slug ?>"></span> <?php echo $message ?></a></h2>
+            <p class="review-status-description"><?php echo $status['description'] ?></p>
+            <p>
+              <?php
+                if ( empty($reason) ) {
+                  echo("<a href='{$review_link}'>See the dxw Security website for details</a>");
+                } else {
+                  print_r($reason);
+                  echo("<a href='{$review_link}'> Read more...</a>");
+                }
+              ?>
+            </p>
+          </div>
+
+          <!-- TODO: Put in a proper path for the image -->
+          <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugin_dir_url() ?>/dxw-security/assets/dxw-logo.png" alt="dxw logo" /></a>
+        </div>
+      </div>
+
+    </div> <!-- End of review-message -->
+    <?php
   }
 
   private function add_review_reason($plugin_file) {

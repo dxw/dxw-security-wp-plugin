@@ -1,55 +1,127 @@
 /*'Green Snake'*/
 /* The following are basically the same as the "update" classes.
     Tried to use &:extend with the relevant classes but couldn't get it to work */
-.plugin-review-tr.active_plugin .plugin-review {
-  border-left: 4px solid #2ea2cc;
-  background-color: #f7fcfe;
-}
-.plugin-review-tr.active_plugin.update_plugin .plugin-review {
-  border-left: 4px solid #d54e21;
-  background-color: #fefaf7;
-}
-.plugin-review-tr .plugin-review {
-  border: 0;
-  padding: 0;
-  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-}
-.plugin-review-tr .plugin-review .review-message {
+/* Overwriting thickbox styles with ridiculous specificity */
+.review-message,
+#plugin-inspection-results-inner.review-message {
   border: 0;
   font-size: 13px;
   font-weight: 400;
-  margin: 6px 12px 12px;
-  padding: 6px 12px;
+  margin: 0 3px 0 0;
+  padding: 12px;
+  min-width: 200px;
 }
-.plugin-review-tr .plugin-review .review-message.use-with-caution {
+.review-message h3,
+#plugin-inspection-results-inner.review-message h3 {
+  margin-top: 0;
+}
+.review-message.use-with-caution,
+#plugin-inspection-results-inner.review-message.use-with-caution {
   background-color: #f8efe2;
 }
-.plugin-review-tr .plugin-review .review-message.use-with-caution h4 a {
-  color: #f0ad4e;
+.review-message.use-with-caution h3 a,
+#plugin-inspection-results-inner.review-message.use-with-caution h3 a,
+.review-message.use-with-caution h2 a,
+#plugin-inspection-results-inner.review-message.use-with-caution h2 a,
+.review-message.use-with-caution a,
+#plugin-inspection-results-inner.review-message.use-with-caution a {
+  color: #db9702;
+  text-decoration: none;
 }
-.plugin-review-tr .plugin-review .review-message.use-with-caution h4 a:hover {
+.review-message.use-with-caution h3 a:hover,
+#plugin-inspection-results-inner.review-message.use-with-caution h3 a:hover,
+.review-message.use-with-caution h2 a:hover,
+#plugin-inspection-results-inner.review-message.use-with-caution h2 a:hover,
+.review-message.use-with-caution a:hover,
+#plugin-inspection-results-inner.review-message.use-with-caution a:hover {
   color: #d89b46;
 }
-.plugin-review-tr .plugin-review .review-message.potentially-unsafe {
+.review-message.potentially-unsafe,
+#plugin-inspection-results-inner.review-message.potentially-unsafe {
   background-color: #fcf3ef;
 }
-.plugin-review-tr .plugin-review .review-message.potentially-unsafe h4 a {
+.review-message.potentially-unsafe h3 a,
+#plugin-inspection-results-inner.review-message.potentially-unsafe h3 a,
+.review-message.potentially-unsafe h2 a,
+#plugin-inspection-results-inner.review-message.potentially-unsafe h2 a,
+.review-message.potentially-unsafe a,
+#plugin-inspection-results-inner.review-message.potentially-unsafe a {
   color: #d54e21;
+  text-decoration: none;
 }
-.plugin-review-tr .plugin-review .review-message.potentially-unsafe h4 a:hover {
+.review-message.potentially-unsafe h3 a:hover,
+#plugin-inspection-results-inner.review-message.potentially-unsafe h3 a:hover,
+.review-message.potentially-unsafe h2 a:hover,
+#plugin-inspection-results-inner.review-message.potentially-unsafe h2 a:hover,
+.review-message.potentially-unsafe a:hover,
+#plugin-inspection-results-inner.review-message.potentially-unsafe a:hover {
   color: #dd714d;
 }
-.plugin-review-tr .plugin-review .review-message h4 {
-  margin: 0 0 0.5em 0;
+.review-message.no-issues-found,
+#plugin-inspection-results-inner.review-message.no-issues-found {
+  background-color: #edf7df;
 }
-.plugin-review-tr .plugin-review .review-message .review-status-description {
+.review-message.no-issues-found h3 a,
+#plugin-inspection-results-inner.review-message.no-issues-found h3 a,
+.review-message.no-issues-found h2 a,
+#plugin-inspection-results-inner.review-message.no-issues-found h2 a,
+.review-message.no-issues-found a,
+#plugin-inspection-results-inner.review-message.no-issues-found a {
+  color: #6cbb3c;
+  text-decoration: none;
+}
+.review-message.no-issues-found h3 a:hover,
+#plugin-inspection-results-inner.review-message.no-issues-found h3 a:hover,
+.review-message.no-issues-found h2 a:hover,
+#plugin-inspection-results-inner.review-message.no-issues-found h2 a:hover,
+.review-message.no-issues-found a:hover,
+#plugin-inspection-results-inner.review-message.no-issues-found a:hover {
+  color: #3f6e23;
+}
+.review-message.no-info,
+#plugin-inspection-results-inner.review-message.no-info {
+  background-color: #f0f0f0;
+}
+.review-message.no-info h3 a,
+#plugin-inspection-results-inner.review-message.no-info h3 a,
+.review-message.no-info h2 a,
+#plugin-inspection-results-inner.review-message.no-info h2 a,
+.review-message.no-info a,
+#plugin-inspection-results-inner.review-message.no-info a {
+  color: #808080;
+  text-decoration: none;
+}
+.review-message.no-info h3 a:hover,
+#plugin-inspection-results-inner.review-message.no-info h3 a:hover,
+.review-message.no-info h2 a:hover,
+#plugin-inspection-results-inner.review-message.no-info h2 a:hover,
+.review-message.no-info a:hover,
+#plugin-inspection-results-inner.review-message.no-info a:hover {
+  color: #4d4d4d;
+}
+.review-message .review-status-description,
+#plugin-inspection-results-inner.review-message .review-status-description {
   font-style: italic;
   color: gray;
 }
-.plugin-review-tr .plugin-review .review-message ul {
+.review-message ul,
+#plugin-inspection-results-inner.review-message ul {
   list-style: disc inside none;
   padding-left: 20px;
+}
+#plugin-inspection-results-inner.review-message {
+  float: left;
+  width: 100%;
+}
+#plugin-inspection-results-inner.review-message #dxw-sec-link {
+  float: right;
+  margin-top: 15px;
+  width: 20%;
+  text-align: right;
+}
+#plugin-inspection-results-inner.review-message .inner {
+  float: left;
+  width: 80%;
 }
 /* The box-shadow of the element above a plugin-review can't be removed either in the code or in pure css, so it'll have to be done in javascript: */
 .no-border.inactive td,
@@ -89,7 +161,7 @@
   content: "\e601";
 }
 .icon-use-with-caution {
-  color: #f0ad4e;
+  color: #db9702;
 }
 .icon-use-with-caution:before {
   content: "\e600";
