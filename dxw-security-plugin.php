@@ -141,7 +141,7 @@ class Dxw_Security_Review_Data {
           </div>
 
           <!-- TODO: Put in a proper path for the image -->
-          <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugin_dir_url() ?>/dxw-security/assets/dxw-logo.png" alt="dxw logo" /></a>
+          <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url( '/assets/dxw-logo.png' , __FILE__ ); ?>" alt="dxw logo" /></a>
         </div>
       </div>
 
