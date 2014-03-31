@@ -104,9 +104,6 @@ class Dxw_Security_Review_Data {
     // TODO: fallback icon for errors?
     if ( empty($slug) ) { $slug = ""; }
 
-    // Add thickbox to the plugin page so that we can get modal windows
-    add_thickbox();
-
     $name = $plugin_data['Name'];
 
     // TODO: Need to handle the error case
@@ -115,6 +112,9 @@ class Dxw_Security_Review_Data {
   }
 
   private function security_plugin_meta_view($slug, $reason, $review_link, $message, $name, $description) {
+    // Add thickbox to the plugin page so that we can get modal windows
+    add_thickbox();
+
     $plugin_slug = sanitize_title($name);
     $popup_id = "plugin-inspection-results{$plugin_slug}";
     ?>
@@ -140,12 +140,11 @@ class Dxw_Security_Review_Data {
             </p>
           </div>
 
-          <!-- TODO: Put in a proper path for the image -->
           <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url( '/assets/dxw-logo.png' , __FILE__ ); ?>" alt="dxw logo" /></a>
         </div>
       </div>
 
-    </div> <!-- End of review-message -->
+    </div>
     <?php
   }
 
