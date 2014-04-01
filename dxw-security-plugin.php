@@ -121,13 +121,15 @@ class Dxw_Security_Review_Data {
   private function security_plugin_meta_view($slug, $reason, $review_link, $message, $name, $description) {
     $plugin_slug = sanitize_title($name);
     $popup_id = "plugin-inspection-results{$plugin_slug}";
+
+    Whippet::print_r($name);
     ?>
     <div class="review-message <?php echo $slug; ?>">
       <h3><?php echo "<a href='{$review_link}'><span class='icon-{$slug}'></span> {$message}</a>"; ?></h3>
 
-      <a href="#<?php echo $popup_id; ?>" class="dialog-link">More information</a>
+      <a href="#<?php echo $popup_id; ?>" data-title="<?php echo $name; ?>" class="dialog-link">More information</a>
 
-      <div id="<?php echo $popup_id; ?>" title="<?php echo $name; ?>" style="display:none;" class="dialog review-message <?php echo $slug; ?>">
+      <div id="<?php echo $popup_id; ?>" style="display:none;" class="dialog review-message <?php echo $slug; ?>">
 
         <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url( '/assets/dxw-logo.png' , __FILE__ ); ?>" alt="dxw logo" /></a>
 
