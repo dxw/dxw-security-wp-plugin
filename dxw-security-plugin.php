@@ -78,7 +78,7 @@ class Dxw_Security_Review_Data {
   private function plugin_security_review($plugin_file, $plugin_data) {
     // Stop making requests after a certain number of failures:
     if ( $this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT ) {
-      $message = "An error occurred - please try again later";
+      return $this->plugin_security_review_error();
     } else {
 
       $api = new Dxw_Security_Api($plugin_file, $plugin_data);
@@ -102,12 +102,13 @@ class Dxw_Security_Review_Data {
         $description = $status['description'];
         $slug = $status['slug'];
 
-      } catch ( Dxw_Security_Error $e ) {
+      } catch ( Exception $e ) {
+      // } catch ( Dxw_Security_Error $e ) {
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
-        $message = "An error occurred - please try again later";
-        $reason = "";
-
         $this->dxw_security_failed_requests++;
+
+        return $this->plugin_security_review_error();
+
       }
     }
     if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
@@ -116,22 +117,28 @@ class Dxw_Security_Review_Data {
 
     $name = $plugin_data['Name'];
 
-    // TODO: Need to handle the error case
-    // TODO: Need to handle no_info and No Issues differently: they have no reason
     $this->plugin_security_review_view($slug, $reason, $review_link, $message, $name, $description);
   }
 
   private function plugin_security_review_view($slug, $reason, $review_link, $message, $name, $description) {
     $plugin_slug = sanitize_title($name);
-    $popup_id = "plugin-inspection-results{$plugin_slug}";
+    $dialog_id = "plugin-inspection-results{$plugin_slug}";
 
     ?>
     <div class="review-message <?php echo $slug; ?>">
       <h3><?php echo "<a href='{$review_link}'><span class='icon-{$slug}'></span> {$message}</a>"; ?></h3>
 
-      <a href="#<?php echo $popup_id; ?>" data-title="<?php echo $name; ?>" class="dialog-link">More information</a>
+      <a href="#<?php echo $dialog_id; ?>" data-title="<?php echo $name; ?>" class="dialog-link">More information</a>
 
-      <div id="<?php echo $popup_id; ?>" style="display:none;" class="dialog review-message <?php echo $slug; ?>">
+      <?php print_r( $this->plugin_security_review_dialog($dialog_id, $slug, $reason, $review_link, $message, $description) ); ?>
+
+    </div>
+    <?php
+  }
+
+  private function plugin_security_review_dialog($dialog_id, $slug, $reason, $review_link, $message, $description){
+    ?>
+      <div id="<?php echo $dialog_id; ?>" style="display:none;" class="dialog review-message <?php echo $slug; ?>">
 
         <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url( '/assets/dxw-logo.png' , __FILE__ ); ?>" alt="dxw logo" /></a>
 
@@ -149,6 +156,14 @@ class Dxw_Security_Review_Data {
         </div>
 
       </div>
+    <?php
+  }
+
+  private function plugin_security_review_error(){
+    ?>
+    <div class="review-message review-error">
+      <h3><a href='<?php echo DXW_SECURITY_PLUGINS_URL; ?>'>An error occurred</a></h3>
+      <p>Please try again later</p>
     </div>
     <?php
   }
