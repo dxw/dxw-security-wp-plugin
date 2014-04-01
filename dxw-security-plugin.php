@@ -48,15 +48,18 @@ class Dxw_Security_Review_Data {
 
   // TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
   public $review_statuses = array(
-    'green'  => array(  'message' => "No issues found",  'slug' => "no-issues-found",
-                        'description' => "dxw's review didn't find anything worrying in this plugin. It's probably safe.",
-                        'failure' => false),
-    'yellow' => array(  'message' => "Use with caution", 'slug' => "use-with-caution",
-                        'description' => "Before using this plugin, you should carefully consider the findings of dxw's review.",
-                        'failure' => true),
-    'red'    => array(  'message' => "Potentially unsafe", 'slug' => "potentially-unsafe",
-                        'description' => "Before using this plugin, you should very carefully consider its potential problems and should conduct a thorough assessment.",
-                        'failure' => true),
+    'green'  => array(  'message' => "No issues found",
+                        'slug' => "no-issues-found",
+                        'description' => "dxw's review didn't find anything worrying in this plugin. It's probably safe."),
+    'yellow' => array(  'message' => "Use with caution",
+                        'slug' => "use-with-caution",
+                        'description' => "Before using this plugin, you should carefully consider the findings of dxw's review."),
+    'red'    => array(  'message' => "Potentially unsafe",
+                        'slug' => "potentially-unsafe",
+                        'description' => "Before using this plugin, you should very carefully consider its potential problems and should conduct a thorough assessment."),
+    'not-found' => array('message' => "Not yet reviewed",
+                        'slug' => "no-info",
+                        'description' => "We haven't reviewed this plugin yet. If you like we can review it for you."),
   );
 
   public function __construct() {
@@ -67,12 +70,12 @@ class Dxw_Security_Review_Data {
 
     add_action('manage_plugins_custom_column', function( $column_name, $plugin_file, $plugin_data) {
       if($column_name == 'security_plugin') {
-        $this->security_plugin_meta($plugin_file, $plugin_data);
+        $this->plugin_security_review($plugin_file, $plugin_data);
       }
     }, 10, 3);
   }
 
-  private function security_plugin_meta($plugin_file, $plugin_data) {
+  private function plugin_security_review($plugin_file, $plugin_data) {
     // Stop making requests after a certain number of failures:
     if ( $this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT ) {
       $message = "An error occurred - please try again later";
@@ -91,13 +94,13 @@ class Dxw_Security_Review_Data {
         $description = $status['description'];
         $slug = $status['slug'];
 
-        //if ( $status['failure'] ) { $this->add_review_reason($plugin_file); }
-
       } catch ( Dxw_Security_NotFound $e ) {
-        $message = "Not yet reviewed";
-        $description = "We haven't reviewed this plugin yet";
         $reason = "";
-        $slug = "no-info";
+
+        $status = $this->review_statuses['not-found'];
+        $message = $status['message'];
+        $description = $status['description'];
+        $slug = $status['slug'];
 
       } catch ( Dxw_Security_Error $e ) {
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
@@ -115,14 +118,13 @@ class Dxw_Security_Review_Data {
 
     // TODO: Need to handle the error case
     // TODO: Need to handle no_info and No Issues differently: they have no reason
-    $this->security_plugin_meta_view($slug, $reason, $review_link, $message, $name, $description);
+    $this->plugin_security_review_view($slug, $reason, $review_link, $message, $name, $description);
   }
 
-  private function security_plugin_meta_view($slug, $reason, $review_link, $message, $name, $description) {
+  private function plugin_security_review_view($slug, $reason, $review_link, $message, $name, $description) {
     $plugin_slug = sanitize_title($name);
     $popup_id = "plugin-inspection-results{$plugin_slug}";
 
-    Whippet::print_r($name);
     ?>
     <div class="review-message <?php echo $slug; ?>">
       <h3><?php echo "<a href='{$review_link}'><span class='icon-{$slug}'></span> {$message}</a>"; ?></h3>
@@ -136,87 +138,20 @@ class Dxw_Security_Review_Data {
         <div class="inner">
           <h2><a href="<?php echo $review_link ?>"><span class="icon-<?php echo $slug ?>"></span> <?php echo $message ?></a></h2>
           <p class="review-status-description"><?php echo $description ?></p>
-          <p>
-            <?php
-              if ( empty($reason) ) {
-                echo("<a href='{$review_link}'>See the dxw Security website for details</a>");
-              } else {
-                print_r($reason);
-                echo("<a href='{$review_link}'> Read more...</a>");
-              }
-            ?>
-          </p>
+          <?php
+            if ( empty($reason) ) {
+              echo("<a href='{$review_link}' class='read-more' >See the dxw Security website for details</a>");
+            } else {
+              print_r("<p>{$reason}</p>");
+              echo("<a href='{$review_link}' class='read-more button-primary'> Read more...</a>");
+            }
+          ?>
         </div>
 
       </div>
     </div>
     <?php
   }
-
-  // private function add_review_reason($plugin_file) {
-  //   // add_action( "after_plugin_row_$plugin_file", function ($file, $plugin_data) {
-  //   add_action( "after_plugin_row_$plugin_file", function($plugin_file, $plugin_data, $status) {
-
-  //     // TODO: do we need to do the "Stop making requests after a certain number of failures" thing here too?
-  //     //   In theory we should only get successes here, but it's in principle possible to get failures - see below.
-
-  //     $api = new Dxw_Security_Api($plugin_file, $plugin_data);
-
-  //     try {
-  //       $review = $api->get_plugin_review();
-
-  //       $review_link = $review->review_link;
-  //       $reason = $review->reason;
-
-  //       // TODO: Needs to be a bit more Defensive? We're currently trusting that this will only ever get called with "red" or "yellow" recommendations...
-  //       $status = $this->review_statuses[$review->recommendation];
-  //       $message = $status['message'];
-  //       $description = $status['description'];
-  //       $slug = $status['slug'];
-
-  //       $row_class = $this->row_class($plugin_file, $plugin_data);
-
-  //       $this->review_info_box($row_class, $slug, $review_link, $reason, $message, $description);
-
-  //     // TODO: What should we do in the error cases below? Displaying nothing would probably be fine...
-  //     } catch ( Dxw_Security_NotFound $e ) {
-  //       // Shouldn't get here, but it's theoretically possible, if the API starts behaving badly....
-  //     } catch ( Dxw_Security_Error $e ) {
-  //       // TODO: in future we should provide some way for users to give us back some useful information when they get this error
-  //       // Shouldn't get here, but it's theoretically possible - e.g. if the cache expires AND the service goes down in-between the first request and this one...
-  //     }
-
-  //   }, 10, 3);
-  // }
-
-  // private function review_info_box($row_class, $slug, $review_link, $reason, $message, $description) {
-  //   if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
-
-  //   // TODO: title text on these links?
-
-  //   // Presumably colspanchange is something to do with responsiveness
-  //   echo("<tr class='plugin-review-tr {$row_class}'>");
-  //   echo("  <td colspan='4' class='plugin-review colspanchange'>");
-  //   echo("    <div class='review-message {$slug}'>");
-  //   echo("      <h4><a href='{$review_link}'><span class='icon-{$slug}'></span> Security review: {$message}</a></h4>");
-  //   echo("      <p class='review-status-description'>{$description}</p>");
-  //   if ( empty($reason) ) {
-  //     echo("<a href='{$review_link}'>See the dxw Security website for details</a>");
-  //   } else {
-  //     print_r($reason);
-  //     echo("<a href='{$review_link}'> Read more...</a>");
-  //   }
-  //   echo("</div></td></tr>");
-  // }
-
-  // private function row_class($plugin_file, $plugin_data) {
-  //   // mostly cribbed from the WP_Plugins_List_Table:
-  //   // TODO: This doesn't handle multisite (?)
-  //   $class = "";
-  //   if ( is_plugin_active( $plugin_file ) ) { $class .= 'active_plugin'; }
-  //   if (! empty( $plugin_data['update'] ) ) { $class .= ' update_plugin'; }
-  //   return $class;
-  // }
 }
 
 
@@ -309,15 +244,4 @@ class Dxw_Security_Api {
   private function plugin_review_slug() {
     return $this->plugin_file . $this->plugin_version;
   }
-}
-
-
-// CURRENTLY NOT USED - ditch it if it's not useful
-// Surely this already exists???
-function insert_at($index, $element, $array) {
-  $array =
-    array_slice($array, 0, $index, true) +
-    $element +
-    array_slice($array, $index , count($array) - 1, true);
-  return $array;
 }

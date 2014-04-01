@@ -3,7 +3,8 @@
 @wp-light-red-background: #fefaf7;
 @red-highlight: #dd714d; // Not a WP colour
 
-@wp-blue: #2ea2cc;
+@wp-blue: #0074a2;
+@wp-blue-highlight: #2ea2cc;
 @wp-light-blue-background: #f7fcfe;
 
 @green: #6cbb3c;  /*'Green Snake'*/
@@ -27,45 +28,28 @@
     margin-top: 0;
   }
 
-  &.use-with-caution {
-    background-color: @amber-background;
+  .colour_box(@color, @background-color, @highlight-color) {
+    background-color: @background-color;
 
     h3 a, h2 a, a {
-      color: @amber;
+      color: @color;
       text-decoration: none;
 
-      &:hover { color: @amber-highlight; }
+      &:hover { color: @highlight-color; }
     }
+  }
+
+  &.use-with-caution {
+    .colour_box(@amber, @amber-background, @amber-highlight);
   }
   &.potentially-unsafe {
-    background-color: @wp-red-background;
-
-    h3 a, h2 a, a {
-      color: @wp-red;
-      text-decoration: none;
-
-      &:hover { color: @red-highlight; }
-    }
+    .colour_box(@wp-red, @wp-red-background, @red-highlight);
   }
   &.no-issues-found {
-    background-color: @green-background;
-
-    h3 a, h2 a, a {
-      color: @green;
-      text-decoration: none;
-
-      &:hover { color: @green-highlight; }
-    }
+    .colour_box(@green, @green-background, @green-highlight);
   }
   &.no-info {
-    background-color: @grey-background;
-
-    h3 a, h2 a, a {
-      color: @grey;
-      text-decoration: none;
-
-      &:hover { color: @grey-highlight; }
-    }
+    .colour_box(@grey, @grey-background, @grey-highlight);
   }
 
   .review-status-description {
@@ -79,8 +63,6 @@
 
 }
 
-// Making room for the logo
-
 .dialog.review-message {
 
   #dxw-sec-link {
@@ -93,6 +75,24 @@
     padding: 5px 20px;
     min-width: 200px;
     margin-right: 101px;
+
+    a.read-more {
+      margin-bottom: 15px;
+      display: inline-block;
+      &.button-primary {
+        color: #fff;
+      }
+    }
+  }
+
+  // The grey isn't super-obvious it's a link when inside the dialog
+  &.no-info {
+    a.read-more {
+      color: @wp-blue;
+      &:hover {
+        color: @wp-blue-highlight;
+      }
+    }
   }
 }
 
