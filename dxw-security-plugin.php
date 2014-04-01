@@ -28,9 +28,14 @@ add_action( 'admin_enqueue_scripts', function($hook) {
   $stylesheet_url = plugins_url( '/assets/main.min.css' , __FILE__ );
   wp_enqueue_style( 'dxw-security-plugin-styles', $stylesheet_url );
 
+  wp_enqueue_style('wp-jquery-ui-dialog');
+
+
   // TODO: This seems like a really inefficient way to include one line of js... Is there a better way?
   $script_url = plugins_url( '/assets/main.js' , __FILE__ );
   wp_enqueue_script( 'dxw-security-plugin-scripts', $script_url );
+
+  wp_enqueue_script('jquery-ui-dialog');
 } );
 
 add_action('admin_init', function() { new Dxw_Security_Review_Data; });
@@ -91,11 +96,13 @@ class Dxw_Security_Review_Data {
       } catch ( Dxw_Security_NotFound $e ) {
         $message = "Not yet reviewed";
         $description = "We haven't reviewed this plugin yet";
+        $reason = "";
         $slug = "no-info";
 
       } catch ( Dxw_Security_Error $e ) {
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
         $message = "An error occurred - please try again later";
+        $reason = "";
 
         $this->dxw_security_failed_requests++;
       }
@@ -112,38 +119,34 @@ class Dxw_Security_Review_Data {
   }
 
   private function security_plugin_meta_view($slug, $reason, $review_link, $message, $name, $description) {
-    // Add thickbox to the plugin page so that we can get modal windows
-    add_thickbox();
-
     $plugin_slug = sanitize_title($name);
     $popup_id = "plugin-inspection-results{$plugin_slug}";
     ?>
     <div class="review-message <?php echo $slug; ?>">
       <h3><?php echo "<a href='{$review_link}'><span class='icon-{$slug}'></span> {$message}</a>"; ?></h3>
 
-      <a href="#TB_inline?width=600&height=250&inlineId=<?php echo $popup_id; ?>" title="<?php echo $name; ?>" class="thickbox">More information</a>
+      <a href="#<?php echo $popup_id; ?>" class="dialog-link">More information</a>
 
-      <div id="<?php echo $popup_id; ?>" style="display:none;">
-        <div id="plugin-inspection-results-inner" class="review-message <?php echo $slug; ?>">
-          <div class="inner">
-            <h2><a href="<?php echo $review_link ?>"><span class="icon-<?php echo $slug ?>"></span> <?php echo $message ?></a></h2>
-            <p class="review-status-description"><?php echo $description ?></p>
-            <p>
-              <?php
-                if ( empty($reason) ) {
-                  echo("<a href='{$review_link}'>See the dxw Security website for details</a>");
-                } else {
-                  print_r($reason);
-                  echo("<a href='{$review_link}'> Read more...</a>");
-                }
-              ?>
-            </p>
-          </div>
+      <div id="<?php echo $popup_id; ?>" title="<?php echo $name; ?>" style="display:none;" class="dialog review-message <?php echo $slug; ?>">
 
-          <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url( '/assets/dxw-logo.png' , __FILE__ ); ?>" alt="dxw logo" /></a>
+        <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url( '/assets/dxw-logo.png' , __FILE__ ); ?>" alt="dxw logo" /></a>
+
+        <div class="inner">
+          <h2><a href="<?php echo $review_link ?>"><span class="icon-<?php echo $slug ?>"></span> <?php echo $message ?></a></h2>
+          <p class="review-status-description"><?php echo $description ?></p>
+          <p>
+            <?php
+              if ( empty($reason) ) {
+                echo("<a href='{$review_link}'>See the dxw Security website for details</a>");
+              } else {
+                print_r($reason);
+                echo("<a href='{$review_link}'> Read more...</a>");
+              }
+            ?>
+          </p>
         </div>
-      </div>
 
+      </div>
     </div>
     <?php
   }

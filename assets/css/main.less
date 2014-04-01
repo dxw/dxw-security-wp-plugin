@@ -18,16 +18,8 @@
 @grey-background: #F0F0F0;
 @grey-highlight: darken(@grey, 20%);
 
-/* The following are basically the same as the "update" classes.
-    Tried to use &:extend with the relevant classes but couldn't get it to work */
 
-/* Overwriting thickbox styles with ridiculous specificity */
-
-.review-message, #plugin-inspection-results-inner.review-message {
-  border: 0;
-  font-size: 13px;
-  font-weight: 400;
-  margin: 0 3px 0 0;
+.review-message {
   padding: 12px;
   min-width: 200px;
 
@@ -89,31 +81,20 @@
 
 // Making room for the logo
 
-#plugin-inspection-results-inner.review-message {
-  float: left;
-  width: 100%;
+.dialog.review-message {
 
   #dxw-sec-link {
     float: right;
     margin-top: 15px;
-    width: 20%;
-    text-align: right;
+    padding: 5px 20px
   }
 
   .inner {
-    float: left;
-    width: 80%;
+    padding: 5px 20px;
+    min-width: 200px;
+    margin-right: 101px;
   }
 }
-
-/* The box-shadow of the element above a plugin-review can't be removed either in the code or in pure css, so it'll have to be done in javascript: */
-.no-border.inactive td, .no-border.inactive th, .no-border.active td, .no-border.active th, .no-border.plugin-update-tr .plugin-update {
-  -webkit-box-shadow: none;
-  box-shadow: none;
-}
-
-
-
 
 /* icon fonts from icomoon */
 @font-face {
