@@ -27,7 +27,7 @@ module.exports = function(grunt) {
         less: {
             dist: {
                 options: {
-                    yuicompress: false,
+                    yuicompress: true,
                 },
                 files: {
                     "assets/main.min.css": "assets/css/main.less"
