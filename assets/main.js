@@ -4,12 +4,13 @@ jQuery( document ).ready(function($) {
     autoOpen: false,
     dialogClass: "wp-dialog",
     width: 480,
-    title: this.title
   });
 
   $( ".dialog-link" ).on('click', function(e) {
+    // Override the default link behaviour:
     e.preventDefault();
-    $( this.hash ).dialog('open');
+    $( this.hash ).dialog( 'option', "title", $( this ).data('title') );
+    $( this.hash ).dialog( 'open' );
     return false;
   });
 });
