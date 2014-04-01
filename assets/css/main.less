@@ -48,7 +48,7 @@
   &.no-issues-found {
     .colour_box(@green, @green-background, @green-highlight);
   }
-  &.no-info {
+  &.no-info, &.review-error {
     .colour_box(@grey, @grey-background, @grey-highlight);
   }
 
@@ -73,7 +73,6 @@
 
   .inner {
     padding: 5px 20px;
-    min-width: 200px;
     margin-right: 101px;
 
     a.read-more {
@@ -94,6 +93,11 @@
       }
     }
   }
+}
+
+// This is to deal with shrinking the box to tiny sizes. It's a bit hacky and will affect any other dialogs on the page.
+body.plugins-php .ui-dialog {
+  overflow: hidden;
 }
 
 /* icon fonts from icomoon */
