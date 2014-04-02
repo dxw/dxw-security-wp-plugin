@@ -20,7 +20,7 @@
 @grey-highlight: darken(@grey, 20%);
 
 
-.dialog-link {
+.dialog-link, .review-error {
   display: block;
   h3 {
     margin-top: 0;
@@ -39,7 +39,7 @@
   .colour_box(@color, @background-color, @highlight-color) {
     background-color: @background-color;
 
-    h2 a, h3, .more-info, &.dialog-link {
+    h2 a, h3 a, h3, .more-info, &.dialog-link {
       color: @color;
       text-decoration: none;
 
