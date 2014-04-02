@@ -45,7 +45,18 @@ module.exports = function(grunt) {
                 },
             },
         },
-
+        compress: {
+          main: {
+            options: {
+              archive: 'dxw-security.zip'
+            },
+            files: [
+              {src: ['assets/*'], filter: 'isFile'},
+              {src: ['assets/fonts/**'] },
+              {src: 'dxw-security-plugin.php' },
+            ]
+          }
+        },
         watch: {
             css: {
                 files: ['assets/css/**/*.less'],
@@ -60,10 +71,12 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-less')
     grunt.loadNpmTasks('grunt-contrib-uglify')
+    grunt.loadNpmTasks('grunt-contrib-compress')
     grunt.loadNpmTasks('grunt-contrib-watch')
 
     grunt.registerTask('default', [
         'less',
         'uglify',
+        'compress',
     ])
 }
