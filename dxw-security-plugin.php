@@ -9,7 +9,7 @@
 
 // CONFIG:
 if (!defined('DXW_SECURITY_API_ROOT')) {
-  define('DXW_SECURITY_API_ROOT', 'https://security.dxw.com/api');
+  define('DXW_SECURITY_API_ROOT', 'http://app.security.dxw.com/api');
 }
 if (!defined('DXW_SECURITY_CACHE_RESPONSES')) {
   define('DXW_SECURITY_CACHE_RESPONSES', true);
