@@ -32,16 +32,82 @@ add_action( 'admin_enqueue_scripts', function($hook) {
   wp_enqueue_script('jquery-ui-dialog');
 } );
 
-add_action('admin_init', function() { new Dxw_Security_Review_Data; });
+add_action('admin_init', function() { new Plugin_Review_Column; });
 
-// TODO: this name is wrong...
-class Dxw_Security_Review_Data {
+class Plugin_Review_Column {
   // Track the number of failed requests so that we can stop trying after a certain number.
   // TODO: This should apply per page load, but ideally this behaviour might be better handled by the API class (?)
-  public $dxw_security_failed_requests = 0;
+  private $dxw_security_failed_requests = 0;
+
+  public function __construct() {
+    add_filter('manage_plugins_columns', function($columns) {
+      $columns['security_review'] = "Security";
+      return $columns;
+    });
+
+    add_action('manage_plugins_custom_column', function( $column_name, $plugin_file, $plugin_data) {
+      if($column_name == 'security_review') {
+        $this->data($plugin_file, $plugin_data);
+      }
+    }, 10, 3);
+  }
+
+  private function data($plugin_file, $plugin_data) {
+    // Stop making requests after a certain number of failures:
+    if ( $this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT ) {
+      $review = new Null_Plugin_Review();
+
+    } else {
+
+      $name = $plugin_data['Name'];
+      $api = new Dxw_Security_Api($plugin_file, $plugin_data);
+
+      try {
+        $review_data = $api->plugin_review();
+
+        $reason = $review_data->reason;
+        $status = $review_data->recommendation;
+        $link = $review_data->review_link;
+
+        $review = new Plugin_Review($name, $status, $reason, $link);
+
+      } catch ( Dxw_Security_NotFound $e ) {
+        $review = new Plugin_Review($name, 'not-found');
+
+      } catch ( Exception $e ) {
+        // TODO: Handle Dxw_Security_Error separately?
+        // TODO: in future we should provide some way for users to give us back some useful information when they get an error
+        $this->dxw_security_failed_requests++;
+
+        $review = new Null_Plugin_Review();
+      }
+    }
+
+    $review->view();
+  }
+}
+
+class Plugin_Review {
+  private $name;
+  private $link;
+  private $reason;
+  private $message;
+  private $description;
+  private $slug;
+
+  public function __construct($name, $status, $reason="", $link=DXW_SECURITY_PLUGINS_URL) {
+    $this->name = $name;
+    $this->link = $link;
+    $this->reason = $reason;
+
+    $review_status = $this->review_statuses[$status];
+    $this->message = $review_status['message'];
+    $this->description = $review_status['description'];
+    $this->slug = $review_status['slug'];
+  }
 
   // TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
-  public $review_statuses = array(
+  private $review_statuses = array(
     'green'  => array(  'message' => "No issues found",
                         'slug' => "no-issues-found",
                         'description' => "dxw's review didn't find anything worrying in this plugin. It's probably safe."),
@@ -56,66 +122,13 @@ class Dxw_Security_Review_Data {
                         'description' => "We haven't reviewed this plugin yet. If you like we can review it for you."),
   );
 
-  public function __construct() {
-    add_filter('manage_plugins_columns', function($columns) {
-      $columns['security_plugin'] = "Security";
-      return $columns;
-    });
 
-    add_action('manage_plugins_custom_column', function( $column_name, $plugin_file, $plugin_data) {
-      if($column_name == 'security_plugin') {
-        $this->plugin_security_review($plugin_file, $plugin_data);
-      }
-    }, 10, 3);
-  }
+  public function view() {
+    $name = $this->name;
+    $slug = $this->slug;
+    $message = $this->message;
 
-  private function plugin_security_review($plugin_file, $plugin_data) {
-    // Stop making requests after a certain number of failures:
-    if ( $this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT ) {
-      return $this->plugin_security_review_error();
-    } else {
-
-      $api = new Dxw_Security_Api($plugin_file, $plugin_data);
-
-      try {
-        $review = $api->plugin_review();
-
-        $review_link = $review->review_link;
-        $reason = $review->reason;
-
-        $status = $this->review_statuses[$review->recommendation];
-        $message = $status['message'];
-        $description = $status['description'];
-        $slug = $status['slug'];
-
-      } catch ( Dxw_Security_NotFound $e ) {
-        $reason = "";
-
-        $status = $this->review_statuses['not-found'];
-        $message = $status['message'];
-        $description = $status['description'];
-        $slug = $status['slug'];
-
-      } catch ( Exception $e ) {
-        // TODO: Handle Dxw_Security_Error separately?
-        // TODO: in future we should provide some way for users to give us back some useful information when they get an error
-        $this->dxw_security_failed_requests++;
-
-        return $this->plugin_security_review_error();
-      }
-    }
-    if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
-    // TODO: fallback icon for errors?
-    if ( empty($slug) ) { $slug = ""; }
-
-    $name = $plugin_data['Name'];
-
-    $this->plugin_security_review_view($slug, $reason, $review_link, $message, $name, $description);
-  }
-
-  private function plugin_security_review_view($slug, $reason, $review_link, $message, $name, $description) {
-    $plugin_slug = sanitize_title($name);
-    $dialog_id = "plugin-inspection-results{$plugin_slug}";
+    $dialog_id = "plugin-inspection-results" . sanitize_title($this->name);
 
     ?>
       <a href="#<?php echo $dialog_id; ?>" data-title="<?php echo $name; ?>" class="dialog-link review-message <?php echo $slug; ?>">
@@ -124,25 +137,31 @@ class Dxw_Security_Review_Data {
         <p class="more-info">More information</p>
       </a>
 
-      <?php print_r( $this->plugin_security_review_dialog($dialog_id, $slug, $reason, $review_link, $message, $description) ); ?>
+      <?php print_r( $this->view_dialog($dialog_id) ); ?>
     <?php
   }
 
-  private function plugin_security_review_dialog($dialog_id, $slug, $reason, $review_link, $message, $description){
+  private function view_dialog($dialog_id){
+    $slug = $this->slug;
+    $message = $this->message;
+    $link = $this->link;
+    $description = $this->description;
+    $reason = $this->reason;
+
     ?>
       <div id="<?php echo $dialog_id; ?>" style="display:none;" class="dialog review-message <?php echo $slug; ?>">
 
         <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url( '/assets/dxw-logo.png' , __FILE__ ); ?>" alt="dxw logo" /></a>
 
         <div class="inner">
-          <h2><a href="<?php echo $review_link ?>"><span class="icon-<?php echo $slug ?>"></span> <?php echo $message ?></a></h2>
+          <h2><a href="<?php echo $link ?>"><span class="icon-<?php echo $slug ?>"></span> <?php echo $message ?></a></h2>
           <p class="review-status-description"><?php echo $description ?></p>
           <?php
             if ( empty($reason) ) {
-              echo("<a href='{$review_link}' class='read-more' >See the dxw Security website for details</a>");
+              echo("<a href='{$link}' class='read-more' >See the dxw Security website for details</a>");
             } else {
               print_r("<p>{$reason}</p>");
-              echo("<a href='{$review_link}' class='read-more button-primary'> Read more...</a>");
+              echo("<a href='{$link}' class='read-more button-primary'> Read more...</a>");
             }
           ?>
         </div>
@@ -150,8 +169,10 @@ class Dxw_Security_Review_Data {
       </div>
     <?php
   }
+}
 
-  private function plugin_security_review_error(){
+class Null_Plugin_Review {
+  public function view(){
     ?>
     <div class="review-message review-error">
       <h3><a href='<?php echo DXW_SECURITY_PLUGINS_URL; ?>'>An error occurred</a></h3>
@@ -169,8 +190,8 @@ class Dxw_Security_Error extends Exception { }
 // TODO: Not sure this is the right name: this is for getting one specific plugin...
 class Dxw_Security_Api {
 
-  public $plugin_file;
-  public $plugin_version;
+  private $plugin_file;
+  private $plugin_version;
 
   public function __construct($plugin_file, $plugin_data) {
     $this->plugin_file = $plugin_file;
