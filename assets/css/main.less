@@ -13,29 +13,39 @@
 
 @amber: #DB9702;
 @amber-background: #f8efe2;
-@amber-highlight: #d89b46;
+@amber-highlight: lighten(@amber, 5%);;
 
 @grey: #808080;
 @grey-background: #F0F0F0;
 @grey-highlight: darken(@grey, 20%);
 
 
+.dialog-link {
+  display: block;
+  h3 {
+    margin-top: 0;
+  }
+  .more-info {
+    margin-bottom: 0;
+  }
+}
+
 .review-message {
   padding: 12px;
   min-width: 200px;
 
-  h3 {
-    margin-top: 0;
-  }
+  a { text-decoration: none; }
 
   .colour_box(@color, @background-color, @highlight-color) {
     background-color: @background-color;
 
-    h3 a, h2 a, a {
+    h2 a, h3, .more-info, &.dialog-link {
       color: @color;
       text-decoration: none;
 
-      &:hover { color: @highlight-color; }
+      &:hover, &:hover * {
+        color: @highlight-color;
+      }
     }
   }
 
@@ -84,7 +94,7 @@
     }
   }
 
-  // The grey isn't super-obvious it's a link when inside the dialog
+  // The grey isn't super-obvious it's a link when inside the dialog, so let's make it blue
   &.no-info {
     a.read-more {
       color: @wp-blue;
@@ -127,18 +137,14 @@ body.plugins-php .ui-dialog {
 }
 
 .icon-no-issues-found {
-  color: @green;
   &:before { content: "\e601"; }
 }
 .icon-use-with-caution {
-  color: @amber;
   &:before { content: "\e600"; }
 }
 .icon-potentially-unsafe {
-  color: @wp-red;
   &:before { content: "\e602"; }
 }
 .icon-no-info {
-  color: @grey;
   &:before  { content: "\e604"; }
 }
