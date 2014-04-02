@@ -34,19 +34,36 @@ module.exports = function(grunt) {
                 },
             },
         },
+        uglify: {
+            dist: {
+                options: {
+                    preserveComments: 'some',
+                    compress: false,
+                },
+                files: {
+                    'assets/main.min.js': 'assets/js/main.js'
+                },
+            },
+        },
 
         watch: {
             css: {
                 files: ['assets/css/**/*.less'],
                 tasks: ['less'],
             },
+            js: {
+                files: ['assets/js/**/*.js'],
+                tasks: ['uglify'],
+            },
         },
     })
 
     grunt.loadNpmTasks('grunt-contrib-less')
+    grunt.loadNpmTasks('grunt-contrib-uglify')
     grunt.loadNpmTasks('grunt-contrib-watch')
 
     grunt.registerTask('default', [
         'less',
+        'uglify',
     ])
 }

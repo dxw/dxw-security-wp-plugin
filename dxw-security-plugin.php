@@ -26,7 +26,7 @@ add_action( 'admin_enqueue_scripts', function($hook) {
   if( 'plugins.php' != $hook ) { return; }
 
   wp_enqueue_style( 'dxw-security-plugin-styles', plugins_url( '/assets/main.min.css' , __FILE__ ));
-  wp_enqueue_script( 'dxw-security-plugin-scripts', plugins_url( '/assets/main.js' , __FILE__ ) );
+  wp_enqueue_script( 'dxw-security-plugin-scripts', plugins_url( '/assets/main.min.js' , __FILE__ ) );
 
   wp_enqueue_style('wp-jquery-ui-dialog');
   wp_enqueue_script('jquery-ui-dialog');
