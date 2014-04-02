@@ -1,8 +1,8 @@
 <?php
 // Plugin Name: dxw Security
-// Plugin URI: https://security.dxw.com/plugin
+// Plugin URI: https://security.dxw.com/
 // Description: Pulls plugin review information from dxw Security into the wordpress plugins screen
-// Version: 0.0.0
+// Version: 0.1.0
 // License: GPLv2
 // Author: dxw
 // Author URI: http://dxw.com/
@@ -25,16 +25,10 @@ define('DXW_SECURITY_PLUGINS_URL', 'https://security.dxw.com/plugins/');
 add_action( 'admin_enqueue_scripts', function($hook) {
   if( 'plugins.php' != $hook ) { return; }
 
-  $stylesheet_url = plugins_url( '/assets/main.min.css' , __FILE__ );
-  wp_enqueue_style( 'dxw-security-plugin-styles', $stylesheet_url );
+  wp_enqueue_style( 'dxw-security-plugin-styles', plugins_url( '/assets/main.min.css' , __FILE__ ));
+  wp_enqueue_script( 'dxw-security-plugin-scripts', plugins_url( '/assets/main.js' , __FILE__ ) );
 
   wp_enqueue_style('wp-jquery-ui-dialog');
-
-
-  // TODO: This seems like a really inefficient way to include one line of js... Is there a better way?
-  $script_url = plugins_url( '/assets/main.js' , __FILE__ );
-  wp_enqueue_script( 'dxw-security-plugin-scripts', $script_url );
-
   wp_enqueue_script('jquery-ui-dialog');
 } );
 
@@ -43,7 +37,7 @@ add_action('admin_init', function() { new Dxw_Security_Review_Data; });
 // TODO: this name is wrong...
 class Dxw_Security_Review_Data {
   // Track the number of failed requests so that we can stop trying after a certain number.
-  // This should apply per page load, but ideally this behaviour might be better handled by the API class (?)
+  // TODO: This should apply per page load, but ideally this behaviour might be better handled by the API class (?)
   public $dxw_security_failed_requests = 0;
 
   // TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
@@ -84,7 +78,7 @@ class Dxw_Security_Review_Data {
       $api = new Dxw_Security_Api($plugin_file, $plugin_data);
 
       try {
-        $review = $api->get_plugin_review();
+        $review = $api->plugin_review();
 
         $review_link = $review->review_link;
         $reason = $review->reason;
@@ -103,12 +97,11 @@ class Dxw_Security_Review_Data {
         $slug = $status['slug'];
 
       } catch ( Exception $e ) {
-      // } catch ( Dxw_Security_Error $e ) {
+        // TODO: Handle Dxw_Security_Error separately?
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
         $this->dxw_security_failed_requests++;
 
         return $this->plugin_security_review_error();
-
       }
     }
     if ( empty($review_link) ) { $review_link = DXW_SECURITY_PLUGINS_URL; }
@@ -174,7 +167,7 @@ class Dxw_Security_Review_Data {
 class Dxw_Security_NotFound extends Exception { }
 class Dxw_Security_Error extends Exception { }
 
-// TODO - not sure this is the right name: this is for getting one specific plugin...
+// TODO: Not sure this is the right name: this is for getting one specific plugin...
 class Dxw_Security_Api {
 
   public $plugin_file;
@@ -185,44 +178,42 @@ class Dxw_Security_Api {
     $this->plugin_version = $plugin_data['Version'];
   }
 
-  public function get_plugin_review() {
-    // TODO: this function does A LOT of things...
-    if ( DXW_SECURITY_CACHE_RESPONSES ) {
-      $review = $this->retrieve_plugin_review();
-    } else {
-      $review = false;
-    }
+  public function plugin_review() {
+    $review = $this->retrieve_plugin_review();
 
-    // TODO: transience returns false if it doesn't have the key, but should we also try to retrieve the result if the cache returned empty?
+    // TODO: Transience returns false if it doesn't have the key, but should we also try to retrieve the result if the cache returned empty?
     if($review === false) {
-
-      $api_root = DXW_SECURITY_API_ROOT;
-      $api_path = "/reviews";
-
-      # TODO: Currently this only handles codex plugins
-      $plugin_url = 'http://wordpress.org/plugins/' . explode('/',$this->plugin_file)[0] . '/';
-
-      $query = http_build_query(
-        array(
-          'codex_link'=>$plugin_url,
-          'version'=>$this->plugin_version
-        )
-      );
-      // this should exist in core, but doesn't seem to:
-      // $url = http_build_url(
-      //   array(
-      //     "host"  => $api_root,
-      //     "path"  => $api_path,
-      //     "query" => $query
-      //   )
-      // );
-      $url = $api_root . $api_path . '?' . $query;
-
-      $response = wp_remote_get($url);
-
-      $review = $this->handle_response($response);
+      $review = $this->get_plugin_review();
     }
     return $review;
+  }
+
+  private function get_plugin_review() {
+    $api_root = DXW_SECURITY_API_ROOT;
+    $api_path = "/reviews";
+
+    // TODO: Currently this only handles codex plugins
+    $plugin_url = 'http://wordpress.org/plugins/' . explode('/',$this->plugin_file)[0] . '/';
+
+    $query = http_build_query(
+      array(
+        'codex_link'=>$plugin_url,
+        'version'=>$this->plugin_version
+      )
+    );
+    // this should exist in core, but doesn't seem to:
+    // $url = http_build_url(
+    //   array(
+    //     "host"  => $api_root,
+    //     "path"  => $api_path,
+    //     "query" => $query
+    //   )
+    // );
+    $url = $api_root . $api_path . '?' . $query;
+
+    $response = wp_remote_get($url);
+
+    return $this->handle_response($response);
   }
 
   // Either return a review or throw an error
@@ -231,19 +222,15 @@ class Dxw_Security_Api {
       throw new Dxw_Security_Error( $response->get_error_message() );
 
     } else {
-
       switch ( $response['response']['code'] ) {
         case 200:
-          // TODO: handle the case where we get an unparseable body
-          $review = json_decode( $response['body'] )->review;
-
-          if ( DXW_SECURITY_CACHE_RESPONSES ) {
-            $this->cache_plugin_review($review);
-          }
+          $review = $this->parse_response_body($response['body']);
+          $this->cache_plugin_review($review);
           return $review;
+
         case 404:
           throw new Dxw_Security_NotFound();
-          break;
+
         default:
           // TODO: handle other codes individually?
           // A redirect would end up here - is it possible to get one??
@@ -252,14 +239,31 @@ class Dxw_Security_Api {
     }
   }
 
+  private function parse_response_body($body) {
+    $parsed_body = json_decode( $body );
+
+    if ( !is_null($parsed_body) ) {
+      return $parsed_body->review;
+    } else {
+      $truncated_body = mb_substr( $body, 0, 100 );
+      throw new Dxw_Security_Error( "Couldn't parse json body beginning: {$truncated_body}" );
+    }
+  }
+
   private function cache_plugin_review($review) {
-    $slug = $this->plugin_review_slug();
-    // TODO: How long should this get cached for?
-    set_transient( $slug, $review, HOUR_IN_SECONDS );
+    if ( DXW_SECURITY_CACHE_RESPONSES ) {
+      $slug = $this->plugin_review_slug();
+      // TODO: How long should this get cached for?
+      set_transient( $slug, $review, HOUR_IN_SECONDS );
+    }
   }
   private function retrieve_plugin_review() {
-    $slug = $this->plugin_review_slug();
-    return get_transient($slug);
+    if ( DXW_SECURITY_CACHE_RESPONSES ) {
+      $slug = $this->plugin_review_slug();
+      return get_transient($slug);
+    } else {
+      return false;
+    }
   }
   private function plugin_review_slug() {
     return $this->plugin_file . $this->plugin_version;
