@@ -188,13 +188,13 @@ class Dxw_Security_Api {
   public function get_plugin_review() {
     // TODO: this function does A LOT of things...
     if ( DXW_SECURITY_CACHE_RESPONSES ) {
-      $response = $this->retrieve_plugin_review();
+      $review = $this->retrieve_plugin_review();
     } else {
-      $response = false;
+      $review = false;
     }
 
     // TODO: transience returns false if it doesn't have the key, but should we also try to retrieve the result if the cache returned empty?
-    if($response === false) {
+    if($review === false) {
 
       $api_root = DXW_SECURITY_API_ROOT;
       $api_path = "/reviews";
@@ -220,37 +220,42 @@ class Dxw_Security_Api {
 
       $response = wp_remote_get($url);
 
-      if ( is_wp_error($response) ) {
-        throw new Dxw_Security_Error( $response->get_error_message() );
-
-      } else {
-
-        switch ( $response['response']['code'] ) {
-          case 200:
-            // TODO: handle the case where we get an unparseable body
-            $review = json_decode( $response['body'] )->review;
-
-            if ( DXW_SECURITY_CACHE_RESPONSES ) {
-              $this->cache_plugin_review($review);
-            }
-            return $review;
-          case 404:
-            throw new Dxw_Security_NotFound();
-            break;
-          default:
-            // TODO: handle other codes individually?
-            // A redirect would end up here - is it possible to get one??
-            throw new Dxw_Security_Error( "Response was {$response['response']['code']}: {$response['body']}" );
-        };
-      }
+      $review = $this->handle_response($response);
     }
-    return $response;
+    return $review;
   }
 
-  private function cache_plugin_review($response) {
+  // Either return a review or throw an error
+  private function handle_response($response) {
+    if ( is_wp_error($response) ) {
+      throw new Dxw_Security_Error( $response->get_error_message() );
+
+    } else {
+
+      switch ( $response['response']['code'] ) {
+        case 200:
+          // TODO: handle the case where we get an unparseable body
+          $review = json_decode( $response['body'] )->review;
+
+          if ( DXW_SECURITY_CACHE_RESPONSES ) {
+            $this->cache_plugin_review($review);
+          }
+          return $review;
+        case 404:
+          throw new Dxw_Security_NotFound();
+          break;
+        default:
+          // TODO: handle other codes individually?
+          // A redirect would end up here - is it possible to get one??
+          throw new Dxw_Security_Error( "Response was {$response['response']['code']}: {$response['body']}" );
+      };
+    }
+  }
+
+  private function cache_plugin_review($review) {
     $slug = $this->plugin_review_slug();
     // TODO: How long should this get cached for?
-    set_transient( $slug, $response, HOUR_IN_SECONDS );
+    set_transient( $slug, $review, HOUR_IN_SECONDS );
   }
   private function retrieve_plugin_review() {
     $slug = $this->plugin_review_slug();
