@@ -118,14 +118,13 @@ class Dxw_Security_Review_Data {
     $dialog_id = "plugin-inspection-results{$plugin_slug}";
 
     ?>
-    <div class="review-message <?php echo $slug; ?>">
-      <h3><?php echo "<a href='{$review_link}'><span class='icon-{$slug}'></span> {$message}</a>"; ?></h3>
+      <a href="#<?php echo $dialog_id; ?>" data-title="<?php echo $name; ?>" class="dialog-link review-message <?php echo $slug; ?>">
+        <h3><span class='icon-<?php echo $slug; ?>'></span> <?php echo $message; ?></h3>
 
-      <a href="#<?php echo $dialog_id; ?>" data-title="<?php echo $name; ?>" class="dialog-link">More information</a>
+        <p class="more-info">More information</p>
+      </a>
 
       <?php print_r( $this->plugin_security_review_dialog($dialog_id, $slug, $reason, $review_link, $message, $description) ); ?>
-
-    </div>
     <?php
   }
 
