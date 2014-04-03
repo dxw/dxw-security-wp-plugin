@@ -71,10 +71,10 @@ class Plugin_Review_Column {
     } else {
 
       $name = $plugin_data['Name'];
-      $api = new Dxw_Security_Api($plugin_file, $plugin_data);
+      $api = new Plugin_Review_API($plugin_file, $plugin_data);
 
       try {
-        $review_data = $api->plugin_review();
+        $review_data = $api->call();
 
         $reason = $review_data->reason;
         $status = $review_data->recommendation;
@@ -194,44 +194,79 @@ class Null_Plugin_Review {
 }
 
 
-// php doesn't support nested classes so these need to live outside the API class
-class Dxw_Security_NotFound extends Exception { }
-class Dxw_Security_Error extends Exception { }
-
-// TODO: Not sure this is the right name: this is for getting one specific plugin...
-class Dxw_Security_Api {
+class Plugin_Review_API extends Dxw_Security_API {
 
   private $plugin_file;
   private $plugin_version;
+
+  // TODO: It would be nice if this was a constant or static. Needs to be accessed from the parent...
+  protected $API_Path = "/reviews";
 
   public function __construct($plugin_file, $plugin_data) {
     $this->plugin_file = $plugin_file;
     $this->plugin_version = $plugin_data['Version'];
   }
 
-  public function plugin_review() {
-    $review = $this->retrieve_plugin_review();
-
-    // TODO: Transience returns false if it doesn't have the key, but should we also try to retrieve the result if the cache returned empty?
-    if($review === false) {
-      $review = $this->get_plugin_review();
-    }
-    return $review;
-  }
-
-  private function get_plugin_review() {
-    $api_root = DXW_SECURITY_API_ROOT;
-    $api_path = "/reviews";
-
+  protected function query() {
     // TODO: Currently this only handles codex plugins
     $plugin_url = "http://wordpress.org/plugins/{$this->plugin_name()}/";
 
-    $query = http_build_query(
+    return http_build_query(
       array(
         'codex_link'=>$plugin_url,
         'version'=>$this->plugin_version
       )
     );
+  }
+
+  protected function cache_slug() {
+    return $this->plugin_file . $this->plugin_version;
+  }
+
+  // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
+  protected function extract_data($parsed_body) {
+    return $parsed_body->review;
+  }
+
+  private function plugin_name() {
+    // Versions of php before 5.4 don't allow array indexes to be accessed directly on the output of functions
+    //   http://www.php.net/manual/en/migration54.new-features.php - "Function array dereferencing"
+    $f = explode( '/', $this->plugin_file );
+    return $f[0];
+  }
+}
+
+
+// php doesn't support nested classes so these need to live outside the API class
+class Dxw_Security_NotFound extends Exception { }
+class Dxw_Security_Error extends Exception { }
+
+// TODO: Not sure this is the right name: this is for getting one specific plugin...
+class Dxw_Security_API {
+  // TODO: This class doesn't work on it's own, only when extended by a class which defines the following:
+  //    variables:
+  //      * $API_Path
+  //    functions:
+  //      * query()
+  //      * cache_slug()
+  //      * extract_data($parsed_body)
+  // Is there a standard way of doing this? should it complain on construction if those things aren't defined
+
+  public function call() {
+    $data = $this->retrieve_api_data();
+
+    // TODO: Transience returns false if it doesn't have the key, but should we also try to retrieve the result if the cache returned empty?
+    if($data === false) {
+      $data = $this->get();
+    }
+    return $data;
+  }
+
+  private function get() {
+    $api_root = DXW_SECURITY_API_ROOT;
+    $api_path = $this->API_Path;
+    $query = $this->query();
+
     // this should exist in core, but doesn't seem to:
     // $url = http_build_url(
     //   array(
@@ -255,9 +290,10 @@ class Dxw_Security_Api {
     } else {
       switch ( $response['response']['code'] ) {
         case 200:
-          $review = $this->parse_response_body($response['body']);
-          $this->cache_plugin_review($review);
-          return $review;
+          $parsed_body = $this->parse_response_body($response['body']);
+          $data = $this->extract_data( $parsed_body );
+          $this->cache_api_data($data);
+          return $data;
 
         case 404:
           throw new Dxw_Security_NotFound();
@@ -274,37 +310,27 @@ class Dxw_Security_Api {
     $parsed_body = json_decode( $body );
 
     if ( !is_null($parsed_body) ) {
-      return $parsed_body->review;
+      return $parsed_body;
     } else {
       $truncated_body = mb_substr( $body, 0, 100 );
       throw new Dxw_Security_Error( "Couldn't parse json body beginning: {$truncated_body}" );
     }
   }
 
-  private function cache_plugin_review($review) {
+  private function cache_api_data($data) {
     if ( DXW_SECURITY_CACHE_RESPONSES ) {
-      $slug = $this->plugin_review_slug();
+      $slug = $this->cache_slug();
       // TODO: How long should this get cached for?
-      set_transient( $slug, $review, HOUR_IN_SECONDS );
+      set_transient( $slug, $data, HOUR_IN_SECONDS );
     }
   }
-  private function retrieve_plugin_review() {
+  private function retrieve_api_data() {
     if ( DXW_SECURITY_CACHE_RESPONSES ) {
-      $slug = $this->plugin_review_slug();
+      $slug = $this->cache_slug();
       return get_transient($slug);
     } else {
       return false;
     }
-  }
-  private function plugin_review_slug() {
-    return $this->plugin_file . $this->plugin_version;
-  }
-
-  private function plugin_name() {
-    // versions of php before 5.4 don't allow array indexes to be accessed directly on the output of functions
-    // http://www.php.net/manual/en/migration54.new-features.php - "Function array dereferencing"
-    $f = explode( '/', $this->plugin_file );
-    return $f[0];
   }
 }
 
