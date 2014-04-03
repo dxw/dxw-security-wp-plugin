@@ -21,18 +21,26 @@ define('DXW_SECURITY_FAILURE_lIMIT', 5);
 // The URL we link to when we don't have any info about a plugin
 define('DXW_SECURITY_PLUGINS_URL', 'https://security.dxw.com/plugins/');
 
+class dxw_Security {
+  public function __construct() {
+    add_action( 'admin_enqueue_scripts', array($this, 'enqueue_scripts') );
+    add_action( 'admin_init', array($this, 'add_security_column') );
+  }
 
-add_action( 'admin_enqueue_scripts', function($hook) {
-  if( 'plugins.php' != $hook ) { return; }
+  public function enqueue_scripts($hook) {
+    if( 'plugins.php' != $hook ) { return; }
 
-  wp_enqueue_style( 'dxw-security-plugin-styles', plugins_url( '/assets/main.min.css' , __FILE__ ));
-  wp_enqueue_script( 'dxw-security-plugin-scripts', plugins_url( '/assets/main.min.js' , __FILE__ ) );
+    wp_enqueue_style( 'dxw-security-plugin-styles', plugins_url( '/assets/main.min.css' , __FILE__ ));
+    wp_enqueue_script( 'dxw-security-plugin-scripts', plugins_url( '/assets/main.min.js' , __FILE__ ) );
 
-  wp_enqueue_style('wp-jquery-ui-dialog');
-  wp_enqueue_script('jquery-ui-dialog');
-} );
+    wp_enqueue_style('wp-jquery-ui-dialog');
+    wp_enqueue_script('jquery-ui-dialog');
+  }
 
-add_action('admin_init', function() { new Plugin_Review_Column; });
+  public function add_security_column() {
+    new Plugin_Review_Column;
+  }
+}
 
 class Plugin_Review_Column {
   // Track the number of failed requests so that we can stop trying after a certain number.
@@ -40,16 +48,19 @@ class Plugin_Review_Column {
   private $dxw_security_failed_requests = 0;
 
   public function __construct() {
-    add_filter('manage_plugins_columns', function($columns) {
-      $columns['security_review'] = "Security";
-      return $columns;
-    });
+    add_filter('manage_plugins_columns', array( $this, 'manage_plugins_columns' ));
+    add_action('manage_plugins_custom_column', array( $this, 'manage_plugins_custom_column' ), 10, 3);
+  }
 
-    add_action('manage_plugins_custom_column', function( $column_name, $plugin_file, $plugin_data) {
-      if($column_name == 'security_review') {
-        $this->data($plugin_file, $plugin_data);
-      }
-    }, 10, 3);
+  public function manage_plugins_columns($columns) {
+    $columns['security_review'] = "Security";
+    return $columns;
+  }
+
+  public function manage_plugins_custom_column( $column_name, $plugin_file, $plugin_data) {
+    if($column_name == 'security_review') {
+      $this->data($plugin_file, $plugin_data);
+    }
   }
 
   private function data($plugin_file, $plugin_data) {
@@ -108,18 +119,18 @@ class Plugin_Review {
 
   // TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
   private $review_statuses = array(
-    'green'  => array(  'message' => "No issues found",
-                        'slug' => "no-issues-found",
-                        'description' => "dxw's review didn't find anything worrying in this plugin. It's probably safe."),
-    'yellow' => array(  'message' => "Use with caution",
-                        'slug' => "use-with-caution",
-                        'description' => "Before using this plugin, you should carefully consider the findings of dxw's review."),
-    'red'    => array(  'message' => "Potentially unsafe",
-                        'slug' => "potentially-unsafe",
-                        'description' => "Before using this plugin, you should very carefully consider its potential problems and should conduct a thorough assessment."),
-    'not-found' => array('message' => "Not yet reviewed",
-                        'slug' => "no-info",
-                        'description' => "We haven't reviewed this plugin yet. If you like we can review it for you."),
+    'green'     => array( 'message' => "No issues found",
+                          'slug' => "no-issues-found",
+                          'description' => "dxw's review didn't find anything worrying in this plugin. It's probably safe."),
+    'yellow'    => array( 'message' => "Use with caution",
+                          'slug' => "use-with-caution",
+                          'description' => "Before using this plugin, you should carefully consider the findings of dxw's review."),
+    'red'       => array( 'message' => "Potentially unsafe",
+                          'slug' => "potentially-unsafe",
+                          'description' => "Before using this plugin, you should very carefully consider its potential problems and should conduct a thorough assessment."),
+    'not-found' => array( 'message' => "Not yet reviewed",
+                          'slug' => "no-info",
+                          'description' => "We haven't reviewed this plugin yet. If you like we can review it for you."),
   );
 
 
@@ -213,7 +224,7 @@ class Dxw_Security_Api {
     $api_path = "/reviews";
 
     // TODO: Currently this only handles codex plugins
-    $plugin_url = 'http://wordpress.org/plugins/' . explode('/',$this->plugin_file)[0] . '/';
+    $plugin_url = "http://wordpress.org/plugins/{$this->plugin_name()}/";
 
     $query = http_build_query(
       array(
@@ -288,4 +299,13 @@ class Dxw_Security_Api {
   private function plugin_review_slug() {
     return $this->plugin_file . $this->plugin_version;
   }
+
+  private function plugin_name() {
+    // versions of php before 5.4 don't allow array indexes to be accessed directly on the output of functions
+    // http://www.php.net/manual/en/migration54.new-features.php - "Function array dereferencing"
+    $f = explode( '/', $this->plugin_file );
+    return $f[0];
+  }
 }
+
+new dxw_Security();
