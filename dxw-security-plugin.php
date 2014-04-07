@@ -23,15 +23,15 @@ define('DXW_SECURITY_PLUGINS_URL', 'https://security.dxw.com/plugins/');
 
 class dxw_Security {
   public function __construct() {
-    add_action( 'admin_enqueue_scripts', array($this, 'enqueue_scripts') );
-    add_action( 'admin_init', array($this, 'add_security_column') );
+    add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
+    add_action('admin_init', array($this, 'add_security_column'));
   }
 
   public function enqueue_scripts($hook) {
-    if( 'plugins.php' != $hook ) { return; }
+    if('plugins.php' != $hook) { return; }
 
-    wp_enqueue_style( 'dxw-security-plugin-styles', plugins_url( '/assets/main.min.css' , __FILE__ ));
-    wp_enqueue_script( 'dxw-security-plugin-scripts', plugins_url( '/assets/main.min.js' , __FILE__ ) );
+    wp_enqueue_style('dxw-security-plugin-styles', plugins_url('/assets/main.min.css' , __FILE__));
+    wp_enqueue_script('dxw-security-plugin-scripts', plugins_url('/assets/main.min.js' , __FILE__));
 
     wp_enqueue_style('wp-jquery-ui-dialog');
     wp_enqueue_script('jquery-ui-dialog');
@@ -48,8 +48,8 @@ class Plugin_Review_Column {
   private $dxw_security_failed_requests = 0;
 
   public function __construct() {
-    add_filter('manage_plugins_columns', array( $this, 'manage_plugins_columns' ));
-    add_action('manage_plugins_custom_column', array( $this, 'manage_plugins_custom_column' ), 10, 3);
+    add_filter('manage_plugins_columns', array($this, 'manage_plugins_columns'));
+    add_action('manage_plugins_custom_column', array($this, 'manage_plugins_custom_column'), 10, 3);
   }
 
   public function manage_plugins_columns($columns) {
@@ -57,7 +57,7 @@ class Plugin_Review_Column {
     return $columns;
   }
 
-  public function manage_plugins_custom_column( $column_name, $plugin_file, $plugin_data) {
+  public function manage_plugins_custom_column($column_name, $plugin_file, $plugin_data) {
     if($column_name == 'security_review') {
       $this->data($plugin_file, $plugin_data);
     }
@@ -65,7 +65,7 @@ class Plugin_Review_Column {
 
   private function data($plugin_file, $plugin_data) {
     // Stop making requests after a certain number of failures:
-    if ( $this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT ) {
+    if ($this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $review = new Null_Plugin_Review();
 
     } else {
@@ -82,10 +82,10 @@ class Plugin_Review_Column {
 
         $review = new Plugin_Review($name, $status, $reason, $link);
 
-      } catch ( Dxw_Security_NotFound $e ) {
+      } catch (Dxw_Security_NotFound $e) {
         $review = new Plugin_Review($name, 'not-found');
 
-      } catch ( Exception $e ) {
+      } catch (Exception $e) {
         // TODO: Handle Dxw_Security_Error separately?
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
         $this->dxw_security_failed_requests++;
@@ -131,13 +131,13 @@ class Plugin_Review {
     'not-found' => array( 'message' => "Not yet reviewed",
                           'slug' => "no-info",
                           'description' => "We haven't reviewed this plugin yet. If you like we can review it for you."),
-  );
+ );
 
 
   public function view() {
-    $name = $this->name;
-    $slug = $this->slug;
-    $message = $this->message;
+    $name = esc_attr($this->name);
+    $slug = esc_attr($this->slug);
+    $message = esc_html($this->message);
 
     $dialog_id = "plugin-inspection-results" . sanitize_title($this->name);
 
@@ -148,27 +148,30 @@ class Plugin_Review {
         <p class="more-info">More information</p>
       </a>
 
-      <?php print_r( $this->view_dialog($dialog_id) ); ?>
+      <?php print_r($this->view_dialog($dialog_id)); ?>
     <?php
   }
 
   private function view_dialog($dialog_id){
-    $slug = $this->slug;
-    $message = $this->message;
-    $link = $this->link;
+    $dialog_id = esc_attr($dialog_id); // Trust no-one!
+    $slug = esc_attr($this->slug);
+    $link = esc_url($this->link);
+    $message = esc_html($this->message);
+
+    // These might legitimately contain html:
     $description = $this->description;
     $reason = $this->reason;
 
     ?>
       <div id="<?php echo $dialog_id; ?>" style="display:none;" class="dialog review-message <?php echo $slug; ?>">
 
-        <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url( '/assets/dxw-logo.png' , __FILE__ ); ?>" alt="dxw logo" /></a>
+        <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url('/assets/dxw-logo.png' , __FILE__); ?>" alt="dxw logo" /></a>
 
         <div class="inner">
           <h2><a href="<?php echo $link ?>"><span class="icon-<?php echo $slug ?>"></span> <?php echo $message ?></a></h2>
           <p class="review-status-description"><?php echo $description ?></p>
           <?php
-            if ( empty($reason) ) {
+            if (empty($reason)) {
               echo("<a href='{$link}' class='read-more' >See the dxw Security website for details</a>");
             } else {
               print_r("<p>{$reason}</p>");
@@ -186,7 +189,7 @@ class Null_Plugin_Review {
   public function view(){
     ?>
     <div class="review-message review-error">
-      <h3><a href='<?php echo DXW_SECURITY_PLUGINS_URL; ?>'>An error occurred</a></h3>
+      <h3><a href='<?php echo(esc_url(DXW_SECURITY_PLUGINS_URL)); ?>'>An error occurred</a></h3>
       <p>Please try again later</p>
     </div>
     <?php
@@ -231,7 +234,7 @@ class Plugin_Review_API extends Dxw_Security_API {
   private function plugin_name() {
     // Versions of php before 5.4 don't allow array indexes to be accessed directly on the output of functions
     //   http://www.php.net/manual/en/migration54.new-features.php - "Function array dereferencing"
-    $f = explode( '/', $this->plugin_file );
+    $f = explode('/', $this->plugin_file);
     return $f[0];
   }
 }
@@ -284,14 +287,14 @@ class Dxw_Security_API {
 
   // Either return a review or throw an error
   private function handle_response($response) {
-    if ( is_wp_error($response) ) {
-      throw new Dxw_Security_Error( $response->get_error_message() );
+    if (is_wp_error($response)) {
+      throw new Dxw_Security_Error($response->get_error_message());
 
     } else {
-      switch ( $response['response']['code'] ) {
+      switch ($response['response']['code']) {
         case 200:
           $parsed_body = $this->parse_response_body($response['body']);
-          $data = $this->extract_data( $parsed_body );
+          $data = $this->extract_data($parsed_body);
           $this->cache_api_data($data);
           return $data;
 
@@ -301,31 +304,31 @@ class Dxw_Security_API {
         default:
           // TODO: handle other codes individually?
           // A redirect would end up here - is it possible to get one??
-          throw new Dxw_Security_Error( "Response was {$response['response']['code']}: {$response['body']}" );
+          throw new Dxw_Security_Error("Response was {$response['response']['code']}: {$response['body']}");
       };
     }
   }
 
   private function parse_response_body($body) {
-    $parsed_body = json_decode( $body );
+    $parsed_body = json_decode($body);
 
-    if ( !is_null($parsed_body) ) {
+    if (!is_null($parsed_body)) {
       return $parsed_body;
     } else {
-      $truncated_body = mb_substr( $body, 0, 100 );
-      throw new Dxw_Security_Error( "Couldn't parse json body beginning: {$truncated_body}" );
+      $truncated_body = mb_substr($body, 0, 100);
+      throw new Dxw_Security_Error("Couldn't parse json body beginning: {$truncated_body}");
     }
   }
 
   private function cache_api_data($data) {
-    if ( DXW_SECURITY_CACHE_RESPONSES ) {
+    if (DXW_SECURITY_CACHE_RESPONSES) {
       $slug = $this->cache_slug();
       // TODO: How long should this get cached for?
-      set_transient( $slug, $data, HOUR_IN_SECONDS );
+      set_transient($slug, $data, HOUR_IN_SECONDS);
     }
   }
   private function retrieve_api_data() {
-    if ( DXW_SECURITY_CACHE_RESPONSES ) {
+    if (DXW_SECURITY_CACHE_RESPONSES) {
       $slug = $this->cache_slug();
       return get_transient($slug);
     } else {
