@@ -51,9 +51,8 @@ module.exports = function(grunt) {
               archive: 'dxw-security.zip'
             },
             files: [
-              {src: ['assets/*'], filter: 'isFile'},
-              {src: ['assets/fonts/**'] },
-              {src: 'dxw-security-plugin.php' },
+              { src: ['assets/*'], dest: 'dxw-security/', filter: 'isFile' },
+              { src: ['assets/fonts/**', 'dxw-security-plugin.php'], dest: 'dxw-security/' },
             ]
           }
         },
