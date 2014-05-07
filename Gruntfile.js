@@ -52,7 +52,7 @@ module.exports = function(grunt) {
             },
             files: [
               { src: ['assets/*'], dest: 'dxw-security/', filter: 'isFile' },
-              { src: ['assets/fonts/**', 'dxw-security-plugin.php'], dest: 'dxw-security/' },
+              { src: ['assets/fonts/**', 'dxw-security.php'], dest: 'dxw-security/' },
             ]
           }
         },
