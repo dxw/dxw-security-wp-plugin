@@ -64,21 +64,21 @@ class Plugin_Review_Column {
   }
 
   private function data($plugin_file, $plugin_data) {
+    $name = $plugin_data['Name'];
+    $installed_version = $plugin_data['Version'];
+
     // Stop making requests after a certain number of failures:
     if ($this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $review = new Null_Plugin_Review();
 
     } else {
-
-      $name = $plugin_data['Name'];
       $api = new Plugin_Review_API($plugin_file);
 
       try {
         $reviews = $api->call();
         if (empty($reviews)) {
-          $review = new Plugin_Review($name, 'not-found');
+          $review = new Plugin_Review($name, $installed_version, 'not-found');
         } else{
-          $installed_version = $plugin_data['Version'];
 
           foreach($reviews as &$r) {
             if ($r->version == $installed_version) {
@@ -86,11 +86,14 @@ class Plugin_Review_Column {
               $status = $r->recommendation;
               $link = $r->review_link;
 
-              $review = new Plugin_Review($name, $status, $reason, $link);
+              $review = new Plugin_Review($name, $installed_version, $status, $reason, $link);
+            } else {
+
             }
           }
           if (empty($review)) {
-            $review = new Plugin_Review($name, 'not-found');
+            # TODO: Instead of green have the most recent review
+            $review = new Other_Version_Plugin_Review($name, $installed_version, 'green');
           }
         }
       } catch (Exception $e) {
@@ -107,15 +110,17 @@ class Plugin_Review_Column {
 }
 
 class Plugin_Review {
-  private $name;
-  private $link;
-  private $reason;
-  private $message;
-  private $description;
-  private $slug;
+  protected $name;
+  protected $version;
+  protected $link;
+  protected $reason;
+  protected $message;
+  protected $description;
+  protected $slug;
 
-  public function __construct($name, $status, $reason="", $link=DXW_SECURITY_PLUGINS_URL) {
+  public function __construct($name, $version, $status, $reason="", $link=DXW_SECURITY_PLUGINS_URL) {
     $this->name = $name;
+    $this->version = $version;
     $this->link = $link;
     $this->reason = $reason;
 
@@ -126,7 +131,7 @@ class Plugin_Review {
   }
 
   // TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
-  private $review_statuses = array(
+  protected $review_statuses = array(
     'green'     => array( 'message' => "No issues found",
                           'slug' => "no-issues-found",
                           'description' => "dxw's review didn't find anything worrying in this plugin. It's probably safe."),
@@ -139,18 +144,19 @@ class Plugin_Review {
     'not-found' => array( 'message' => "Not yet reviewed",
                           'slug' => "no-info",
                           'description' => "We haven't reviewed this plugin yet. If you like we can review it for you."),
- );
+  );
 
 
   public function view() {
     $name = esc_attr($this->name);
+    $version = esc_attr($this->version);
     $slug = esc_attr($this->slug);
     $message = esc_html($this->message);
 
-    $dialog_id = "plugin-inspection-results" . sanitize_title($this->name);
+    $dialog_id = $this->dialog_id($name);
 
     ?>
-      <a href="#<?php echo $dialog_id; ?>" data-title="<?php echo $name; ?>" class="dialog-link review-message <?php echo $slug; ?>">
+      <a href="#<?php echo $dialog_id; ?>" data-title="<?php echo $name; ?> - <?php echo $version; ?>" class="dialog-link review-message <?php echo $slug; ?>">
         <h3><span class='icon-<?php echo $slug; ?>'></span> <?php echo $message; ?></h3>
 
         <p class="more-info">More information</p>
@@ -160,7 +166,7 @@ class Plugin_Review {
     <?php
   }
 
-  private function view_dialog($dialog_id){
+  protected function view_dialog($dialog_id){
     $dialog_id = esc_attr($dialog_id); // Trust no-one!
     $slug = esc_attr($this->slug);
     $link = esc_url($this->link);
@@ -191,6 +197,36 @@ class Plugin_Review {
       </div>
     <?php
   }
+
+  protected function dialog_id($name) {
+    return "plugin-inspection-results-" . sanitize_title($name);
+  }
+}
+
+class Other_Version_Plugin_Review extends Plugin_Review {
+
+  // TODO: This overlaps quite a bit with the base class
+  public function view() {
+    $name = esc_attr($this->name);
+    $version = esc_attr($this->version);
+    $slug = esc_attr($this->slug);
+
+    $dialog_id = $this->dialog_id($name);
+
+    ?>
+      <a href="#<?php echo $dialog_id; ?>" data-title="<?php echo $name; ?> - <?php echo $version; ?>" class="dialog-link review-message no-info other-versions-reviewed other-<?php echo $slug; ?>">
+        <h3></span>Other versions have been reviewed</h3>
+
+        <p class="more-info">More information</p>
+      </a>
+
+      <?php print_r($this->view_dialog($dialog_id)); ?>
+    <?php
+  }
+
+  // TODO: A view displaying the other reviews.
+
+
 }
 
 class Null_Plugin_Review {
