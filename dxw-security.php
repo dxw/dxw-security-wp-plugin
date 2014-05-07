@@ -74,17 +74,25 @@ class Plugin_Review_Column {
       $api = new Plugin_Review_API($plugin_file, $plugin_data);
 
       try {
-        $review_data = $api->call();
+        $reviews = $api->call();
+        if (empty($reviews)) {
+          $review = new Plugin_Review($name, 'not-found');
+        } else{
+          $installed_version = $plugin_data['Version'];
 
-        $reason = $review_data->reason;
-        $status = $review_data->recommendation;
-        $link = $review_data->review_link;
+          foreach($reviews as &$r) {
+            if ($r->version == $installed_version) {
+              $reason = $r->reason;
+              $status = $r->recommendation;
+              $link = $r->review_link;
 
-        $review = new Plugin_Review($name, $status, $reason, $link);
-
-      } catch (Dxw_Security_NotFound $e) {
-        $review = new Plugin_Review($name, 'not-found');
-
+              $review = new Plugin_Review($name, $status, $reason, $link);
+            }
+          }
+          if (empty($review)) {
+            $review = new Plugin_Review($name, 'not-found');
+          }
+        }
       } catch (Exception $e) {
         // TODO: Handle Dxw_Security_Error separately?
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
@@ -196,29 +204,26 @@ class Null_Plugin_Review {
   }
 }
 
-
 class Plugin_Review_API extends Dxw_Security_API {
 
   private $plugin_file;
-  private $plugin_version;
-
-  // TODO: Currently this only handles directory plugins
-  protected function api_path() {
-    return "/directory_plugins/{$this->plugin_name()}/reviews/{$this->plugin_version}";
-  }
 
   public function __construct($plugin_file, $plugin_data) {
     $this->plugin_file = $plugin_file;
-    $this->plugin_version = $plugin_data['Version'];
+  }
+
+  // TODO: Currently this only handles directory plugins
+  protected function api_path() {
+    return "/directory_plugins/{$this->plugin_name()}/reviews/";
   }
 
   protected function cache_slug() {
-    return $this->plugin_file . $this->plugin_version;
+    return $this->plugin_file;
   }
 
   // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
   protected function extract_data($parsed_body) {
-    return $parsed_body->review;
+    return $parsed_body->reviews;
   }
 
   private function plugin_name() {
@@ -231,7 +236,6 @@ class Plugin_Review_API extends Dxw_Security_API {
 
 
 // php doesn't support nested classes so these need to live outside the API class
-class Dxw_Security_NotFound extends Exception { }
 class Dxw_Security_Error extends Exception { }
 
 // TODO: Not sure this is the right name: this is for getting one specific plugin...
