@@ -71,7 +71,7 @@ class Plugin_Review_Column {
     } else {
 
       $name = $plugin_data['Name'];
-      $api = new Plugin_Review_API($plugin_file, $plugin_data);
+      $api = new Plugin_Review_API($plugin_file);
 
       try {
         $reviews = $api->call();
@@ -208,7 +208,7 @@ class Plugin_Review_API extends Dxw_Security_API {
 
   private $plugin_file;
 
-  public function __construct($plugin_file, $plugin_data) {
+  public function __construct($plugin_file) {
     $this->plugin_file = $plugin_file;
   }
 
