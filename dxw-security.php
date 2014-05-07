@@ -2,7 +2,7 @@
 // Plugin Name: dxw Security
 // Plugin URI: https://security.dxw.com/
 // Description: Pulls plugin review information from dxw Security into the wordpress plugins screen
-// Version: 0.1.0
+// Version: 0.2.0
 // License: GPLv2
 // Author: dxw
 // Author URI: http://dxw.com/
@@ -202,24 +202,14 @@ class Plugin_Review_API extends Dxw_Security_API {
   private $plugin_file;
   private $plugin_version;
 
-  // TODO: It would be nice if this was a constant or static. Needs to be accessed from the parent...
-  protected $API_Path = "/reviews";
+  // TODO: Currently this only handles directory plugins
+  protected function api_path() {
+    return "/directory_plugins/{$this->plugin_name()}/reviews/{$this->plugin_version}";
+  }
 
   public function __construct($plugin_file, $plugin_data) {
     $this->plugin_file = $plugin_file;
     $this->plugin_version = $plugin_data['Version'];
-  }
-
-  protected function query() {
-    // TODO: Currently this only handles codex plugins
-    $plugin_url = "http://wordpress.org/plugins/{$this->plugin_name()}/";
-
-    return http_build_query(
-      array(
-        'codex_link'=>$plugin_url,
-        'version'=>$this->plugin_version
-      )
-    );
   }
 
   protected function cache_slug() {
@@ -247,10 +237,8 @@ class Dxw_Security_Error extends Exception { }
 // TODO: Not sure this is the right name: this is for getting one specific plugin...
 class Dxw_Security_API {
   // TODO: This class doesn't work on it's own, only when extended by a class which defines the following:
-  //    variables:
-  //      * $API_Path
   //    functions:
-  //      * query()
+  //      * $api_path()
   //      * cache_slug()
   //      * extract_data($parsed_body)
   // Is there a standard way of doing this? should it complain on construction if those things aren't defined
@@ -267,8 +255,7 @@ class Dxw_Security_API {
 
   private function get() {
     $api_root = DXW_SECURITY_API_ROOT;
-    $api_path = $this->API_Path;
-    $query = $this->query();
+    $api_path = $this->api_path();
 
     // this should exist in core, but doesn't seem to:
     // $url = http_build_url(
@@ -278,7 +265,7 @@ class Dxw_Security_API {
     //     "query" => $query
     //   )
     // );
-    $url = $api_root . $api_path . '?' . $query;
+    $url = $api_root . $api_path;
 
     $response = wp_remote_get($url);
 
