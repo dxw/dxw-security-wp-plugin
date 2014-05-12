@@ -99,7 +99,7 @@ class Plugin_Review_Column {
           if (empty($recommendation)) {
             # TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
             #   - if something went wrong then that might not be the case ...(?)
-            $other_version_reviews_data = new Other_Version_Reviews_Data(array_reverse($other_version_reviews));
+            $other_version_reviews_data = new Other_Version_Reviews_Data(array_reverse($other_version_reviews)); // Reversed so that we get the latest review first
             $recommendation = new Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
           }
         }
@@ -201,8 +201,10 @@ class Review_Data {
   public function render() {
     // reason is retrieved from the api but might legitimately include html
     // description and heading might also legitimately include html but come from strings in this code
+
+    // The class ($slug) on the heading will be duplicated for reviewed versions but it's there for the "other reviewed versions" case
     ?>
-      <h2><a href="<?php echo esc_url($this->link) ?>"><?php echo $this->heading() ?></a></h2>
+      <h2 class="<?php echo esc_attr($this->slug); ?>"><a href="<?php echo esc_url($this->link) ?>"><?php echo $this->heading() ?></a></h2>
       <p class="review-status-description"><?php echo $this->description ?></p>
       <?php
         if (empty($this->reason)) {

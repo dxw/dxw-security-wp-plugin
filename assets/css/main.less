@@ -91,6 +91,18 @@
     .colour_box(@grey, @grey-background, @grey-highlight);
   }
 
+  // TODO - this isn't the best implementation, but it works. The problem is that if there's one review, we want to display the whole dialog as a colour box,
+  //   but if there are several reviews (of different versions) then we need to display a different colour in each case
+  h2.use-with-caution a{
+    color: @amber;
+  }
+  h2.potentially-unsafe a{
+    color: @wp-red;
+  }
+  h2.no-issues-found a{
+    color: @green;
+  }
+
   .review-status-description {
     font-style: italic;
     color: gray;
@@ -129,7 +141,7 @@
     }
   }
 
-  &.other-versions-reviewed {
+  &.dialog-link {
     &.other-use-with-caution {
       .corner_triangle(@amber);
     }
