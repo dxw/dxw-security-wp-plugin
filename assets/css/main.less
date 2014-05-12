@@ -30,6 +30,8 @@
 }
 .rotation(@deg:5deg){
   .transform(rotate(@deg));
+  -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=cos(@deg), M12=sin(@deg), M21=sin(@deg), M22=cos(@deg))";
+  filter: progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=cos(@deg), M12=sin(@deg), M21=sin(@deg), M22=cos(@deg));
 }
 
 .transition(@target: all, @duration:0.2s, @ease:ease-out) {
@@ -38,6 +40,13 @@
   -o-transition: all @duration @ease;
   transition: all @duration @ease;
 }
+
+.opacity(@opacity) {
+  opacity: @opacity;
+  @opacity-ie: (@opacity * 100);
+  filter: alpha(opacity=@opacity-ie); //IE8
+}
+
 // End Generic mixins
 
 .dialog-link, .review-error {
@@ -91,36 +100,44 @@
     padding-left: 20px;
   }
 
-  // TODO: can this be cleaned up further?
+
+  // TODO: cribbed from OCS - can this be cleaned up further?
   .corner_triangle(@colour) {
-    content: "";
-    width: 0;
-    height: 0;
-    border-left: 28px solid transparent;
-    border-right: 29px solid transparent;
-    border-bottom: 29px solid @colour;
-    display: inline-block;
-    position: absolute;
-    bottom: -4px;
-    right: -18px;
-    opacity: 1;
-    filter: alpha(opacity=100);
-    -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=cos(135deg), M12=sin(135deg), M21=sin(135deg), M22=cos(135deg))";
-    filter: progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=cos(135deg), M12=sin(135deg), M21=sin(135deg), M22=cos(135deg));
-    .rotation(135deg);
-    .transition(border-color 0.3s ease-in-out);
+    position: relative;
+    overflow: hidden;
+    &:after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 28px solid transparent;
+      border-right: 29px solid transparent;
+      border-bottom: 29px solid @colour;
+      display: inline-block;
+      position: absolute;
+      bottom: -4px;
+      right: -18px;
+      opacity: 1;
+      filter: alpha(opacity=100);
+      .rotation(135deg);
+      .transition(border-color 0.3s ease-in-out);
+
+      // TODO: I think using this requires using modernizr to add the .lt-1e9 class. Is there any other way we can do this?
+      // .lt-ie9 & {
+      //   display: none;
+      //   visibility: hidden;
+      // }
+    }
   }
 
   &.other-versions-reviewed {
-    position:relative;
     &.other-use-with-caution {
-      &:after { .corner_triangle(@amber); }
+      .corner_triangle(@amber);
     }
     &.other-potentially-unsafe {
-      &:after { .corner_triangle(@wp-red); }
+      .corner_triangle(@wp-red);
     }
     &.other-no-issues-found {
-      &:after { .corner_triangle(@green); }
+      .corner_triangle(@green);
     }
   }
 }
