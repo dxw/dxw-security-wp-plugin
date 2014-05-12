@@ -68,13 +68,12 @@
   .colour_box(@color, @background-color, @highlight-color) {
     background-color: @background-color;
 
-    h2 a, h3 a, h3, .more-info, &.dialog-link {
+    &.dialog h2 a, &.dialog-link * {
       color: @color;
       text-decoration: none;
-
-      &:hover, &:hover * {
-        color: @highlight-color;
-      }
+    }
+    &.dialog h2 a:hover, &.dialog-link:hover * {
+      color: @highlight-color;
     }
   }
 
@@ -89,6 +88,18 @@
   }
   &.no-info, &.review-error {
     .colour_box(@grey, @grey-background, @grey-highlight);
+  }
+  &.other-versions-reviewed {
+    background-color: @grey-background;
+    color: @grey;
+
+    h3, .more-info {
+      color: @grey;
+      text-decoration: none;
+    }
+    &.dialog-link:hover * {
+      color: @grey-highlight;
+    }
   }
 
   // TODO - this isn't the best implementation, but it works. The problem is that if there's one review, we want to display the whole dialog as a colour box,

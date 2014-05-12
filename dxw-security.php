@@ -116,7 +116,7 @@ class Plugin_Review_Column {
 }
 
 
-class Plugin_Recommendation  {
+class Plugin_Recommendation {
   private $name;
   private $version;
   private $slug;
@@ -163,6 +163,42 @@ class Plugin_Recommendation  {
 }
 
 
+class Plugin_Recommendation_Reviewed {
+  public function __construct($name, $version, $review_data) {
+    $this->recommendation = new Plugin_Recommendation($name, $version, $review_data->slug, $review_data);
+  }
+  public function render() {
+    $this->recommendation->render();
+  }
+}
+
+
+class Plugin_Recommendation_Other_Versions_Reviewed {
+  private $recommendation;
+
+  public function __construct($name, $version, $other_reviews_data) {
+    // TODO - replace no-info with the slug of the latest review
+    $latest_result = $other_reviews_data->most_recent()->slug;
+    $this->recommendation = new Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, "other-{$latest_result}");
+  }
+  public function render() {
+    $this->recommendation->render();
+  }
+}
+
+
+class Null_Plugin_Recommendation {
+  public function render(){
+    ?>
+    <div class="review-message review-error">
+      <h3><a href='<?php echo(esc_url(DXW_SECURITY_PLUGINS_URL)); ?>'>An error occurred</a></h3>
+      <p>Please try again later</p>
+    </div>
+    <?php
+  }
+}
+
+
 class Review_Data {
   public $version;
   public $slug;
@@ -185,7 +221,6 @@ class Review_Data {
                           'slug' => "no-info",
                           'description' => "We haven't reviewed this plugin yet. If you like we can review it for you."),
   );
-
 
   public function __construct($version, $status, $reason="", $link=DXW_SECURITY_PLUGINS_URL) {
     $this->version = $version;
@@ -243,41 +278,6 @@ class Other_Version_Reviews_Data {
 
   public function most_recent() {
     return current($this->reviews);
-  }
-}
-
-class Plugin_Recommendation_Reviewed {
-  public function __construct($name, $version, $review_data) {
-    $this->recommendation = new Plugin_Recommendation($name, $version, $review_data->slug, $review_data);
-  }
-  public function render() {
-    $this->recommendation->render();
-  }
-}
-
-
-class Plugin_Recommendation_Other_Versions_Reviewed {
-  private $recommendation;
-
-  public function __construct($name, $version, $other_reviews_data) {
-    // TODO - replace no-info with the slug of the latest review
-    $latest_result = $other_reviews_data->most_recent()->slug;
-    $this->recommendation = new Plugin_Recommendation($name, $version, "no-info", $other_reviews_data, "other-versions-reviewed other-{$latest_result}");
-  }
-  public function render() {
-    $this->recommendation->render();
-  }
-}
-
-
-class Null_Plugin_Recommendation {
-  public function render(){
-    ?>
-    <div class="review-message review-error">
-      <h3><a href='<?php echo(esc_url(DXW_SECURITY_PLUGINS_URL)); ?>'>An error occurred</a></h3>
-      <p>Please try again later</p>
-    </div>
-    <?php
   }
 }
 
