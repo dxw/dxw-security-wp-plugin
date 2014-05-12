@@ -68,11 +68,11 @@
   .colour_box(@color, @background-color, @highlight-color) {
     background-color: @background-color;
 
-    &.dialog h2 a, &.dialog-link * {
+    h2 a, &.dialog-link * {
       color: @color;
       text-decoration: none;
     }
-    &.dialog h2 a:hover, &.dialog-link:hover * {
+    h2 a:hover, &.dialog-link:hover * {
       color: @highlight-color;
     }
   }
