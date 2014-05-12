@@ -69,7 +69,7 @@ class Plugin_Review_Column {
 
     // Stop making requests after a certain number of failures:
     if ($this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
-      $review = new Null_Plugin_Review();
+      $recommendation = new Null_Plugin_Review();
 
     } else {
       $api = new Plugin_Review_API($plugin_file);
@@ -77,23 +77,30 @@ class Plugin_Review_Column {
       try {
         $reviews = $api->call();
         if (empty($reviews)) {
-          $review = new Plugin_Review($name, $installed_version, 'not-found');
+          $review_data = new Review_Data($installed_version, "not-found");
+          $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
         } else{
 
+          $other_version_reviews = array();
           foreach($reviews as &$r) {
+            $version = $r->version;
+            $status = $r->recommendation;
+            $reason = $r->reason;
+            $link = $r->review_link;
+
+            $review_data = new Review_Data($version, $status, $reason, $link);
+
             if ($r->version == $installed_version) {
-              $reason = $r->reason;
-              $status = $r->recommendation;
-              $link = $r->review_link;
-
-              $review = new Plugin_Review($name, $installed_version, $status, $reason, $link);
+              $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
             } else {
-
+              $other_version_reviews[] = $review_data;
             }
           }
-          if (empty($review)) {
-            # TODO: Instead of green have the most recent review
-            $review = new Other_Version_Plugin_Review($name, $installed_version, 'green');
+          if (empty($recommendation)) {
+            # TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
+            #   - if something went wrong then that might not be the case ...(?)
+            $other_version_reviews_data = new Other_Version_Reviews_Data($other_version_reviews);
+            $recommendation = new Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
           }
         }
       } catch (Exception $e) {
@@ -101,37 +108,77 @@ class Plugin_Review_Column {
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
         $this->dxw_security_failed_requests++;
 
-        $review = new Null_Plugin_Review();
+        $recommendation = new Null_Plugin_Recommendation();
       }
     }
 
-    $review->view();
+    $recommendation->render();
   }
 }
 
-class Plugin_Review {
-  protected $name;
-  protected $version;
-  protected $link;
-  protected $reason;
-  protected $message;
-  protected $description;
-  protected $slug;
 
-  public function __construct($name, $version, $status, $reason="", $link=DXW_SECURITY_PLUGINS_URL) {
+class Plugin_Recommendation  {
+  private $name;
+  private $version;
+  private $message;
+  private $slug;
+  private $review_data;
+  private $css_class;
+
+  public function __construct($name, $version, $message, $slug, $review_data, $css_class="") {
     $this->name = $name;
     $this->version = $version;
-    $this->link = $link;
-    $this->reason = $reason;
-
-    $review_status = $this->review_statuses[$status];
-    $this->message = $review_status['message'];
-    $this->description = $review_status['description'];
-    $this->slug = $review_status['slug'];
+    $this->message = $message;
+    $this->slug = $slug;
+    $this->review_data = $review_data;
+    $this->css_class = $css_class;
   }
 
-  // TODO: this should be some kind of constant, but we couldn't work out how. Static didn't work, and class consts can't contain arrays
-  protected $review_statuses = array(
+  public function render() {
+    ?>
+      <a href="#<?php echo esc_attr($this->dialog_id()); ?>" data-title="<?php echo esc_attr($this->name); ?> - <?php echo esc_attr($this->version); ?>" class="dialog-link review-message <?php echo esc_attr($this->slug) ?> <?php echo esc_attr($this->css_class) ?>">
+        <h3><?php echo $this->heading(); ?></h3>
+
+        <p class="more-info">More information</p>
+      </a>
+
+      <?php print_r($this->render_dialog()); ?>
+    <?php
+  }
+
+  protected function render_dialog(){
+    ?>
+      <div id="<?php echo esc_attr($this->dialog_id()); ?>" style="display:none;" class="dialog review-message <?php echo esc_attr($this->slug); ?> <?php echo esc_attr($this->css_class) ?>">
+
+        <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url('/assets/dxw-logo.png' , __FILE__); ?>" alt="dxw logo" /></a>
+
+        <div class="inner">
+          <?php print_r($this->review_data->render()) ?>
+        </div>
+
+      </div>
+    <?php
+  }
+
+  protected function heading() {
+    return "<span class='icon-{$this->slug} ?>'></span> {$this->message}";
+  }
+
+  protected function dialog_id() {
+    return "plugin-inspection-results-" . sanitize_title($this->name);
+  }
+}
+
+
+class Review_Data {
+  public $version;
+  public $slug;
+  public $message;
+  private $description;
+  private $reason;
+
+  // TODO: ideally this would be a class constant, but php doesn't support that
+  private static $dxw_security_review_statuses = array(
     'green'     => array( 'message' => "No issues found",
                           'slug' => "no-issues-found",
                           'description' => "dxw's review didn't find anything worrying in this plugin. It's probably safe."),
@@ -147,89 +194,76 @@ class Plugin_Review {
   );
 
 
-  public function view() {
-    $name = esc_attr($this->name);
-    $version = esc_attr($this->version);
-    $slug = esc_attr($this->slug);
-    $message = esc_html($this->message);
+  public function __construct($version, $status, $reason="", $link=DXW_SECURITY_PLUGINS_URL) {
+    $this->version = $version;
+    $this->reason = $reason;
+    $this->link = $link;
 
-    $dialog_id = $this->dialog_id($name);
-
-    ?>
-      <a href="#<?php echo $dialog_id; ?>" data-title="<?php echo $name; ?> - <?php echo $version; ?>" class="dialog-link review-message <?php echo $slug; ?>">
-        <h3><span class='icon-<?php echo $slug; ?>'></span> <?php echo $message; ?></h3>
-
-        <p class="more-info">More information</p>
-      </a>
-
-      <?php print_r($this->view_dialog($dialog_id)); ?>
-    <?php
+    $review_status = self::$dxw_security_review_statuses[$status];
+    $this->message       = $review_status['message'];
+    $this->description   = $review_status['description'];
+    $this->slug          = $review_status['slug'];
   }
 
-  protected function view_dialog($dialog_id){
-    $dialog_id = esc_attr($dialog_id); // Trust no-one!
-    $slug = esc_attr($this->slug);
-    $link = esc_url($this->link);
-    $message = esc_html($this->message);
-
-    // These might legitimately contain html:
-    $description = $this->description;
-    $reason = $this->reason;
-
+  public function render() {
+    // reason is retrieved from the api but might legitimately include html
+    // description might also legitimately include html but comes from a string in this code
     ?>
-      <div id="<?php echo $dialog_id; ?>" style="display:none;" class="dialog review-message <?php echo $slug; ?>">
-
-        <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url('/assets/dxw-logo.png' , __FILE__); ?>" alt="dxw logo" /></a>
-
-        <div class="inner">
-          <h2><a href="<?php echo $link ?>"><span class="icon-<?php echo $slug ?>"></span> <?php echo $message ?></a></h2>
-          <p class="review-status-description"><?php echo $description ?></p>
-          <?php
-            if (empty($reason)) {
-              echo("<a href='{$link}' class='read-more' >See the dxw Security website for details</a>");
-            } else {
-              print_r("<p>{$reason}</p>");
-              echo("<a href='{$link}' class='read-more button-primary'> Read more...</a>");
-            }
-          ?>
-        </div>
-
-      </div>
+      <h2><a href="<?php echo esc_url($this->link) ?>"><span class="icon-<?php echo esc_attr($this->slug) ?>"></span> <?php echo esc_html($this->message) ?></a></h2>
+      <p class="review-status-description"><?php echo $this->description ?></p>
+      <?php
+        if (empty($this->reason)) {
+          echo("<a href='{esc_url($this->link)}' class='read-more' >See the dxw Security website for details</a>");
+        } else {
+          print_r("<p>{$this->reason}</p>");
+          echo("<a href='{esc_url($this->link)}' class='read-more button-primary'> Read more...</a>");
+        }
+      ?>
     <?php
-  }
-
-  protected function dialog_id($name) {
-    return "plugin-inspection-results-" . sanitize_title($name);
   }
 }
 
-class Other_Version_Plugin_Review extends Plugin_Review {
-
-  // TODO: This overlaps quite a bit with the base class
-  public function view() {
-    $name = esc_attr($this->name);
-    $version = esc_attr($this->version);
-    $slug = esc_attr($this->slug);
-
-    $dialog_id = $this->dialog_id($name);
-
-    ?>
-      <a href="#<?php echo $dialog_id; ?>" data-title="<?php echo $name; ?> - <?php echo $version; ?>" class="dialog-link review-message no-info other-versions-reviewed other-<?php echo $slug; ?>">
-        <h3></span>Other versions have been reviewed</h3>
-
-        <p class="more-info">More information</p>
-      </a>
-
-      <?php print_r($this->view_dialog($dialog_id)); ?>
-    <?php
+class Other_Version_Reviews_Data {
+  # Expects an array of Review_Data objects
+  public function __construct($reviews) {
+    $this->reviews = $reviews;
   }
 
-  // TODO: A view displaying the other reviews.
-
-
+  public function render() {
+    echo("<p>This version of the plugin has not yet been reviewed, but here are some reviews of other versions:</p>");
+    foreach($this->reviews as &$review) {
+      // TODO - this will result in two consecutive h2 headings - not great, but works for now.
+      echo("<h2>Version {$review->version}</h2>");
+      $review->render();
+    }
+  }
 }
 
-class Null_Plugin_Review {
+class Plugin_Recommendation_Reviewed {
+  public function __construct($name, $version, $review_data) {
+    $this->recommendation = new Plugin_Recommendation($name, $version, $review_data->message, $review_data->slug, $review_data);
+  }
+  public function render() {
+    $this->recommendation->render();
+  }
+}
+
+
+class Plugin_Recommendation_Other_Versions_Reviewed {
+  private $recommendation;
+
+  public function __construct($name, $version, $other_reviews_data) {
+    // TODO - replace no-info with the slug of the latest review
+    $latest_result = "no-issues-found";
+    $this->recommendation = new Plugin_Recommendation($name, $version, "Other versions have been reviewed", "no-info", $other_reviews_data, "other-versions-reviewed other-{$latest_result}");
+  }
+  public function render() {
+    $this->recommendation->render();
+  }
+}
+
+
+class Null_Plugin_Recommendation {
   public function view(){
     ?>
     <div class="review-message review-error">
@@ -239,6 +273,7 @@ class Null_Plugin_Review {
     <?php
   }
 }
+
 
 class Plugin_Review_API extends Dxw_Security_API {
 
