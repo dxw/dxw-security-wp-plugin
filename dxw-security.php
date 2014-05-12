@@ -90,7 +90,8 @@ class Plugin_Review_Column {
 
             $review_data = new Review_Data($version, $status, $reason, $link);
 
-            if ($r->version == $installed_version) {
+            // $r->version might be a list of versions, so we need to do a little work to compare it
+            if ($this->version_matches($installed_version, $r->version)) {
               $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
             } else {
               $other_version_reviews[] = $review_data;
@@ -112,6 +113,10 @@ class Plugin_Review_Column {
     }
 
     $recommendation->render();
+  }
+  private function version_matches($version, $list) {
+    $versions = explode( ',', $list );
+    return in_array($version, $versions);
   }
 }
 
