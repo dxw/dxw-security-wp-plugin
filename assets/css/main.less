@@ -77,13 +77,13 @@
     }
   }
 
-  &.use-with-caution {
+  .use-with-caution, &.use-with-caution {
     .colour_box(@amber, @amber-background, @amber-highlight);
   }
-  &.potentially-unsafe {
+  .potentially-unsafe, &.potentially-unsafe {
     .colour_box(@wp-red, @wp-red-background, @red-highlight);
   }
-  &.no-issues-found {
+  .no-issues-found, &.no-issues-found {
     .colour_box(@green, @green-background, @green-highlight);
   }
   &.no-info, &.review-error {
@@ -93,12 +93,20 @@
     background-color: @grey-background;
     color: @grey;
 
-    h3, .more-info {
+    &.dialog-link * {
       color: @grey;
       text-decoration: none;
     }
     &.dialog-link:hover * {
       color: @grey-highlight;
+    }
+
+    &.dialog {
+      .other-review {
+        padding: 0 20px;
+        margin-bottom: 20px;
+        border: 1px solid @grey;
+      }
     }
   }
 
