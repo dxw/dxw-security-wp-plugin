@@ -264,11 +264,15 @@ class Other_Version_Reviews_Data {
   }
 
   public function render() {
+    // TODO - this will result in two consecutive h2 headings - not great, but works for now.
     echo("<p>This version of the plugin has not yet been reviewed, but here are some reviews of other versions:</p>");
     foreach($this->reviews as &$review) {
-      // TODO - this will result in two consecutive h2 headings - not great, but works for now.
-      echo("<h2>Version {$review->version}</h2>");
-      $review->render();
+      ?>
+        <div class="other-review <?php echo $review->slug ?>">
+          <h2>Version <?php echo $review->version ?></h2>
+          <?php print_r($review->render()) ?>
+        </div>
+      <?php
     }
   }
 
