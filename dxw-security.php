@@ -69,7 +69,7 @@ class Plugin_Review_Column {
 
     // Stop making requests after a certain number of failures:
     if ($this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
-      $recommendation = new Null_Plugin_Review();
+      $recommendation = new Null_Plugin_Recommendation();
 
     } else {
       $api = new Plugin_Review_API($plugin_file);
@@ -99,7 +99,7 @@ class Plugin_Review_Column {
           if (empty($recommendation)) {
             # TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
             #   - if something went wrong then that might not be the case ...(?)
-            $other_version_reviews_data = new Other_Version_Reviews_Data($other_version_reviews);
+            $other_version_reviews_data = new Other_Version_Reviews_Data(array_reverse($other_version_reviews));
             $recommendation = new Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
           }
         }
@@ -107,7 +107,6 @@ class Plugin_Review_Column {
         // TODO: Handle Dxw_Security_Error separately?
         // TODO: in future we should provide some way for users to give us back some useful information when they get an error
         $this->dxw_security_failed_requests++;
-
         $recommendation = new Null_Plugin_Recommendation();
       }
     }
@@ -120,15 +119,13 @@ class Plugin_Review_Column {
 class Plugin_Recommendation  {
   private $name;
   private $version;
-  private $message;
   private $slug;
   private $review_data;
   private $css_class;
 
-  public function __construct($name, $version, $message, $slug, $review_data, $css_class="") {
+  public function __construct($name, $version, $slug, $review_data, $css_class="") {
     $this->name = $name;
     $this->version = $version;
-    $this->message = $message;
     $this->slug = $slug;
     $this->review_data = $review_data;
     $this->css_class = $css_class;
@@ -137,7 +134,7 @@ class Plugin_Recommendation  {
   public function render() {
     ?>
       <a href="#<?php echo esc_attr($this->dialog_id()); ?>" data-title="<?php echo esc_attr($this->name); ?> - <?php echo esc_attr($this->version); ?>" class="dialog-link review-message <?php echo esc_attr($this->slug) ?> <?php echo esc_attr($this->css_class) ?>">
-        <h3><?php echo $this->heading(); ?></h3>
+        <h3><?php echo $this->review_data->heading(); ?></h3>
 
         <p class="more-info">More information</p>
       </a>
@@ -160,10 +157,6 @@ class Plugin_Recommendation  {
     <?php
   }
 
-  protected function heading() {
-    return "<span class='icon-{$this->slug} ?>'></span> {$this->message}";
-  }
-
   protected function dialog_id() {
     return "plugin-inspection-results-" . sanitize_title($this->name);
   }
@@ -173,7 +166,7 @@ class Plugin_Recommendation  {
 class Review_Data {
   public $version;
   public $slug;
-  public $message;
+  private $message;
   private $description;
   private $reason;
 
@@ -207,9 +200,9 @@ class Review_Data {
 
   public function render() {
     // reason is retrieved from the api but might legitimately include html
-    // description might also legitimately include html but comes from a string in this code
+    // description and heading might also legitimately include html but come from strings in this code
     ?>
-      <h2><a href="<?php echo esc_url($this->link) ?>"><span class="icon-<?php echo esc_attr($this->slug) ?>"></span> <?php echo esc_html($this->message) ?></a></h2>
+      <h2><a href="<?php echo esc_url($this->link) ?>"><?php echo $this->heading() ?></a></h2>
       <p class="review-status-description"><?php echo $this->description ?></p>
       <?php
         if (empty($this->reason)) {
@@ -220,6 +213,10 @@ class Review_Data {
         }
       ?>
     <?php
+  }
+
+  public function heading() {
+    return "<span class='icon-{$this->slug} ?>'></span> {$this->message}";
   }
 }
 
@@ -237,11 +234,19 @@ class Other_Version_Reviews_Data {
       $review->render();
     }
   }
+
+  public function heading() {
+    return "Other versions have been reviewed";
+  }
+
+  public function most_recent() {
+    return current($this->reviews);
+  }
 }
 
 class Plugin_Recommendation_Reviewed {
   public function __construct($name, $version, $review_data) {
-    $this->recommendation = new Plugin_Recommendation($name, $version, $review_data->message, $review_data->slug, $review_data);
+    $this->recommendation = new Plugin_Recommendation($name, $version, $review_data->slug, $review_data);
   }
   public function render() {
     $this->recommendation->render();
@@ -254,8 +259,8 @@ class Plugin_Recommendation_Other_Versions_Reviewed {
 
   public function __construct($name, $version, $other_reviews_data) {
     // TODO - replace no-info with the slug of the latest review
-    $latest_result = "no-issues-found";
-    $this->recommendation = new Plugin_Recommendation($name, $version, "Other versions have been reviewed", "no-info", $other_reviews_data, "other-versions-reviewed other-{$latest_result}");
+    $latest_result = $other_reviews_data->most_recent()->slug;
+    $this->recommendation = new Plugin_Recommendation($name, $version, "no-info", $other_reviews_data, "other-versions-reviewed other-{$latest_result}");
   }
   public function render() {
     $this->recommendation->render();
@@ -264,7 +269,7 @@ class Plugin_Recommendation_Other_Versions_Reviewed {
 
 
 class Null_Plugin_Recommendation {
-  public function view(){
+  public function render(){
     ?>
     <div class="review-message review-error">
       <h3><a href='<?php echo(esc_url(DXW_SECURITY_PLUGINS_URL)); ?>'>An error occurred</a></h3>
