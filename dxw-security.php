@@ -241,15 +241,16 @@ class Review_Data {
   public function render() {
     // reason is retrieved from the api but might legitimately include html
     // description and heading might also legitimately include html but come from strings in this code
+    $link = esc_url($this->link)
     ?>
-      <h2><a href="<?php echo esc_url($this->link) ?>"><?php echo $this->heading() ?></a></h2>
+      <h2><a href="<?php echo $link ?>"><?php echo $this->heading() ?></a></h2>
       <p class="review-status-description"><?php echo $this->description ?></p>
       <?php
         if (empty($this->reason)) {
-          echo("<a href='{esc_url($this->link)}' class='read-more' >See the dxw Security website for details</a>");
+          echo("<a href='{$link}' class='read-more' >See the dxw Security website for details</a>");
         } else {
           print_r("<p>{$this->reason}</p>");
-          echo("<a href='{esc_url($this->link)}' class='read-more button-primary'> Read more...</a>");
+          echo("<a href='{$link}' class='read-more button-primary'> Read more...</a>");
         }
       ?>
     <?php
