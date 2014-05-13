@@ -128,11 +128,13 @@ class Plugin_Recommendation {
   private $review_data;
   private $css_class;
 
-  public function __construct($name, $version, $slug, $review_data, $css_class="") {
+  public function __construct($name, $version, $slug, $review_data, $more_info="More information", $dialog_intro="", $css_class="") {
     $this->name = $name;
     $this->version = $version;
     $this->slug = $slug;
     $this->review_data = $review_data;
+    $this->more_info = $more_info;
+    $this->dialog_intro = $dialog_intro;
     $this->css_class = $css_class;
   }
 
@@ -141,11 +143,10 @@ class Plugin_Recommendation {
       <a href="#<?php echo esc_attr($this->dialog_id()); ?>" data-title="<?php echo esc_attr($this->name); ?> - <?php echo esc_attr($this->version); ?>" class="dialog-link review-message <?php echo esc_attr($this->slug) ?> <?php echo esc_attr($this->css_class) ?>">
         <h3><?php echo $this->review_data->heading(); ?></h3>
 
-        <p class="more-info">More information</p>
+        <p class="more-info"><?php echo esc_html($this->more_info); ?></p>
       </a>
-
-      <?php print_r($this->render_dialog()); ?>
     <?php
+    print_r($this->render_dialog());
   }
 
   protected function render_dialog(){
@@ -155,6 +156,7 @@ class Plugin_Recommendation {
         <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url('/assets/dxw-logo.png' , __FILE__); ?>" alt="dxw logo" /></a>
 
         <div class="inner">
+          <?php print_r($this->dialog_intro) ?>
           <?php print_r($this->review_data->render()) ?>
         </div>
 
@@ -182,9 +184,10 @@ class Plugin_Recommendation_Other_Versions_Reviewed {
   private $recommendation;
 
   public function __construct($name, $version, $other_reviews_data) {
-    // TODO - replace no-info with the slug of the latest review
     $latest_result = $other_reviews_data->most_recent()->slug;
-    $this->recommendation = new Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, "other-{$latest_result}");
+    $dialog_intro =  "<p class='intro'>The installed version ({$version}) has not yet been reviewed, but here are some reviews of other versions:</p>";
+    $more_info =  "These versions have been reviewed: {$other_reviews_data->versions()}";
+    $this->recommendation = new Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, $more_info, $dialog_intro, "other-{$latest_result}");
   }
   public function render() {
     $this->recommendation->render();
@@ -259,6 +262,11 @@ class Review_Data {
   public function heading() {
     return "<span class='icon-{$this->slug} ?>'></span> {$this->message}";
   }
+
+  // Versions might be a comma separated string with no spaces e.g. "1.9.2,1.9.3"
+  public function version() {
+    return implode(", ", explode(",", $this->version));
+  }
 }
 
 class Other_Version_Reviews_Data {
@@ -269,7 +277,6 @@ class Other_Version_Reviews_Data {
 
   public function render() {
     // TODO - this will result in two consecutive h2 headings - not great, but works for now.
-    echo("<p>This version of the plugin has not yet been reviewed, but here are some reviews of other versions:</p>");
     foreach($this->reviews as &$review) {
       ?>
         <div class="other-review <?php echo $review->slug ?>">
@@ -281,11 +288,20 @@ class Other_Version_Reviews_Data {
   }
 
   public function heading() {
-    return "Other versions have been reviewed";
+    return "This version not yet reviewed";
   }
 
   public function most_recent() {
     return current($this->reviews);
+  }
+
+  // It would be nice to use array_map for this, but it doesn't seem to be possible to do that without defining a callback function in the global namespace.
+  public function versions() {
+    $versions=array();
+    foreach($this->reviews as &$review) {
+      $versions[] = $review->version();
+    }
+    return implode(", ", $versions);
   }
 }
 

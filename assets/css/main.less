@@ -91,7 +91,6 @@
   }
   &.other-versions-reviewed {
     background-color: @grey-background;
-    color: @grey;
 
     &.dialog-link * {
       color: @grey;
@@ -102,6 +101,9 @@
     }
 
     &.dialog {
+      .intro {
+        font-size: 14px;
+      }
       .other-review {
         padding: 0 20px;
         margin-bottom: 20px;
@@ -124,7 +126,7 @@
 
   .review-status-description {
     font-style: italic;
-    color: gray;
+    color: @grey;
   }
   ul {
     list-style: disc inside none;
