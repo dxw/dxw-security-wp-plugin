@@ -59,7 +59,68 @@ class Dxw_Security_Dashboard_Widget {
   }
 
   public function dashboard_widget_content() {
-    echo "Hello World, this is my first Dashboard Widget!";
+    $plugins = get_plugins();
+
+    $red = 0;
+    $amber = 0;
+    $yellow = 0;
+    $different_version = 0;
+    $not_reviewed = 0;
+
+    foreach($plugins as $path => $data) {
+      $plugin_file = explode("/",$path)[0];
+      $installed_version = $data["Version"];
+
+      // HACK - strip off file extensions to make Hello Dolly not complain
+      $plugin_file= preg_replace("/\\.[^.\\s]{3,4}$/", "", $plugin_file);
+      //END HACK
+
+      // TODO: duplication with the security column
+      // TODO: handle errors/timeouts
+      $api = new Plugin_Review_API($plugin_file);
+
+      $reviews = $api->call();
+      if (empty($reviews)) {
+        $not_reviewed++;
+      } else{
+
+        $status = NULL;
+        foreach($reviews as &$review) {
+          // $review->version might be a list of versions, so we need to do a little work to compare it
+          if ($this->version_matches($installed_version, $review->version)) {
+            $status = $review->recommendation;
+          }
+        }
+
+        switch ($status) {
+        case "red":
+          $red++;
+          break;
+        case "amber":
+          $amber++;
+          break;
+        case "green":
+          $green++;
+          break;
+        default:
+          // Assumption: if there were some reviews, but no review of the installed version,
+          //  then there must be reviews of other versions
+          $different_version++;
+        }
+      }
+    }
+    echo("
+    <p>red: {$red}</p>
+    <p>amber: {$amber}</p>
+    <p>green: {$green}</p>
+    <p>different_version: {$different_version}</p>
+    <p>not_reviewed: {$not_reviewed}</p>
+    ");
+  }
+
+  private function version_matches($version, $list) {
+    $versions = explode( ',', $list );
+    return in_array($version, $versions);
   }
 }
 
