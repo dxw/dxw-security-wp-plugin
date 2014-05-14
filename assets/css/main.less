@@ -207,6 +207,42 @@
   }
 }
 
+
+// Dashboard widget styles
+#dashboard_dxw_security {
+  .review_counts {
+    margin-left: 15px;
+    .count {
+      margin-left: 5px;
+      display: inline-block;
+      width: 15px;
+      text-align: right;
+    }
+  }
+
+  .use-with-caution {
+    [class^="icon-"], [class*=" icon-"] {
+      color: @amber;
+    }
+  }
+  .potentially-unsafe {
+    [class^="icon-"], [class*=" icon-"] {
+      color: @wp-red;
+    }
+  }
+  .no-issues-found {
+    [class^="icon-"], [class*=" icon-"] {
+      color: @green;
+    }
+  }
+  .no-info {
+    [class^="icon-"], [class*=" icon-"] {
+      color: @grey;
+    }
+  }
+}
+
+
 // This is to deal with shrinking the box to tiny sizes. It's a bit hacky and will affect any other dialogs on the page.
 body.plugins-php .ui-dialog {
   overflow: hidden;
