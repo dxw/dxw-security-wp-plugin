@@ -25,6 +25,7 @@ class dxw_Security {
   public function __construct() {
     add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
     add_action('admin_init', array($this, 'add_security_column'));
+    add_action('admin_init', array($this, 'add_dashboard_widget'));
   }
 
   public function enqueue_scripts($hook) {
@@ -39,6 +40,26 @@ class dxw_Security {
 
   public function add_security_column() {
     new Plugin_Review_Column;
+  }
+
+  public function add_dashboard_widget() {
+    new Dxw_Security_Dashboard_Widget;
+  }
+}
+
+class Dxw_Security_Dashboard_Widget {
+  public function __construct() {
+    add_action('wp_dashboard_setup', array($this, 'add_dashboard_widgets'));
+  }
+
+  // Function used in the action hook
+  public function add_dashboard_widgets() {
+    // could use wp_add_dashboard_widget, but that puts it at the bottom of the left column which isn't very visible;
+    add_meta_box('dashboard_dxw_security', 'dxw Security', array($this, 'dashboard_widget_content'), 'dashboard', 'side', 'high');
+  }
+
+  public function dashboard_widget_content() {
+    echo "Hello World, this is my first Dashboard Widget!";
   }
 }
 
