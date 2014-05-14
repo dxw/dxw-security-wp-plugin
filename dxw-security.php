@@ -127,9 +127,9 @@ class Dxw_Security_Dashboard_Widget {
     } else {
       echo "<p>Of the plugins installed on this site...</p>";
       echo "<ul class='review_counts'>";
-      if ($red > 0) {               echo "<li class='{$red_slug}'><span class='icon-{$red_slug}'></span><span class='count'>{$red}</span> are potentially unsafe </li>"; }
-      if ($yellow > 0) {            echo "<li class='{$yellow_slug}'><span class='icon-{$yellow_slug}'></span><span class='count'>{$yellow}</span> should only be used with caution </li>"; }
-      if ($green > 0) {             echo "<li class='{$green_slug}'><span class='icon-{$green_slug}'></span><span class='count'>{$green}</span> are probably safe </li>"; }
+      $this->plugin_review_count_box($red, $red_slug, "are potentially unsafe");
+      $this->plugin_review_count_box($yellow, $yellow_slug, "should be used with caution");
+      $this->plugin_review_count_box($green, $green_slug, "are probably safe");
       if ($different_version > 0) { echo "<li class='{$grey_slug}'><span class='icon-{$grey_slug}'></span><span class='count'>{$different_version}</span> have reviews for different versions </li>"; }
       if ($not_reviewed > 0) {      echo "<li class='{$grey_slug}'><span class='icon-{$grey_slug}'></span><span class='count'>{$not_reviewed}</span> have not yet been reviewed</li>"; }
       echo "</ul>";
@@ -137,9 +137,22 @@ class Dxw_Security_Dashboard_Widget {
     }
   }
 
+  // TODO: DUPLICATION! - move into Review_Data
   private function version_matches($version, $list) {
     $versions = explode( ',', $list );
     return in_array($version, $versions);
+  }
+
+  private function plugin_review_count_box($count, $slug, $message) {
+    ?>
+      <li class='<?php echo $slug ?>'>
+        <div class='plugin_review_count_box'>
+          <span class='count'><?php echo $count ?></span>
+          <?php echo $message ?>
+          <span class='icon-<?php echo $slug ?>'></span>
+        </div>
+      </li>
+    <?php
   }
 }
 

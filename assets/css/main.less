@@ -59,23 +59,23 @@
   }
 }
 
+.colour_box(@color, @background-color, @highlight-color) {
+  background-color: @background-color;
+
+  h2 a, &.dialog-link *, [class^="icon-"], [class*=" icon-"] {
+    color: @color;
+    text-decoration: none;
+  }
+  h2 a:hover, &.dialog-link:hover *, [class^="icon-"], [class*=" icon-"] {
+    color: @highlight-color;
+  }
+}
+
 .review-message {
   padding: 12px;
   min-width: 200px;
 
   a { text-decoration: none; }
-
-  .colour_box(@color, @background-color, @highlight-color) {
-    background-color: @background-color;
-
-    h2 a, &.dialog-link * {
-      color: @color;
-      text-decoration: none;
-    }
-    h2 a:hover, &.dialog-link:hover * {
-      color: @highlight-color;
-    }
-  }
 
   .use-with-caution, &.use-with-caution {
     .colour_box(@amber, @amber-background, @amber-highlight);
@@ -211,34 +211,62 @@
 // Dashboard widget styles
 #dashboard_dxw_security {
   .review_counts {
-    margin-left: 15px;
-    .count {
-      margin-left: 5px;
-      display: inline-block;
-      width: 15px;
-      text-align: right;
+    .plugin_review_count_box {
+      padding: 10px;
+      float: left;
+      margin:5px;
+      height: 165px; // TODO - is there a better way to achieve consistent heights?
+      .count {
+        display: block;
+        font-size: 40px;
+        margin: 10px 0;
+        line-height: 1;
+        text-align: center;
+        font-weight:bold;
+      }
+      [class^="icon-"], [class*=" icon-"] {
+        display: block;
+        font-size: 30px;
+        padding: 10px;
+      }
+    }
+
+    // a bit hacky - should probably use another class on the li's
+    li.use-with-caution, li.potentially-unsafe, li.no-issues-found {
+      width:33.33%;
+      float: left;
+      text-align: center;
+    }
+    li.no-info {
+      clear: left;
+      padding: 10px;
+      margin: 0 5px 10px; // to match the padding of the review count boxes
+      .count {
+        margin-left: 5px;
+        display: inline-block;
+        width: 15px;
+        text-align: right;
+      }
     }
   }
 
   .use-with-caution {
-    [class^="icon-"], [class*=" icon-"] {
-      color: @amber;
+    .plugin_review_count_box {
+      .colour_box(@amber, @amber-background, @amber-highlight);
     }
   }
   .potentially-unsafe {
-    [class^="icon-"], [class*=" icon-"] {
-      color: @wp-red;
+    .plugin_review_count_box {
+      .colour_box(@wp-red, @wp-red-background, @red-highlight);
     }
   }
   .no-issues-found {
-    [class^="icon-"], [class*=" icon-"] {
-      color: @green;
+    .plugin_review_count_box {
+      .colour_box(@green, @green-background, @green-highlight);
     }
   }
   .no-info {
-    [class^="icon-"], [class*=" icon-"] {
-      color: @grey;
-    }
+    .colour_box(@grey, @grey-background, @grey-highlight);
   }
 }
 
