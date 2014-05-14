@@ -29,7 +29,11 @@ class dxw_Security {
   }
 
   public function enqueue_scripts($hook) {
-    if('plugins.php' != $hook) { return; }
+    // TODO: find a better way to do this
+    //    and/or split the css up into plugins page/dashboard/common
+    //    and/or move those enqueues into the relevant classes
+    // TODO: does using index.php here mean that this gets included on the user-facing index page?
+    if('plugins.php' != $hook && 'index.php' != $hook) { return; }
 
     wp_enqueue_style('dxw-security-plugin-styles', plugins_url('/assets/main.min.css' , __FILE__));
     wp_enqueue_script('dxw-security-plugin-scripts', plugins_url('/assets/main.min.js' , __FILE__));
@@ -62,8 +66,8 @@ class Dxw_Security_Dashboard_Widget {
     $plugins = get_plugins();
 
     $red = 0;
-    $amber = 0;
     $yellow = 0;
+    $green = 0;
     $different_version = 0;
     $not_reviewed = 0;
 
@@ -96,8 +100,8 @@ class Dxw_Security_Dashboard_Widget {
         case "red":
           $red++;
           break;
-        case "amber":
-          $amber++;
+        case "yellow":
+          $yellow++;
           break;
         case "green":
           $green++;
@@ -109,13 +113,28 @@ class Dxw_Security_Dashboard_Widget {
         }
       }
     }
-    echo("
-    <p>red: {$red}</p>
-    <p>amber: {$amber}</p>
-    <p>green: {$green}</p>
-    <p>different_version: {$different_version}</p>
-    <p>not_reviewed: {$not_reviewed}</p>
-    ");
+    $red_slug = Review_Data::$dxw_security_review_statuses["red"]["slug"];
+    $yellow_slug = Review_Data::$dxw_security_review_statuses["yellow"]["slug"];
+    $green_slug = Review_Data::$dxw_security_review_statuses["green"]["slug"];
+    $grey_slug = Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
+
+    // Is this reliable?
+    $plugins_page_url = "plugins.php";
+
+    if ( count(get_plugins()) == 0 ) {
+      // TODO: should this be right at the top?
+      echo "<p>There are no plugins installed on this site.</p>";
+    } else {
+      echo "<p>Of the plugins installed on this site...</p>";
+      echo "<ul class='review_counts'>";
+      if ($red > 0) {               echo "<li class='{$red_slug}'><span class='icon-{$red_slug}'></span><span class='count'>{$red}</span> are potentially unsafe </li>"; }
+      if ($yellow > 0) {            echo "<li class='{$yellow_slug}'><span class='icon-{$yellow_slug}'></span><span class='count'>{$yellow}</span> should only be used with caution </li>"; }
+      if ($green > 0) {             echo "<li class='{$green_slug}'><span class='icon-{$green_slug}'></span><span class='count'>{$green}</span> are probably safe </li>"; }
+      if ($different_version > 0) { echo "<li class='{$grey_slug}'><span class='icon-{$grey_slug}'></span><span class='count'>{$different_version}</span> have reviews for different versions </li>"; }
+      if ($not_reviewed > 0) {      echo "<li class='{$grey_slug}'><span class='icon-{$grey_slug}'></span><span class='count'>{$not_reviewed}</span> have not yet been reviewed</li>"; }
+      echo "</ul>";
+      echo "<p><a href='{$plugins_page_url}'>Visit your plugins page for more details...</a></p>";
+    }
   }
 
   private function version_matches($version, $list) {
@@ -299,7 +318,7 @@ class Review_Data {
   private $reason;
 
   // TODO: ideally this would be a class constant, but php doesn't support that
-  private static $dxw_security_review_statuses = array(
+  public static $dxw_security_review_statuses = array(
     'green'     => array( 'message' => "No issues found",
                           'slug' => "no-issues-found",
                           'description' => "dxw's review didn't find anything worrying in this plugin. It's probably safe."),
