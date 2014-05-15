@@ -414,7 +414,7 @@ class Other_Version_Reviews_Data {
     foreach($this->reviews as &$review) {
       ?>
         <div class="other-review <?php echo $review->slug ?>">
-          <h2>Version <?php echo $review->version ?></h2>
+          <h2>Version <?php echo $review->version() ?></h2>
           <?php print_r($review->render()) ?>
         </div>
       <?php
