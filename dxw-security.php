@@ -59,7 +59,6 @@ class Dxw_Security_Dashboard_Widget {
   private $different_version = 0;
   private $not_reviewed = 0;
 
-
   public function __construct() {
     add_action('wp_dashboard_setup', array($this, 'add_dashboard_widgets'));
   }
@@ -152,6 +151,7 @@ class Dxw_Security_Dashboard_Widget {
   }
 
   private function plugin_review_count_box($count, $slug, $message) {
+    if ($count == 0) { $slug = $slug . " none"; }
     ?>
       <li class='<?php echo $slug ?>'>
         <div class='plugin_review_count_box'>
