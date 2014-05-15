@@ -106,53 +106,64 @@ class Dxw_Security_Dashboard_Widget {
     foreach($plugins as $path => $data) {
       // Stop making requests after a certain number of failures:
       if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
-        // Assume it would have failed
-        $this->failed_requests++;
-        // TODO: instead throw an error here to be captured higher up.
+        $this->handle_api_fatal_error($e);
       } else {
 
         $installed_version = $data["Version"];
 
         // TODO: duplication with the security column
-        // TODO: handle errors/timeouts
         $api = new Plugin_Review_API($path);
         try {
           $reviews = $api->call();
-          if (empty($reviews)) {
-            $this->not_reviewed++;
-          } else{
-
-            $status = NULL;
-            foreach($reviews as &$review) {
-              // $review->version might be a list of versions, so we need to do a little work to compare it
-              if (Review_Data::version_matches($installed_version, $review->version)) {
-                $status = $review->recommendation;
-              }
-            }
-
-            switch ($status) {
-            case "red":
-              $this->red++;
-              break;
-            case "yellow":
-              $this->yellow++;
-              break;
-            case "green":
-              $this->green++;
-              break;
-            default:
-              // Assumption: if there were some reviews, but no review of the installed version,
-              //  then there must be reviews of other versions
-              $this->different_version++;
-            }
-          }
+          $this->handle_api_response($reviews, $installed_version);
         } catch (Exception $e) {
-          // TODO: Handle Dxw_Security_Error separately?
-          // TODO: in future we should provide some way for users to give us back some useful information when they get an error
-          $this->failed_requests++;
+          $this->handle_api_error($e);
         }
       }
     }
+  }
+
+  private function handle_api_response($reviews, $installed_version) {
+    if (empty($reviews)) {
+      $this->not_reviewed++;
+    } else{
+
+      foreach($reviews as &$review) {
+        // $review->version might be a list of versions, so we can't just do a straightforward comparison
+        if (Review_Data::version_matches($installed_version, $review->version)) {
+          switch ($review->recommendation) {
+          case "red":
+            $this->red++;
+            break;
+          case "yellow":
+            $this->yellow++;
+            break;
+          case "green":
+            $this->green++;
+            break;
+          }
+          return; //No point checking the other reviews
+        } else {
+          // Assumption: if there were some reviews, but no review of the installed version,
+          //  then there must be reviews of other versions
+          $this->different_version++;
+          return; // Don't double-count
+        }
+      }
+    }
+  }
+
+  private function handle_api_error($error) {
+    // TODO: Handle Dxw_Security_Error separately?
+    // TODO: in future we should provide some way for users to give us back some useful information when they get an error
+    $this->failed_requests++;
+    Whippet::print_r($this->failed_requests);
+  }
+
+  private function handle_api_fatal_error($error) {
+    // Assume it would have failed
+    $this->handle_api_error($error);
+    // TODO: instead throw an error here to be captured higher up.
   }
 
   private function plugin_review_count_box($count, $slug, $message) {
@@ -493,6 +504,8 @@ class Dxw_Security_API {
   //      * cache_slug()
   //      * extract_data($parsed_body)
   // Is there a standard way of doing this? should it complain on construction if those things aren't defined
+
+  // TODO: re-implement as decorator pattern?
 
   public function call() {
     $data = $this->retrieve_api_data();
