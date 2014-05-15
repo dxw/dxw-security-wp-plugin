@@ -71,6 +71,11 @@
   }
 }
 
+.red_colour_box { .colour_box(@wp-red, @wp-red-background, @red-highlight); }
+.amber_colour_box { .colour_box(@amber, @amber-background, @amber-highlight); }
+.green_colour_box { .colour_box(@green, @green-background, @green-highlight); }
+.grey_colour_box { .colour_box(@grey, @grey-background, @grey-highlight); }
+
 .review-message {
   padding: 12px;
   min-width: 200px;
@@ -78,16 +83,16 @@
   a { text-decoration: none; }
 
   .use-with-caution, &.use-with-caution {
-    .colour_box(@amber, @amber-background, @amber-highlight);
+    .amber_colour_box;
   }
   .potentially-unsafe, &.potentially-unsafe {
-    .colour_box(@wp-red, @wp-red-background, @red-highlight);
+    .red_colour_box;
   }
   .no-issues-found, &.no-issues-found {
-    .colour_box(@green, @green-background, @green-highlight);
+    .green_colour_box;
   }
   &.no-info, &.review-error {
-    .colour_box(@grey, @grey-background, @grey-highlight);
+    .grey_colour_box;
   }
   &.other-versions-reviewed {
     background-color: @grey-background;
@@ -252,22 +257,28 @@
 
   .use-with-caution {
     .plugin_review_count_box {
-      .colour_box(@amber, @amber-background, @amber-highlight);
+      .amber_colour_box;
     }
   }
   .potentially-unsafe {
     .plugin_review_count_box {
-      .colour_box(@wp-red, @wp-red-background, @red-highlight);
+      .red_colour_box;
     }
   }
   .no-issues-found {
     .plugin_review_count_box {
-      .colour_box(@green, @green-background, @green-highlight);
+      .green_colour_box;
+    }
+  }
+  .none { // Grey it out if the count is 0
+    .plugin_review_count_box {
+      .grey_colour_box;
     }
   }
   .no-info {
-    .colour_box(@grey, @grey-background, @grey-highlight);
+    .grey_colour_box;
   }
+
 }
 
 
