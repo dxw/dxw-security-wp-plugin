@@ -52,6 +52,14 @@ class dxw_Security {
 }
 
 class Dxw_Security_Dashboard_Widget {
+  private $number_of_plugins;
+  private $red = 0;
+  private $yellow = 0;
+  private $green = 0;
+  private $different_version = 0;
+  private $not_reviewed = 0;
+
+
   public function __construct() {
     add_action('wp_dashboard_setup', array($this, 'add_dashboard_widgets'));
   }
@@ -63,13 +71,35 @@ class Dxw_Security_Dashboard_Widget {
   }
 
   public function dashboard_widget_content() {
-    $plugins = get_plugins();
+    $this->get_counts();
 
-    $red = 0;
-    $yellow = 0;
-    $green = 0;
-    $different_version = 0;
-    $not_reviewed = 0;
+    $red_slug = Review_Data::$dxw_security_review_statuses["red"]["slug"];
+    $yellow_slug = Review_Data::$dxw_security_review_statuses["yellow"]["slug"];
+    $green_slug = Review_Data::$dxw_security_review_statuses["green"]["slug"];
+    $grey_slug = Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
+
+    // Is this reliable?
+    $plugins_page_url = "plugins.php";
+
+    if ( $this->number_of_plugins == 0 ) {
+      // TODO: should this be right at the top?
+      echo "<p>There are no plugins installed on this site.</p>";
+    } else {
+      echo "<p>Of the {$this->number_of_plugins} plugins installed on this site:</p>";
+      echo "<ul class='review_counts'>";
+      $this->plugin_review_count_box($this->red, $red_slug, "are potentially unsafe");
+      $this->plugin_review_count_box($this->yellow, $yellow_slug, "should be used with caution");
+      $this->plugin_review_count_box($this->green, $green_slug, "are probably safe");
+      if ($this->different_version > 0) { $this->plugin_review_not_reviewed_box($this->different_version, $grey_slug, "have reviews for different versions"); }
+      if ($this->not_reviewed > 0) {      $this->plugin_review_not_reviewed_box($this->not_reviewed, $grey_slug, "have not yet been reviewed"); }
+      echo "</ul>";
+      echo "<p><a href='{$plugins_page_url}'>Visit your plugins page for more details...</a></p>";
+    }
+  }
+
+  private function get_counts() {
+    $plugins = get_plugins();
+    $this->number_of_plugins = count($plugins);
 
     foreach($plugins as $path => $data) {
       $plugin_file = explode("/",$path)[0];
@@ -85,7 +115,7 @@ class Dxw_Security_Dashboard_Widget {
 
       $reviews = $api->call();
       if (empty($reviews)) {
-        $not_reviewed++;
+        $this->not_reviewed++;
       } else{
 
         $status = NULL;
@@ -98,42 +128,20 @@ class Dxw_Security_Dashboard_Widget {
 
         switch ($status) {
         case "red":
-          $red++;
+          $this->red++;
           break;
         case "yellow":
-          $yellow++;
+          $this->yellow++;
           break;
         case "green":
-          $green++;
+          $this->green++;
           break;
         default:
           // Assumption: if there were some reviews, but no review of the installed version,
           //  then there must be reviews of other versions
-          $different_version++;
+          $this->different_version++;
         }
       }
-    }
-    $red_slug = Review_Data::$dxw_security_review_statuses["red"]["slug"];
-    $yellow_slug = Review_Data::$dxw_security_review_statuses["yellow"]["slug"];
-    $green_slug = Review_Data::$dxw_security_review_statuses["green"]["slug"];
-    $grey_slug = Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
-
-    // Is this reliable?
-    $plugins_page_url = "plugins.php";
-
-    if ( count(get_plugins()) == 0 ) {
-      // TODO: should this be right at the top?
-      echo "<p>There are no plugins installed on this site.</p>";
-    } else {
-      echo "<p>Of the plugins installed on this site...</p>";
-      echo "<ul class='review_counts'>";
-      $this->plugin_review_count_box($red, $red_slug, "are potentially unsafe");
-      $this->plugin_review_count_box($yellow, $yellow_slug, "should be used with caution");
-      $this->plugin_review_count_box($green, $green_slug, "are probably safe");
-      if ($different_version > 0) { echo "<li class='{$grey_slug}'><span class='icon-{$grey_slug}'></span><span class='count'>{$different_version}</span> have reviews for different versions </li>"; }
-      if ($not_reviewed > 0) {      echo "<li class='{$grey_slug}'><span class='icon-{$grey_slug}'></span><span class='count'>{$not_reviewed}</span> have not yet been reviewed</li>"; }
-      echo "</ul>";
-      echo "<p><a href='{$plugins_page_url}'>Visit your plugins page for more details...</a></p>";
     }
   }
 
@@ -147,10 +155,20 @@ class Dxw_Security_Dashboard_Widget {
     ?>
       <li class='<?php echo $slug ?>'>
         <div class='plugin_review_count_box'>
+          <span class='icon-<?php echo $slug ?>'></span>
           <span class='count'><?php echo $count ?></span>
           <?php echo $message ?>
-          <span class='icon-<?php echo $slug ?>'></span>
         </div>
+      </li>
+    <?php
+  }
+
+  private function plugin_review_not_reviewed_box($count, $slug, $message) {
+    ?>
+      <li class='<?php echo $slug ?>'>
+        <span class='icon-<?php echo $slug ?>'></span>
+        <span class='count'><?php echo $count ?></span>
+        <?php echo $message ?>
       </li>
     <?php
   }
