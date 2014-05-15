@@ -319,7 +319,7 @@ class Plugin_Recommendation_Other_Versions_Reviewed {
   public function __construct($name, $version, $other_reviews_data) {
     $latest_result = $other_reviews_data->most_recent()->slug;
     $dialog_intro =  "<p class='intro'>The installed version ({$version}) has not yet been reviewed, but here are some reviews of other versions:</p>";
-    $heading = "This version ({$version}) not yet reviewed";
+    $heading = "<span class='icon-no-info'></span> This version ({$version}) not yet reviewed";
     $more_info =  "These versions have been reviewed: {$other_reviews_data->versions()}";
     $this->recommendation = new Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, $heading, $more_info, $dialog_intro, "other-{$latest_result}");
   }
@@ -394,7 +394,7 @@ class Review_Data {
   }
 
   public function heading() {
-    return "<span class='icon-{$this->slug} ?>'></span> {$this->message}";
+    return "<span class='icon-{$this->slug}'></span> {$this->message}";
   }
 
   // Versions might be a comma separated string with no spaces e.g. "1.9.2,1.9.3"
