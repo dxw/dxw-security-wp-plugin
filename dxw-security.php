@@ -58,6 +58,7 @@ class Dxw_Security_Dashboard_Widget {
   private $green = 0;
   private $different_version = 0;
   private $not_reviewed = 0;
+  private $failed_requests = 0;
 
   public function __construct() {
     add_action('wp_dashboard_setup', array($this, 'add_dashboard_widgets'));
@@ -91,6 +92,8 @@ class Dxw_Security_Dashboard_Widget {
       $this->plugin_review_count_box($this->green, $green_slug, "are probably safe");
       if ($this->different_version > 0) { $this->plugin_review_not_reviewed_box($this->different_version, $grey_slug, "have reviews for different versions"); }
       if ($this->not_reviewed > 0) {      $this->plugin_review_not_reviewed_box($this->not_reviewed, $grey_slug, "have not yet been reviewed"); }
+      if ($this->failed_requests > 0) {   $this->plugin_review_not_reviewed_box($this->failed_requests, $grey_slug, "could not be checked due to errors. Please try again later."); }
+
       echo "</ul>";
       echo "<p><a href='{$plugins_page_url}'>Visit your plugins page for more details...</a></p>";
     }
@@ -101,39 +104,52 @@ class Dxw_Security_Dashboard_Widget {
     $this->number_of_plugins = count($plugins);
 
     foreach($plugins as $path => $data) {
-      $installed_version = $data["Version"];
+      // Stop making requests after a certain number of failures:
+      if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
+        // Assume it would have failed
+        $this->failed_requests++;
+        // TODO: instead throw an error here to be captured higher up.
+      } else {
 
-      // TODO: duplication with the security column
-      // TODO: handle errors/timeouts
-      $api = new Plugin_Review_API($path);
+        $installed_version = $data["Version"];
 
-      $reviews = $api->call();
-      if (empty($reviews)) {
-        $this->not_reviewed++;
-      } else{
+        // TODO: duplication with the security column
+        // TODO: handle errors/timeouts
+        $api = new Plugin_Review_API($path);
+        try {
+          $reviews = $api->call();
+          if (empty($reviews)) {
+            $this->not_reviewed++;
+          } else{
 
-        $status = NULL;
-        foreach($reviews as &$review) {
-          // $review->version might be a list of versions, so we need to do a little work to compare it
-          if (Review_Data::version_matches($installed_version, $review->version)) {
-            $status = $review->recommendation;
+            $status = NULL;
+            foreach($reviews as &$review) {
+              // $review->version might be a list of versions, so we need to do a little work to compare it
+              if (Review_Data::version_matches($installed_version, $review->version)) {
+                $status = $review->recommendation;
+              }
+            }
+
+            switch ($status) {
+            case "red":
+              $this->red++;
+              break;
+            case "yellow":
+              $this->yellow++;
+              break;
+            case "green":
+              $this->green++;
+              break;
+            default:
+              // Assumption: if there were some reviews, but no review of the installed version,
+              //  then there must be reviews of other versions
+              $this->different_version++;
+            }
           }
-        }
-
-        switch ($status) {
-        case "red":
-          $this->red++;
-          break;
-        case "yellow":
-          $this->yellow++;
-          break;
-        case "green":
-          $this->green++;
-          break;
-        default:
-          // Assumption: if there were some reviews, but no review of the installed version,
-          //  then there must be reviews of other versions
-          $this->different_version++;
+        } catch (Exception $e) {
+          // TODO: Handle Dxw_Security_Error separately?
+          // TODO: in future we should provide some way for users to give us back some useful information when they get an error
+          $this->failed_requests++;
         }
       }
     }
