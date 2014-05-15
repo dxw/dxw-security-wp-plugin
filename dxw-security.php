@@ -101,16 +101,11 @@ class Dxw_Security_Dashboard_Widget {
     $this->number_of_plugins = count($plugins);
 
     foreach($plugins as $path => $data) {
-      $plugin_file = explode("/",$path)[0];
       $installed_version = $data["Version"];
-
-      // HACK - strip off file extensions to make Hello Dolly not complain
-      $plugin_file= preg_replace("/\\.[^.\\s]{3,4}$/", "", $plugin_file);
-      //END HACK
 
       // TODO: duplication with the security column
       // TODO: handle errors/timeouts
-      $api = new Plugin_Review_API($plugin_file);
+      $api = new Plugin_Review_API($path);
 
       $reviews = $api->call();
       if (empty($reviews)) {
@@ -460,7 +455,13 @@ class Plugin_Review_API extends Dxw_Security_API {
     // Versions of php before 5.4 don't allow array indexes to be accessed directly on the output of functions
     //   http://www.php.net/manual/en/migration54.new-features.php - "Function array dereferencing"
     $f = explode('/', $this->plugin_file);
-    return $f[0];
+
+    // HACK - strip off file extensions to make Hello Dolly etc. not complain
+    //  we might get lucky and this actually be the slug we're looking for, but if not, the search just won't find anything
+    $directory_slug = preg_replace("/\\.[^.\\s]{3,4}$/", "", $f[0]);
+    //END HACK
+
+    return $directory_slug;
   }
 }
 
