@@ -213,7 +213,6 @@
   .review_counts {
     .plugin_review_count_box {
       padding: 10px;
-      float: left;
       margin:5px;
       height: 165px; // TODO - is there a better way to achieve consistent heights?
       .count {
@@ -234,6 +233,7 @@
     // a bit hacky - should probably use another class on the li's
     li.use-with-caution, li.potentially-unsafe, li.no-issues-found {
       width:33.33%;
+      width: calc(100%/3);
       float: left;
       text-align: center;
     }
