@@ -322,10 +322,10 @@ class Plugin_Recommendation_Other_Versions_Reviewed {
 class Null_Plugin_Recommendation {
   public function render(){
     ?>
-    <div class="review-message review-error">
-      <h3><a href='<?php echo(esc_url(DXW_SECURITY_PLUGINS_URL)); ?>'>An error occurred</a></h3>
+    <a href='<?php echo(esc_url(DXW_SECURITY_PLUGINS_URL)); ?>' class="review-message review-error">
+      <h3>An error occurred</h3>
       <p>Please try again later</p>
-    </div>
+    </a>
     <?php
   }
 }
@@ -455,6 +455,8 @@ class Plugin_Review_API extends Dxw_Security_API {
   }
 
   private function plugin_name() {
+    // TODO: DUPLICATION!
+
     // Versions of php before 5.4 don't allow array indexes to be accessed directly on the output of functions
     //   http://www.php.net/manual/en/migration54.new-features.php - "Function array dereferencing"
     $f = explode('/', $this->plugin_file);
