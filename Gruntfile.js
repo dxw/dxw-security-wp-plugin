@@ -16,8 +16,8 @@
 // Watch for changes:
 // % grunt watch
 //
-// Compress images (not done by the above tasks):
-// % grunt img
+// Create zip file
+// % grunt compress
 //
 
 module.exports = function(grunt) {
@@ -66,16 +66,16 @@ module.exports = function(grunt) {
                 tasks: ['uglify'],
             },
         },
-    })
+    });
 
-    grunt.loadNpmTasks('grunt-contrib-less')
-    grunt.loadNpmTasks('grunt-contrib-uglify')
-    grunt.loadNpmTasks('grunt-contrib-compress')
-    grunt.loadNpmTasks('grunt-contrib-watch')
+    grunt.loadNpmTasks('grunt-contrib-less');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask('default', [
         'less',
         'uglify',
         'compress',
-    ])
-}
+    ]);
+};
