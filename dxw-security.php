@@ -106,7 +106,7 @@ class Dxw_Security_Dashboard_Widget {
     foreach($plugins as $path => $data) {
       // Stop making requests after a certain number of failures:
       if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
-        $this->handle_api_fatal_error($e);
+        $this->handle_api_fatal_error();
       } else {
 
         $installed_version = $data["Version"];
@@ -157,12 +157,12 @@ class Dxw_Security_Dashboard_Widget {
     // TODO: Handle Dxw_Security_Error separately?
     // TODO: in future we should provide some way for users to give us back some useful information when they get an error
     $this->failed_requests++;
-    Whippet::print_r($this->failed_requests);
   }
 
-  private function handle_api_fatal_error($error) {
+  private function handle_api_fatal_error() {
     // Assume it would have failed
-    $this->handle_api_error($error);
+    //   Keep counting because currently we're just displaying "x failed"
+    $this->failed_requests++;
     // TODO: instead throw an error here to be captured higher up.
   }
 
@@ -217,50 +217,63 @@ class Plugin_Review_Column {
 
     // Stop making requests after a certain number of failures:
     if ($this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
-      $recommendation = new Null_Plugin_Recommendation();
+      $recommendation = $this->handle_api_fatal_error();
 
     } else {
       $api = new Plugin_Review_API($plugin_file);
 
       try {
         $reviews = $api->call();
-        if (empty($reviews)) {
-          $review_data = new Review_Data($installed_version, "not-found");
-          $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
-        } else{
-
-          $other_version_reviews = array();
-          foreach($reviews as &$review) {
-            $version = $review->version;
-            $status = $review->recommendation;
-            $reason = $review->reason;
-            $link = $review->review_link;
-
-            $review_data = new Review_Data($version, $status, $reason, $link);
-
-            // $review->version might be a list of versions, so we need to do a little work to compare it
-            if (Review_Data::version_matches($installed_version, $review->version)) {
-              $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
-            } else {
-              $other_version_reviews[] = $review_data;
-            }
-          }
-          if (empty($recommendation)) {
-            # TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
-            #   - if something went wrong then that might not be the case ...(?)
-            $other_version_reviews_data = new Other_Version_Reviews_Data(array_reverse($other_version_reviews)); // Reversed so that we get the latest review first
-            $recommendation = new Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
-          }
-        }
+        $recommendation = $this->handle_api_response($reviews, $name, $installed_version);
       } catch (Exception $e) {
-        // TODO: Handle Dxw_Security_Error separately?
-        // TODO: in future we should provide some way for users to give us back some useful information when they get an error
-        $this->dxw_security_failed_requests++;
-        $recommendation = new Null_Plugin_Recommendation();
+        $recommendation = $this->handle_api_error($e);
       }
     }
 
     $recommendation->render();
+  }
+
+  private function handle_api_response($reviews, $name, $installed_version) {
+    if (empty($reviews)) {
+      $review_data = new Review_Data($installed_version, "not-found");
+      $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
+    } else{
+
+      $other_version_reviews = array();
+      foreach($reviews as &$review) {
+        $version = $review->version;
+        $status = $review->recommendation;
+        $reason = $review->reason;
+        $link = $review->review_link;
+
+        $review_data = new Review_Data($version, $status, $reason, $link);
+
+        // $review->version might be a list of versions, so we need to do a little work to compare it
+        if (Review_Data::version_matches($installed_version, $review->version)) {
+          $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
+        } else {
+          $other_version_reviews[] = $review_data;
+        }
+      }
+      if (empty($recommendation)) {
+        # TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
+        #   - if something went wrong then that might not be the case ...(?)
+        $other_version_reviews_data = new Other_Version_Reviews_Data(array_reverse($other_version_reviews)); // Reversed so that we get the latest review first
+        $recommendation = new Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
+      }
+    }
+    return $recommendation;
+  }
+
+  private function handle_api_error($error) {
+    // TODO: Handle Dxw_Security_Error separately?
+    // TODO: in future we should provide some way for users to give us back some useful information when they get an error
+    $this->dxw_security_failed_requests++;
+    return new Null_Plugin_Recommendation();
+  }
+
+  private function handle_api_fatal_error() {
+    return new Null_Plugin_Recommendation();
   }
 }
 
