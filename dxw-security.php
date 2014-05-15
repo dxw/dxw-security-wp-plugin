@@ -120,7 +120,7 @@ class Dxw_Security_Dashboard_Widget {
         $status = NULL;
         foreach($reviews as &$review) {
           // $review->version might be a list of versions, so we need to do a little work to compare it
-          if ($this->version_matches($installed_version, $review->version)) {
+          if (Review_Data::version_matches($installed_version, $review->version)) {
             $status = $review->recommendation;
           }
         }
@@ -142,12 +142,6 @@ class Dxw_Security_Dashboard_Widget {
         }
       }
     }
-  }
-
-  // TODO: DUPLICATION! - move into Review_Data
-  private function version_matches($version, $list) {
-    $versions = explode( ',', $list );
-    return in_array($version, $versions);
   }
 
   private function plugin_review_count_box($count, $slug, $message) {
@@ -214,16 +208,16 @@ class Plugin_Review_Column {
         } else{
 
           $other_version_reviews = array();
-          foreach($reviews as &$r) {
-            $version = $r->version;
-            $status = $r->recommendation;
-            $reason = $r->reason;
-            $link = $r->review_link;
+          foreach($reviews as &$review) {
+            $version = $review->version;
+            $status = $review->recommendation;
+            $reason = $review->reason;
+            $link = $review->review_link;
 
             $review_data = new Review_Data($version, $status, $reason, $link);
 
-            // $r->version might be a list of versions, so we need to do a little work to compare it
-            if ($this->version_matches($installed_version, $r->version)) {
+            // $review->version might be a list of versions, so we need to do a little work to compare it
+            if (Review_Data::version_matches($installed_version, $review->version)) {
               $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
             } else {
               $other_version_reviews[] = $review_data;
@@ -245,10 +239,6 @@ class Plugin_Review_Column {
     }
 
     $recommendation->render();
-  }
-  private function version_matches($version, $list) {
-    $versions = explode( ',', $list );
-    return in_array($version, $versions);
   }
 }
 
@@ -400,6 +390,12 @@ class Review_Data {
   // Versions might be a comma separated string with no spaces e.g. "1.9.2,1.9.3"
   public function version() {
     return implode(", ", explode(",", $this->version));
+  }
+
+  // Compares a single version string to a comma separated list of versions
+  public static function version_matches($version, $list) {
+    $versions = explode( ',', $list );
+    return in_array($version, $versions);
   }
 }
 
