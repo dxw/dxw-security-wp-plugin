@@ -29,7 +29,7 @@ class dxw_Security {
   }
 
   public function enqueue_scripts($hook) {
-    // TODO: find a better way to do this
+    // TODO: find a better way to do this conditional
     //    and/or split the css up into plugins page/dashboard/common
     //    and/or move those enqueues into the relevant classes
     // TODO: does using index.php here mean that this gets included on the user-facing index page?
@@ -52,7 +52,6 @@ class dxw_Security {
 }
 
 class Dxw_Security_Dashboard_Widget {
-  private $number_of_plugins;
   private $red = 0;
   private $yellow = 0;
   private $green = 0;
@@ -71,7 +70,15 @@ class Dxw_Security_Dashboard_Widget {
   }
 
   public function dashboard_widget_content() {
-    $this->get_counts();
+    $plugins = get_plugins();
+    $number_of_plugins = count($plugins);
+
+    if ( $number_of_plugins == 0 ) {
+      echo "<p>There are no plugins installed on this site.</p>";
+      return;
+    }
+
+    $this->get_counts($plugins);
 
     $red_slug = Review_Data::$dxw_security_review_statuses["red"]["slug"];
     $yellow_slug = Review_Data::$dxw_security_review_statuses["yellow"]["slug"];
@@ -81,37 +88,28 @@ class Dxw_Security_Dashboard_Widget {
     // Is this reliable?
     $plugins_page_url = "plugins.php";
 
-    if ( $this->number_of_plugins == 0 ) {
-      // TODO: should this be right at the top?
-      echo "<p>There are no plugins installed on this site.</p>";
-    } else {
-      echo "<p>Of the {$this->number_of_plugins} plugins installed on this site:</p>";
-      echo "<ul class='review_counts'>";
-      $this->plugin_review_count_box($this->red, $red_slug, "are potentially unsafe");
-      $this->plugin_review_count_box($this->yellow, $yellow_slug, "should be used with caution");
-      $this->plugin_review_count_box($this->green, $green_slug, "are probably safe");
-      if ($this->different_version > 0) { $this->plugin_review_not_reviewed_box($this->different_version, $grey_slug, "have reviews for different versions"); }
-      if ($this->not_reviewed > 0) {      $this->plugin_review_not_reviewed_box($this->not_reviewed, $grey_slug, "have not yet been reviewed"); }
-      if ($this->failed_requests > 0) {   $this->plugin_review_not_reviewed_box($this->failed_requests, $grey_slug, "could not be checked due to errors. Please try again later."); }
+    echo "<p>Of the {$number_of_plugins} plugins installed on this site:</p>";
+    echo "<ul class='review_counts'>";
+    $this->plugin_review_count_box($this->red, $red_slug, "are potentially unsafe");
+    $this->plugin_review_count_box($this->yellow, $yellow_slug, "should be used with caution");
+    $this->plugin_review_count_box($this->green, $green_slug, "are probably safe");
+    if ($this->different_version > 0) { $this->plugin_review_not_reviewed_box($this->different_version, $grey_slug, "have reviews for different versions"); }
+    if ($this->not_reviewed > 0) {      $this->plugin_review_not_reviewed_box($this->not_reviewed, $grey_slug, "have not yet been reviewed"); }
+    if ($this->failed_requests > 0) {   $this->plugin_review_not_reviewed_box($this->failed_requests, $grey_slug, "could not be checked due to errors. Please try again later."); }
 
-      echo "</ul>";
-      echo "<p><a href='{$plugins_page_url}'>Visit your plugins page for more details...</a></p>";
-    }
+    echo "</ul>";
+    echo "<p><a href='{$plugins_page_url}'>Visit your plugins page for more details...</a></p>";
   }
 
-  private function get_counts() {
-    $plugins = get_plugins();
-    $this->number_of_plugins = count($plugins);
-
+  private function get_counts($plugins) {
     foreach($plugins as $path => $data) {
+      $installed_version = $data["Version"];
+
+      // TODO: this pattern is duplicated in the security column code
       // Stop making requests after a certain number of failures:
       if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
         $this->handle_api_fatal_error();
       } else {
-
-        $installed_version = $data["Version"];
-
-        // TODO: duplication with the security column
         $api = new Plugin_Review_API($path);
         try {
           $reviews = $api->call();
@@ -154,7 +152,7 @@ class Dxw_Security_Dashboard_Widget {
   }
 
   private function handle_api_error($error) {
-    // TODO: Handle Dxw_Security_Error separately?
+    // TODO: Handle Dxw_Security_Error separately from other errors?
     // TODO: in future we should provide some way for users to give us back some useful information when they get an error
     $this->failed_requests++;
   }
@@ -193,7 +191,7 @@ class Dxw_Security_Dashboard_Widget {
 class Plugin_Review_Column {
   // Track the number of failed requests so that we can stop trying after a certain number.
   // TODO: This should apply per page load, but ideally this behaviour might be better handled by the API class (?)
-  private $dxw_security_failed_requests = 0;
+  private $failed_requests = 0;
 
   public function __construct() {
     add_filter('manage_plugins_columns', array($this, 'manage_plugins_columns'));
@@ -216,12 +214,10 @@ class Plugin_Review_Column {
     $installed_version = $plugin_data['Version'];
 
     // Stop making requests after a certain number of failures:
-    if ($this->dxw_security_failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
+    if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $recommendation = $this->handle_api_fatal_error();
-
     } else {
       $api = new Plugin_Review_API($plugin_file);
-
       try {
         $reviews = $api->call();
         $recommendation = $this->handle_api_response($reviews, $name, $installed_version);
@@ -256,8 +252,8 @@ class Plugin_Review_Column {
         }
       }
       if (empty($recommendation)) {
-        # TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
-        #   - if something went wrong then that might not be the case ...(?)
+        // TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
+        //   - if something went wrong then that might not be the case ...(?)
         $other_version_reviews_data = new Other_Version_Reviews_Data(array_reverse($other_version_reviews)); // Reversed so that we get the latest review first
         $recommendation = new Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
       }
@@ -268,7 +264,7 @@ class Plugin_Review_Column {
   private function handle_api_error($error) {
     // TODO: Handle Dxw_Security_Error separately?
     // TODO: in future we should provide some way for users to give us back some useful information when they get an error
-    $this->dxw_security_failed_requests++;
+    $this->failed_requests++;
     return new Null_Plugin_Recommendation();
   }
 
@@ -373,7 +369,6 @@ class Review_Data {
   private $description;
   private $reason;
 
-  // TODO: ideally this would be a class constant, but php doesn't support that
   public static $dxw_security_review_statuses = array(
     'green'     => array( 'message' => "No issues found",
                           'slug' => "no-issues-found",
@@ -490,8 +485,6 @@ class Plugin_Review_API extends Dxw_Security_API {
   }
 
   private function plugin_name() {
-    // TODO: DUPLICATION!
-
     // Versions of php before 5.4 don't allow array indexes to be accessed directly on the output of functions
     //   http://www.php.net/manual/en/migration54.new-features.php - "Function array dereferencing"
     $f = explode('/', $this->plugin_file);
@@ -499,7 +492,7 @@ class Plugin_Review_API extends Dxw_Security_API {
     // HACK - strip off file extensions to make Hello Dolly etc. not complain
     //  we might get lucky and this actually be the slug we're looking for, but if not, the search just won't find anything
     $directory_slug = preg_replace("/\\.[^.\\s]{3,4}$/", "", $f[0]);
-    //END HACK
+    // END HACK
 
     return $directory_slug;
   }
@@ -508,8 +501,6 @@ class Plugin_Review_API extends Dxw_Security_API {
 
 // php doesn't support nested classes so these need to live outside the API class
 class Dxw_Security_Error extends Exception { }
-
-// TODO: Not sure this is the right name: this is for getting one specific plugin...
 class Dxw_Security_API {
   // TODO: This class doesn't work on it's own, only when extended by a class which defines the following:
   //    functions:
@@ -544,7 +535,7 @@ class Dxw_Security_API {
     // );
     $url = $api_root . $api_path;
 
-    $response = wp_remote_get($url);
+    $response = wp_remote_get(esc_url($url));
 
     return $this->handle_response($response);
   }
