@@ -2,8 +2,8 @@
 Contributors: dxw, dgmstuart
 Tags: security, security plugin, plugin security, wordpress security, security vulnerabilities, vulnerability, exploit, code review, security review, CSRF, XSS, injection, SQL injection, arbitrary code
 Requires at least: 3.8.1
-Tested up to: 3.8.1
-Stable tag: 0.2.0
+Tested up to: 3.9.1
+Stable tag: trunk
 License: GPLv2 or later
 
 Displays a security rating against each of the plugins you have installed
@@ -27,6 +27,13 @@ It also displays a widget on the dashboard showing the totals of each plugin rev
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Look at your plugins page - a box will show on the far right showing the result of security reviews of your plugins
 4. Look at the dashboard - a box will show detailing the numbers of each status of review.
+
+== Screenshots ==
+
+1. The security ratings displayed on your plugins page
+2. Information about a potentially unsafe plugin on the plugins page
+3. The dashboard widget showing the security ratings of your plugins
+
 
 == Changelog ==
 
