@@ -91,14 +91,14 @@ class Dashboard_Widget {
             $this->green++;
             break;
           }
-          return; //No point checking the other reviews
-        } else {
-          // Assumption: if there were some reviews, but no review of the installed version,
-          //  then there must be reviews of other versions
-          $this->different_version++;
-          return; // Don't double-count
+          return;
         }
       }
+
+      // If an exact version matched then we won't get this far because of that return
+      // Assumption: if there were some reviews, but no review of the installed version,
+      //  then there must be reviews of other versions
+      $this->different_version++;
     }
   }
 

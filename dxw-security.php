@@ -2,7 +2,7 @@
 // Plugin Name: dxw Security
 // Plugin URI: https://security.dxw.com/
 // Description: Pulls plugin review information from dxw Security into the wordpress plugins screen
-// Version: 0.2.0
+// Version: 0.2.1
 // License: GPLv2
 // Author: dxw
 // Author URI: http://dxw.com/
