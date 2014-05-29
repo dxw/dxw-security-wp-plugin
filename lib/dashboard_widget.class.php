@@ -1,8 +1,8 @@
-<?php namespace dxw_security;
+<?php
 require_once(dirname(__FILE__) . '/api.class.php');
 require_once(dirname(__FILE__) . '/review_data.class.php');
 
-class Dashboard_Widget {
+class dxw_security_Dashboard_Widget {
   private $red = 0;
   private $yellow = 0;
   private $green = 0;
@@ -31,10 +31,10 @@ class Dashboard_Widget {
 
     $this->get_counts($plugins);
 
-    $red_slug = Review_Data::$dxw_security_review_statuses["red"]["slug"];
-    $yellow_slug = Review_Data::$dxw_security_review_statuses["yellow"]["slug"];
-    $green_slug = Review_Data::$dxw_security_review_statuses["green"]["slug"];
-    $grey_slug = Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
+    $red_slug = dxw_security_Review_Data::$dxw_security_review_statuses["red"]["slug"];
+    $yellow_slug = dxw_security_Review_Data::$dxw_security_review_statuses["yellow"]["slug"];
+    $green_slug = dxw_security_Review_Data::$dxw_security_review_statuses["green"]["slug"];
+    $grey_slug = dxw_security_Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
 
     // Is this reliable?
     $plugins_page_url = "plugins.php";
@@ -61,7 +61,7 @@ class Dashboard_Widget {
       if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
         $this->handle_api_fatal_error();
       } else {
-        $api = new Plugin_Review_API($path);
+        $api = new dxw_security_Plugin_Review_API($path);
         try {
           $reviews = $api->call();
           $this->handle_api_response($reviews, $installed_version);
@@ -79,7 +79,7 @@ class Dashboard_Widget {
 
       foreach($reviews as &$review) {
         // $review->version might be a list of versions, so we can't just do a straightforward comparison
-        if (Review_Data::version_matches($installed_version, $review->version)) {
+        if (dxw_security_Review_Data::version_matches($installed_version, $review->version)) {
           switch ($review->recommendation) {
           case "red":
             $this->red++;

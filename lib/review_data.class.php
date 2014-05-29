@@ -1,5 +1,5 @@
-<?php namespace dxw_security;
-class Review_Data {
+<?php
+class dxw_security_Review_Data {
   public $version;
   public $slug;
   private $message;
@@ -66,7 +66,7 @@ class Review_Data {
   }
 }
 
-class Other_Version_Reviews_Data {
+class dxw_security_Other_Version_Reviews_Data {
   # Expects an array of Review_Data objects
   public function __construct($reviews) {
     $this->reviews = $reviews;
