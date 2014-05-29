@@ -3,7 +3,7 @@ Contributors: dxw, dgmstuart
 Tags: security, security plugin, plugin security, wordpress security, security vulnerabilities, vulnerability, exploit, code review, security review, CSRF, XSS, injection, SQL injection, arbitrary code
 Requires at least: 3.8.1
 Tested up to: 3.9.1
-Stable tag: trunk
+Stable tag: 0.2.1
 License: GPLv2 or later
 
 Displays a security rating against each of the plugins you have installed
@@ -36,6 +36,9 @@ It also displays a widget on the dashboard showing the totals of each plugin rev
 
 
 == Changelog ==
+
+= 0.2.1 =
+* Fixed a bug whereby plugins with multiple reviews weren't getting counted correctly in the dashboard widget
 
 = 0.2.0 =
 * Updated to use the new api request format: /api/directory_plugins/(:plugin_id)/reviews/(:plugin_version)
