@@ -48,11 +48,11 @@ module.exports = function(grunt) {
         compress: {
           main: {
             options: {
-              archive: 'dxw-security.zip'
+              archive: 'dxw-security-0_2_1.zip'
             },
             files: [
               { src: ['assets/*'], dest: 'dxw-security/', filter: 'isFile' },
-              { src: ['assets/fonts/**', 'dxw-security.php', 'readme.txt'], dest: 'dxw-security/' },
+              { src: ['assets/fonts/**', 'dxw-security.php', 'lib/*', 'readme.txt'], dest: 'dxw-security/' },
             ]
           }
         },
