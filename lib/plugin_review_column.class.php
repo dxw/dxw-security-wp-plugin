@@ -1,10 +1,10 @@
-<?php namespace dxw_security;
+<?php
 require_once(dirname(__FILE__) . '/api.class.php');
 require_once(dirname(__FILE__) . '/review_data.class.php');
 require_once(dirname(__FILE__) . '/plugin_recommendation.class.php');
 
 
-class Plugin_Review_Column {
+class dxw_security_Plugin_Review_Column {
   // Track the number of failed requests so that we can stop trying after a certain number.
   // TODO: This should apply per page load, but ideally this behaviour might be better handled by the API class (?)
   private $failed_requests = 0;
@@ -33,7 +33,7 @@ class Plugin_Review_Column {
     if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $recommendation = $this->handle_api_fatal_error();
     } else {
-      $api = new Plugin_Review_API($plugin_file);
+      $api = new dxw_security_Plugin_Review_API($plugin_file);
       try {
         $reviews = $api->call();
         $recommendation = $this->handle_api_response($reviews, $name, $installed_version);
@@ -47,8 +47,8 @@ class Plugin_Review_Column {
 
   private function handle_api_response($reviews, $name, $installed_version) {
     if (empty($reviews)) {
-      $review_data = new Review_Data($installed_version, "not-found");
-      $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
+      $review_data = new dxw_security_Review_Data($installed_version, "not-found");
+      $recommendation = new dxw_security_Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
     } else{
 
       $other_version_reviews = array();
@@ -58,11 +58,11 @@ class Plugin_Review_Column {
         $reason = $review->reason;
         $link = $review->review_link;
 
-        $review_data = new Review_Data($version, $status, $reason, $link);
+        $review_data = new dxw_security_Review_Data($version, $status, $reason, $link);
 
         // $review->version might be a list of versions, so we need to do a little work to compare it
-        if (Review_Data::version_matches($installed_version, $review->version)) {
-          $recommendation = new Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
+        if (dxw_security_Review_Data::version_matches($installed_version, $review->version)) {
+          $recommendation = new dxw_security_Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
         } else {
           $other_version_reviews[] = $review_data;
         }
@@ -70,8 +70,8 @@ class Plugin_Review_Column {
       if (empty($recommendation)) {
         // TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
         //   - if something went wrong then that might not be the case ...(?)
-        $other_version_reviews_data = new Other_Version_Reviews_Data(array_reverse($other_version_reviews)); // Reversed so that we get the latest review first
-        $recommendation = new Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
+        $other_version_reviews_data = new dxw_security_Other_Version_Reviews_Data(array_reverse($other_version_reviews)); // Reversed so that we get the latest review first
+        $recommendation = new dxw_security_Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
       }
     }
     return $recommendation;
@@ -81,11 +81,11 @@ class Plugin_Review_Column {
     // TODO: Handle errors actually raised by us in the api class separately?
     // TODO: in future we should provide some way for users to give us back some useful information when they get an error
     $this->failed_requests++;
-    return new Null_Plugin_Recommendation();
+    return new dxw_security_Null_Plugin_Recommendation();
   }
 
   private function handle_api_fatal_error() {
-    return new Null_Plugin_Recommendation();
+    return new dxw_security_Null_Plugin_Recommendation();
   }
 }
 ?>

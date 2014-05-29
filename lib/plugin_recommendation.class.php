@@ -1,5 +1,5 @@
-<?php namespace dxw_security;
-class Plugin_Recommendation {
+<?php
+class dxw_security_Plugin_Recommendation {
   private $name;
   private $version;
   private $slug;
@@ -49,9 +49,9 @@ class Plugin_Recommendation {
 }
 
 
-class Plugin_Recommendation_Reviewed {
+class dxw_security_Plugin_Recommendation_Reviewed {
   public function __construct($name, $version, $review_data) {
-    $this->recommendation = new Plugin_Recommendation($name, $version, $review_data->slug, $review_data, $review_data->heading());
+    $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, $review_data->slug, $review_data, $review_data->heading());
   }
   public function render() {
     $this->recommendation->render();
@@ -59,7 +59,7 @@ class Plugin_Recommendation_Reviewed {
 }
 
 
-class Plugin_Recommendation_Other_Versions_Reviewed {
+class dxw_security_Plugin_Recommendation_Other_Versions_Reviewed {
   private $recommendation;
 
   public function __construct($name, $version, $other_reviews_data) {
@@ -67,7 +67,7 @@ class Plugin_Recommendation_Other_Versions_Reviewed {
     $dialog_intro =  "<p class='intro'>The installed version ({$version}) has not yet been reviewed, but here are some reviews of other versions:</p>";
     $heading = "<span class='icon-no-info'></span> This version ({$version}) not yet reviewed";
     $more_info =  "These versions have been reviewed: {$other_reviews_data->versions()}";
-    $this->recommendation = new Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, $heading, $more_info, $dialog_intro, "other-{$latest_result}");
+    $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, $heading, $more_info, $dialog_intro, "other-{$latest_result}");
   }
   public function render() {
     $this->recommendation->render();
@@ -75,7 +75,7 @@ class Plugin_Recommendation_Other_Versions_Reviewed {
 }
 
 
-class Null_Plugin_Recommendation {
+class dxw_security_Null_Plugin_Recommendation {
   public function render(){
     ?>
     <a href='<?php echo(esc_url(DXW_SECURITY_PLUGINS_URL)); ?>' class="review-message review-error">

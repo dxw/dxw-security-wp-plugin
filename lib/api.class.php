@@ -1,5 +1,5 @@
-<?php namespace dxw_security;
-class Plugin_Review_API extends API {
+<?php
+class dxw_security_Plugin_Review_API extends dxw_security_API {
 
   private $plugin_file;
 
@@ -37,8 +37,8 @@ class Plugin_Review_API extends API {
 
 
 // php doesn't support nested classes so these need to live outside the API class
-class API_Error extends \Exception { }
-class API {
+class dxw_security_API_Error extends \Exception { }
+class dxw_security_API {
   // TODO: This class doesn't work on it's own, only when extended by a class which defines the following:
   //    functions:
   //      * $api_path()
@@ -80,7 +80,7 @@ class API {
   // Either return a review or throw an error
   private function handle_response($response) {
     if (is_wp_error($response)) {
-      throw new API_Error($response->get_error_message());
+      throw new dxw_security_API_Error($response->get_error_message());
 
     } else {
       switch ($response['response']['code']) {
@@ -96,7 +96,7 @@ class API {
         default:
           // TODO: handle other codes individually?
           // A redirect would end up here - is it possible to get one??
-          throw new API_Error("Response was {$response['response']['code']}: {$response['body']}");
+          throw new dxw_security_API_Error("Response was {$response['response']['code']}: {$response['body']}");
       };
     }
   }
@@ -108,7 +108,7 @@ class API {
       return $parsed_body;
     } else {
       $truncated_body = mb_substr($body, 0, 100);
-      throw new API_Error("Couldn't parse json body beginning: {$truncated_body}");
+      throw new dxw_security_API_Error("Couldn't parse json body beginning: {$truncated_body}");
     }
   }
 

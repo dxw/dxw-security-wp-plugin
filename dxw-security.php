@@ -46,11 +46,11 @@ class dxw_Security {
   }
 
   public function add_security_column() {
-    new dxw_security\Plugin_Review_Column;
+    new dxw_security_Plugin_Review_Column;
   }
 
   public function add_dashboard_widget() {
-    new dxw_security\Dashboard_Widget;
+    new dxw_security_Dashboard_Widget;
   }
 }
 
