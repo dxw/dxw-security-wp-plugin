@@ -32,7 +32,7 @@ class dxw_security_Plugin_Recommendation {
     ?>
       <div id="<?php echo esc_attr($this->dialog_id()); ?>" style="display:none;" class="dialog review-message <?php echo esc_attr($this->slug); ?> <?php echo esc_attr($this->css_class) ?>">
 
-        <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url('/assets/dxw-logo.png' , __FILE__); ?>" alt="dxw logo" /></a>
+        <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url('/assets/dxw-logo.png' , dirname(__FILE__)); ?>" alt="dxw logo" /></a>
 
         <div class="inner">
           <?php print_r($this->dialog_intro) ?>
