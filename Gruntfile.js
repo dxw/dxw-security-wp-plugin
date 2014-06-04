@@ -45,14 +45,23 @@ module.exports = function(grunt) {
                 },
             },
         },
+        copy: {
+          main: {
+            nonull: true,
+            files: [
+              { src: ['assets/*'], dest: 'build/', filter: 'isFile' },
+              { src: ['assets/fonts/**', 'dxw-security.php', 'lib/*', 'readme.txt'], dest: 'build/' },
+            ]
+          }
+        },
         compress: {
           main: {
+            nonull: true,
             options: {
               archive: 'dxw-security-0_2_1.zip'
             },
             files: [
-              { src: ['assets/*'], dest: 'dxw-security/', filter: 'isFile' },
-              { src: ['assets/fonts/**', 'dxw-security.php', 'lib/*', 'readme.txt'], dest: 'dxw-security/' },
+              { cwd: 'build', src: ['**'], dest: 'dxw-security/', filter: 'isFile' },
             ]
           }
         },
@@ -72,10 +81,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('default', [
         'less',
         'uglify',
-        'compress',
     ]);
+
+    grunt.registerTask('build', ['copy', 'compress'])
 };
