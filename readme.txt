@@ -1,5 +1,5 @@
 === dxw Security ===
-Contributors: dxw, dgmstuart
+Contributors: dxw, dgmstuart, harrym
 Tags: security, security plugin, plugin security, wordpress security, security vulnerabilities, vulnerability, exploit, code review, security review, CSRF, XSS, injection, SQL injection, arbitrary code
 Requires at least: 3.8.1
 Tested up to: 3.9.1
@@ -15,6 +15,14 @@ The dxw Security plugin helps you to judge whether or not the plugins installed 
 It displays a security rating against each plugin on your plugins page, based on the security reviews on https://security.dxw.com/.
 
 It also displays a widget on the dashboard showing the totals of each plugin review status.
+
+### Privacy
+
+In order to work out what we should review next, we record aggregate numbers of requests for reviews of individual plugins. However we don't associate these with individual users or IP addresses (and we will never do so without your consent), and we don't receive any information about the specific versions you have installed.
+
+### Developers
+
+The code in WordPress' SVN is a deployable version. If you'd like to contribute to this plugin, you can find the development files on github: https://github.com/dxw/dxw-security-wp-plugin
 
 == Installation ==
 
