@@ -116,7 +116,7 @@ class dxw_security_API {
     if (DXW_SECURITY_CACHE_RESPONSES) {
       $slug = $this->cache_slug();
       // TODO: How long should this get cached for?
-      set_transient($slug, $data, HOUR_IN_SECONDS);
+      set_transient($slug, $data, DAY_IN_SECONDS);
     }
   }
   private function retrieve_api_data() {
