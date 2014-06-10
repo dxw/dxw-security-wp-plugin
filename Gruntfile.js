@@ -58,7 +58,7 @@ module.exports = function(grunt) {
           main: {
             nonull: true,
             options: {
-              archive: 'dxw-security-0_2_1.zip'
+              archive: 'dxw-security-0_2_2.zip'
             },
             files: [
               { cwd: 'build', src: ['**'], dest: 'dxw-security/', filter: 'isFile' },

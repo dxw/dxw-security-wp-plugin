@@ -3,7 +3,7 @@ Contributors: dxw, dgmstuart, harrym
 Tags: security, security plugin, plugin security, wordpress security, security vulnerabilities, vulnerability, exploit, code review, security review, CSRF, XSS, injection, SQL injection, arbitrary code
 Requires at least: 3.8.1
 Tested up to: 3.9.1
-Stable tag: 0.2.1
+Stable tag: 0.2.2
 License: GPLv2 or later
 
 Displays a security rating against each of the plugins you have installed
@@ -44,6 +44,9 @@ The code in WordPress' SVN is a deployable version. If you'd like to contribute 
 
 
 == Changelog ==
+
+= 0.2.2 =
+* Plugin reviews are now cached for 24 hours (rather than 5 minutes)
 
 = 0.2.1 =
 * Fixed a bug whereby plugins with multiple reviews weren't getting counted correctly in the dashboard widget
