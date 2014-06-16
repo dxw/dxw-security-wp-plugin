@@ -20,13 +20,6 @@ It also displays a widget on the dashboard showing the totals of each plugin rev
 
 The code in WordPress' SVN is a deployable version. If you'd like to contribute to this plugin, you can find the development files on github: https://github.com/dxw/dxw-security-wp-plugin
 
-#### Privacy
-
-Just in case you were wondering, no, we don't collect information about the plugins you're using.
-
-In order to work out what we should review next, we record aggregate numbers of requests for reviews of individual plugins.
-However we *don't* receive any information about the specific versions installed on a site. We certainly don't associate these with individual users or IP addresses (and we will never do so without your consent).
-
 == Installation ==
 
 1. Installation options:
@@ -39,11 +32,24 @@ However we *don't* receive any information about the specific versions installed
 3. Look at your plugins page - a box will show on the far right showing the result of security reviews of your plugins
 4. Look at the dashboard - a box will show detailing the numbers of each status of review.
 
+== Frequently Asked Questions ==
+
+= Do you collect information about the plugins I'm using? =
+In short, no. We value your privacy.
+
+We do record aggregate numbers of requests for reviews of individual plugins (so that we can work out what we should be reviewing next)
+but we don't associate these with individual users, sites or IP addresses (and we will never do so without your consent).
+
+We only record the name of the plugin - not the version or any other specific information.
+
+You can see the data we currently record by visiting http://app.security.dxw.com/api/plugin_requests
+
 == Screenshots ==
 
 1. The security ratings displayed on your plugins page
 2. Information about a potentially unsafe plugin on the plugins page
 3. The dashboard widget showing the security ratings of your plugins
+
 
 
 == Changelog ==
