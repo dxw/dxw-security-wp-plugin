@@ -39,10 +39,12 @@ class dxw_security_Review_Data {
     ?>
       <h2><a href="<?php echo $link ?>"><?php echo $this->heading() ?></a></h2>
       <p class="review-status-description"><?php echo $this->description ?></p>
+
       <?php
         if (empty($this->reason)) {
           echo("<a href='{$link}' class='read-more' >See the dxw Security website for details</a>");
         } else {
+          print_r("<h3>Details:</h3>");
           print_r("<p>{$this->reason}</p>");
           echo("<a href='{$link}' class='read-more button-primary'> Read more...</a>");
         }
