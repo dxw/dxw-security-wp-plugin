@@ -1,11 +1,13 @@
 <?php
-// Plugin Name: dxw Security
-// Plugin URI: https://security.dxw.com/
-// Description: Pulls plugin review information from dxw Security into the wordpress plugins screen
-// Version: 0.2.2
-// License: GPLv2
-// Author: dxw
-// Author URI: http://dxw.com/
+/**
+  * Plugin Name: dxw Security
+  * Plugin URI: https://security.dxw.com/
+  * Description: Pulls plugin review information from dxw Security into the wordpress plugins screen
+  * Version: 0.2.2
+  * License: GPLv2
+  * Author: dxw
+  * Author URI: http://dxw.com/
+*/
 
 // CONFIG:
 if (!defined('DXW_SECURITY_API_ROOT')) {
