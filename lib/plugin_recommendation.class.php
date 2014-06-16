@@ -6,13 +6,13 @@ class dxw_security_Plugin_Recommendation {
   private $review_data;
   private $css_class;
 
-  public function __construct($name, $version, $slug, $review_data, $heading, $more_info="More information", $dialog_intro="", $css_class="") {
+  public function __construct($name, $version, $slug, $review_data, $heading, $body, $dialog_intro="", $css_class="") {
     $this->name = $name;
     $this->version = $version;
     $this->slug = $slug;
+    $this->body = $body; // Legitimately includes html - defined in this file
     $this->review_data = $review_data;
     $this->heading = $heading;
-    $this->more_info = $more_info;
     $this->dialog_intro = $dialog_intro;
     $this->css_class = $css_class;
   }
@@ -22,7 +22,7 @@ class dxw_security_Plugin_Recommendation {
       <a href="#<?php echo esc_attr($this->dialog_id()); ?>" data-title="<?php echo esc_attr($this->name); ?> - <?php echo esc_attr($this->version); ?>" class="dialog-link review-message <?php echo esc_attr($this->slug) ?> <?php echo esc_attr($this->css_class) ?>">
         <h3><?php echo $this->heading; ?></h3>
 
-        <p class="more-info"><?php echo esc_html($this->more_info); ?></p>
+        <?php echo $this->body; ?>
       </a>
     <?php
     print_r($this->render_dialog());
@@ -51,7 +51,8 @@ class dxw_security_Plugin_Recommendation {
 
 class dxw_security_Plugin_Recommendation_Reviewed {
   public function __construct($name, $version, $review_data) {
-    $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, $review_data->slug, $review_data, $review_data->heading());
+    $body = "<p class='more-info'>More information</p>";
+    $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, $review_data->slug, $review_data, $review_data->heading(), $body);
   }
   public function render() {
     $this->recommendation->render();
@@ -65,9 +66,9 @@ class dxw_security_Plugin_Recommendation_Other_Versions_Reviewed {
   public function __construct($name, $version, $other_reviews_data) {
     $latest_result = $other_reviews_data->most_recent()->slug;
     $dialog_intro =  "<p class='intro'>The installed version ({$version}) has not yet been reviewed, but here are some reviews of other versions:</p>";
-    $heading = "<span class='icon-no-info'></span> This version ({$version}) not yet reviewed";
-    $more_info =  "These versions have been reviewed: {$other_reviews_data->versions()}";
-    $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, $heading, $more_info, $dialog_intro, "other-{$latest_result}");
+    $heading = "<span class='icon-no-info'></span> Not yet reviewed";
+    $body =  "<p class='more-info'>Other versions:</p> {$other_reviews_data->render_versions()}"; // TODO: Passing around a chunk of html is kind of nasty
+    $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, $heading, $body, $dialog_intro, "other-{$latest_result}");
   }
   public function render() {
     $this->recommendation->render();

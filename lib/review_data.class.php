@@ -53,7 +53,11 @@ class dxw_security_Review_Data {
   }
 
   public function heading() {
-    return "<span class='icon-{$this->slug}'></span> {$this->message}";
+    return "{$this->icon()} {$this->message}";
+  }
+
+  public function icon() {
+    return "<span class='icon-{$this->slug}'></span>";
   }
 
   // Versions might be a comma separated string with no spaces e.g. "1.9.2,1.9.3"
@@ -98,5 +102,17 @@ class dxw_security_Other_Version_Reviews_Data {
     }
     return implode(", ", $versions);
   }
+
+  // Return an html fragment comprising a list of versions with icons
+  //   TODO: Is there a less horrible way of doing this?
+  public function render_versions() {
+    $list_items = "";
+    foreach($this->reviews as &$review) {
+      $list_items .= "<li>{$review->icon()} {$review->version()}</li>";
+    }
+
+    return "<ul class='other'>{$list_items}</ul>";
+  }
+
 }
 ?>
