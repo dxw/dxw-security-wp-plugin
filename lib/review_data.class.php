@@ -72,6 +72,9 @@ class dxw_security_Review_Data {
 }
 
 class dxw_security_Other_Version_Reviews_Data {
+  private $reviews;
+  private $latest_version;
+
   # Expects an array of Review_Data objects
   public function __construct($reviews, $latest_version) {
     $this->reviews = $reviews;

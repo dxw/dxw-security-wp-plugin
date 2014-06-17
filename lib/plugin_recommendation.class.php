@@ -3,8 +3,10 @@ class dxw_security_Plugin_Recommendation {
   private $name;
   private $version;
   private $slug;
+  private $body;
   private $review_data;
-  private $css_class;
+  private $heading;
+  private $dialog_intro;
 
   public function __construct($name, $version, $slug, $review_data, $heading, $body, $dialog_intro="") {
     $this->name = $name;
@@ -14,12 +16,11 @@ class dxw_security_Plugin_Recommendation {
     $this->review_data = $review_data;
     $this->heading = $heading;
     $this->dialog_intro = $dialog_intro;
-
   }
 
   public function render() {
     ?>
-      <a href="#<?php echo esc_attr($this->dialog_id()); ?>" data-title="<?php echo esc_attr($this->name); ?> - <?php echo esc_attr($this->version); ?>" class="dialog-link review-message <?php echo esc_attr($this->slug) ?> <?php echo esc_attr($this->css_class) ?>">
+      <a href="#<?php echo esc_attr($this->dialog_id()); ?>" data-title="<?php echo esc_attr($this->name); ?> - <?php echo esc_attr($this->version); ?>" class="dialog-link review-message <?php echo esc_attr($this->slug) ?>">
         <h3><?php echo $this->heading; ?></h3>
 
         <?php echo $this->body; ?>
@@ -50,6 +51,8 @@ class dxw_security_Plugin_Recommendation {
 
 
 class dxw_security_Plugin_Recommendation_Reviewed {
+  private $recommendation;
+
   public function __construct($name, $version, $review_data) {
     $body = "<p class='more-info'>More information</p>";
     $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, $review_data->slug, $review_data, $review_data->heading(), $body);
