@@ -2,6 +2,7 @@
 require_once(dirname(__FILE__) . '/api.class.php');
 require_once(dirname(__FILE__) . '/review_data.class.php');
 require_once(dirname(__FILE__) . '/plugin_recommendation.class.php');
+require_once(dirname(__FILE__) . '/plugin_file.class.php');
 
 
 class dxw_security_Plugin_Review_Column {
@@ -26,6 +27,8 @@ class dxw_security_Plugin_Review_Column {
   }
 
   private function data($plugin_file, $plugin_data) {
+    $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
+
     $name = $plugin_data['Name'];
     $installed_version = $plugin_data['Version'];
 
@@ -37,7 +40,7 @@ class dxw_security_Plugin_Review_Column {
     if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $recommendation = $this->handle_api_fatal_error();
     } else {
-      $api = new dxw_security_Plugin_Review_API($plugin_file);
+      $api = new dxw_security_Plugin_Review_API($plugin_file_object->plugin_slug);
 
       try {
         $reviews = $api->call();

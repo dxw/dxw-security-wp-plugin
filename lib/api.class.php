@@ -1,37 +1,24 @@
 <?php
 class dxw_security_Plugin_Review_API extends dxw_security_API {
 
-  private $plugin_file;
+  private $plugin_slug;
 
-  public function __construct($plugin_file) {
-    $this->plugin_file = $plugin_file;
+  public function __construct($plugin_slug) {
+    $this->plugin_slug = $plugin_slug;
   }
 
   // TODO: Currently this only handles directory plugins
   protected function api_path() {
-    return "/directory_plugins/{$this->plugin_name()}/reviews/";
+    return "/directory_plugins/{$this->plugin_slug}/reviews/";
   }
 
   protected function cache_slug() {
-    return $this->plugin_file;
+    return $this->plugin_slug;
   }
 
   // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
   protected function extract_data($parsed_body) {
     return $parsed_body->reviews;
-  }
-
-  private function plugin_name() {
-    // Versions of php before 5.4 don't allow array indexes to be accessed directly on the output of functions
-    //   http://www.php.net/manual/en/migration54.new-features.php - "Function array dereferencing"
-    $f = explode('/', $this->plugin_file);
-
-    // HACK - strip off file extensions to make Hello Dolly etc. not complain
-    //  we might get lucky and this actually be the slug we're looking for, but if not, the search just won't find anything
-    $directory_slug = preg_replace("/\\.[^.\\s]{3,4}$/", "", $f[0]);
-    // END HACK
-
-    return $directory_slug;
   }
 }
 

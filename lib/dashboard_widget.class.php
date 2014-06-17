@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/api.class.php');
 require_once(dirname(__FILE__) . '/review_data.class.php');
+require_once(dirname(__FILE__) . '/plugin_file.class.php');
 
 class dxw_security_Dashboard_Widget {
   private $red = 0;
@@ -53,7 +54,9 @@ class dxw_security_Dashboard_Widget {
   }
 
   private function get_counts($plugins) {
-    foreach($plugins as $path => $data) {
+    foreach($plugins as $plugin_file => $data) {
+      $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
+
       $installed_version = $data["Version"];
 
       // TODO: this pattern is duplicated in the security column code
@@ -61,7 +64,7 @@ class dxw_security_Dashboard_Widget {
       if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
         $this->handle_api_fatal_error();
       } else {
-        $api = new dxw_security_Plugin_Review_API($path);
+        $api = new dxw_security_Plugin_Review_API($plugin_file_object->plugin_slug);
         try {
           $reviews = $api->call();
           $this->handle_api_response($reviews, $installed_version);
