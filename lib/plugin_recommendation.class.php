@@ -67,7 +67,7 @@ class dxw_security_Plugin_Recommendation_Other_Versions_Reviewed {
     $latest_result = $other_reviews_data->most_recent()->slug;
     $dialog_intro =  "<p class='intro'>The installed version ({$version}) has not yet been reviewed, but here are some reviews of other versions:</p>";
     $heading = "<span class='icon-no-info'></span> Not yet reviewed";
-    $body =  "<p class='more-info'>Other versions:</p> {$other_reviews_data->render_versions()}"; // TODO: Passing around a chunk of html is kind of nasty
+    $body =  "<p class='more-info'>Reviewed versions:</p> {$other_reviews_data->render_versions()}"; // TODO: Passing around a chunk of html is kind of nasty
     $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, $heading, $body, $dialog_intro);
   }
   public function render() {

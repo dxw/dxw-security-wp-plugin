@@ -137,8 +137,19 @@
     margin-bottom: 0; // The default styling spaces the text above and below equally - doesn't look good.
   }
 
-  &.dialog-link {
-// STYLING OTHER VERSUIBS HERE
+  &.dialog-link ul.reviewed_versions{
+    margin: 8px 0 0;
+    padding-left: 10px;
+    list-style: none;
+    .icon-no-issues-found {
+      color: @green;
+    }
+    .icon-use-with-caution {
+      color: @amber;
+    }
+    .icon-potentially-unsafe {
+      color: @wp-red;
+    }
   }
 }
 

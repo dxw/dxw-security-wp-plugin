@@ -111,7 +111,7 @@ class dxw_security_Other_Version_Reviews_Data {
       $list_items .= "<li>{$review->icon()} {$review->version()}</li>";
     }
 
-    return "<ul class='other'>{$list_items}</ul>";
+    return "<ul class='reviewed_versions'>{$list_items}</ul>";
   }
 
 }
