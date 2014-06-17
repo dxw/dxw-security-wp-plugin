@@ -56,6 +56,7 @@ You can see the data we currently record by visiting http://app.security.dxw.com
 
 = 0.2.3 =
 * Improvements to the display of the plugins page column where the current version hasn't been reviewed, but reviews exist for other versions.
+* The dashboard plugin now links to the first plugin on the plugins page which has that review status
 
 = 0.2.2 =
 * Plugin reviews are now cached for 24 hours (rather than 5 minutes)
