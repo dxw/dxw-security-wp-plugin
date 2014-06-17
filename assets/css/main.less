@@ -2,6 +2,7 @@
 @wp-red-background: #fcf3ef;
 @wp-light-red-background: #fefaf7;
 @red-highlight: #dd714d; // Not a WP colour
+@red-highlight-background: darken(@wp-red-background, 10%);
 
 @wp-blue: #0074a2;
 @wp-blue-highlight: #2ea2cc;
@@ -10,14 +11,18 @@
 @green: #6cbb3c;  // 'Green Snake'
 @green-background: lighten(#CAE8A2, 15%);
 @green-highlight: darken(@green, 20%);
+@green-highlight-background: darken(@green-background, 10%);
 
 @amber: #DB9702;
 @amber-background: #f8efe2;
-@amber-highlight: lighten(@amber, 5%);;
+@amber-highlight: lighten(@amber, 5%);
+@amber-highlight-background: darken(@amber-background, 10%);
 
 @grey: #808080;
 @grey-background: #F0F0F0;
 @grey-highlight: darken(@grey, 20%);
+@grey-highlight-background: darken(@grey-background, 10%);
+
 
 
 // Generic mixins - TODO can we get at these more easily?
@@ -189,7 +194,7 @@
 // Dashboard widget styles
 #dashboard_dxw_security {
   .review_counts {
-    .plugin_review_count_box {
+    .plugin_review_count_box_inner {
       padding: 10px;
       margin:5px;
       height: 165px; // TODO - is there a better way to achieve consistent heights?
@@ -209,7 +214,7 @@
     }
 
     // a bit hacky - should probably use another class on the li's
-    li.use-with-caution, li.potentially-unsafe, li.no-issues-found {
+    li.plugin_review_count_box {
       width:33.33%;
       width: calc(100%/3);
       float: left;
@@ -226,30 +231,43 @@
         text-align: right;
       }
     }
+
+    a {
+      color: inherit;
+    }
   }
 
-  .use-with-caution {
-    .plugin_review_count_box {
-      .amber_colour_box;
-    }
-  }
-  .potentially-unsafe {
-    .plugin_review_count_box {
+  .plugin_review_count_box {
+    .potentially-unsafe {
       .red_colour_box;
+      &:hover {
+        background-color: @red-highlight-background;
+      }
     }
-  }
-  .no-issues-found {
-    .plugin_review_count_box {
+    .use-with-caution {
+      .amber_colour_box;
+      &:hover {
+        background-color: @amber-highlight-background;
+      }
+    }
+    .no-issues-found {
       .green_colour_box;
+      &:hover {
+        background-color: @green-highlight-background;
+      }
     }
-  }
-  .none { // Grey it out if the count is 0
-    .plugin_review_count_box {
+    .none { // Grey it out if the count is 0
       .grey_colour_box;
+      &:hover {
+        background-color: @grey-background; // HACK - to make the background colour not change
+      }
     }
   }
   .no-info {
     .grey_colour_box;
+    &:hover {
+      background-color: @grey-highlight-background;
+    }
   }
 
 }

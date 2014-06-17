@@ -11,6 +11,13 @@ class dxw_security_Dashboard_Widget {
   private $not_reviewed = 0;
   private $failed_requests = 0;
 
+  private $first_red_slug;
+  private $first_yellow_slug;
+  private $first_green_slug;
+  private $first_different_version_slug;
+  private $first_not_reviewed_slug;
+  private $first_failed_request_slug;
+
   public function __construct() {
     add_action('wp_dashboard_setup', array($this, 'add_dashboard_widgets'));
   }
@@ -37,17 +44,24 @@ class dxw_security_Dashboard_Widget {
     $green_slug = dxw_security_Review_Data::$dxw_security_review_statuses["green"]["slug"];
     $grey_slug = dxw_security_Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
 
+    $first_red_plugin_link               = $this->plugin_link($this->first_red_slug);
+    $first_yellow_plugin_link            = $this->plugin_link($this->first_yellow_slug);
+    $first_green_plugin_link             = $this->plugin_link($this->first_green_slug);
+    $first_different_version_plugin_link = $this->plugin_link($this->first_different_version_slug);
+    $first_not_reviewed_plugin_link      = $this->plugin_link($this->first_not_reviewed_slug);
+    $first_failed_request_plugin_link    = $this->plugin_link($this->first_failed_request_slug);
+
     // Is this reliable?
     $plugins_page_url = "plugins.php";
 
     echo "<p>Of the {$number_of_plugins} plugins installed on this site:</p>";
     echo "<ul class='review_counts'>";
-    $this->plugin_review_count_box($this->red, $red_slug, "are potentially unsafe");
-    $this->plugin_review_count_box($this->yellow, $yellow_slug, "should be used with caution");
-    $this->plugin_review_count_box($this->green, $green_slug, "are probably safe");
-    if ($this->different_version > 0) { $this->plugin_review_not_reviewed_box($this->different_version, $grey_slug, "have reviews for different versions"); }
-    if ($this->not_reviewed > 0) {      $this->plugin_review_not_reviewed_box($this->not_reviewed, $grey_slug, "have not yet been reviewed"); }
-    if ($this->failed_requests > 0) {   $this->plugin_review_not_reviewed_box($this->failed_requests, $grey_slug, "could not be checked due to errors. Please try again later."); }
+    $this->plugin_review_count_box($this->red, $red_slug, $first_red_plugin_link, "are potentially unsafe");
+    $this->plugin_review_count_box($this->yellow, $yellow_slug, $first_yellow_plugin_link, "should be used with caution");
+    $this->plugin_review_count_box($this->green, $green_slug, $first_green_plugin_link, "are probably safe");
+    if ($this->different_version > 0) { $this->plugin_review_not_reviewed_box($this->different_version, $grey_slug, $first_different_version_plugin_link, "have reviews for different versions"); }
+    if ($this->not_reviewed > 0) {      $this->plugin_review_not_reviewed_box($this->not_reviewed, $grey_slug, $first_not_reviewed_plugin_link, "have not yet been reviewed"); }
+    if ($this->failed_requests > 0) {   $this->plugin_review_not_reviewed_box($this->failed_requests, $grey_slug, $first_failed_request_plugin_link, "could not be checked due to errors. Please try again later."); }
 
     echo "</ul>";
     echo "<p><a href='{$plugins_page_url}'>Visit your plugins page for more details...</a></p>";
@@ -67,7 +81,7 @@ class dxw_security_Dashboard_Widget {
         $api = new dxw_security_Plugin_Review_API($plugin_file_object->plugin_slug);
         try {
           $reviews = $api->call();
-          $this->handle_api_response($reviews, $installed_version);
+          $this->handle_api_response($reviews, $installed_version, $plugin_file_object->plugin_slug);
         } catch (Exception $e) {
           $this->handle_api_error($e);
         }
@@ -75,9 +89,10 @@ class dxw_security_Dashboard_Widget {
     }
   }
 
-  private function handle_api_response($reviews, $installed_version) {
+  private function handle_api_response($reviews, $installed_version, $plugin_slug) {
     if (empty($reviews)) {
       $this->not_reviewed++;
+      if (is_null($this->first_not_reviewed_slug)) { $this->first_not_reviewed_slug = $plugin_slug; }
     } else{
 
       foreach($reviews as &$review) {
@@ -86,12 +101,15 @@ class dxw_security_Dashboard_Widget {
           switch ($review->recommendation) {
           case "red":
             $this->red++;
+            if (is_null($this->first_red_slug)) { $this->first_red_slug = $plugin_slug; }
             break;
           case "yellow":
             $this->yellow++;
+            if (is_null($this->first_yellow_slug)) { $this->first_yellow_slug = $plugin_slug; }
             break;
           case "green":
             $this->green++;
+            if (is_null($this->first_green_slug)) { $this->first_green_slug = $plugin_slug; }
             break;
           }
           return;
@@ -102,6 +120,7 @@ class dxw_security_Dashboard_Widget {
       // Assumption: if there were some reviews, but no review of the installed version,
       //  then there must be reviews of other versions
       $this->different_version++;
+      if (is_null($this->first_different_version_slug)) { $this->first_different_version_slug = $plugin_slug; }
     }
   }
 
@@ -109,36 +128,53 @@ class dxw_security_Dashboard_Widget {
     // TODO: Handle errors actually raised by us in the api class separately from other errors?
     // TODO: in future we should provide some way for users to give us back some useful information when they get an error
     $this->failed_requests++;
+    if (is_null($this->first_failed_requests_slug)) { $this->first_failed_requests_slug = $plugin_slug; }
   }
 
   private function handle_api_fatal_error() {
     // Assume it would have failed
     //   Keep counting because currently we're just displaying "x failed"
     $this->failed_requests++;
+    if (is_null($this->first_failed_requests_slug)) { $this->first_failed_requests_slug = $plugin_slug; }
     // TODO: instead throw an error here to be captured higher up.
   }
 
-  private function plugin_review_count_box($count, $slug, $message) {
-    if ($count == 0) { $slug = $slug . " none"; }
+  private function plugin_review_count_box($count, $css_class, $plugin_link, $message) {
+    if ($count == 0) { $css_class = $css_class . " none"; }
+    // TODO: Is it bad form to wrap the li in an anchor, rather than having it inside?
+    if (!is_null($plugin_link)) { print_r("<a href={$plugin_link}>"); }
     ?>
-      <li class='<?php echo $slug ?>'>
-        <div class='plugin_review_count_box'>
-          <span class='icon-<?php echo $slug ?>'></span>
+      <li class='plugin_review_count_box'>
+        <div class='<?php echo $css_class ?> plugin_review_count_box_inner'>
+          <span class='icon-<?php echo $css_class ?>'></span>
           <span class='count'><?php echo $count ?></span>
           <?php echo $message ?>
         </div>
       </li>
     <?php
+    if (!is_null($plugin_link)) { print_r("</a>"); }
   }
 
-  private function plugin_review_not_reviewed_box($count, $slug, $message) {
+  private function plugin_review_not_reviewed_box($count, $css_class, $plugin_link, $message) {
+    // TODO: Is it bad form to wrap the li in an anchor, rather than having it inside?
     ?>
-      <li class='<?php echo $slug ?>'>
-        <span class='icon-<?php echo $slug ?>'></span>
-        <span class='count'><?php echo $count ?></span>
-        <?php echo $message ?>
-      </li>
+      <a href='<?php echo $plugin_link ?>'>
+        <li class='<?php echo $css_class ?>'>
+          <span class='icon-<?php echo $css_class ?>'></span>
+          <span class='count'><?php echo $count ?></span>
+          <?php echo $message ?>
+        </li>
+      </a>
     <?php
   }
+
+  private function plugin_link($plugin_slug) {
+    if (is_null($plugin_slug)) { return; }
+    // TODO: Is this reliable?
+    // TODO: Also - duplication
+    $plugins_page_url = "plugins.php";
+    return "{$plugins_page_url}#{$plugin_slug}";
+  }
+
 }
 ?>
