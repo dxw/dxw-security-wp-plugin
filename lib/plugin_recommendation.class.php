@@ -6,7 +6,7 @@ class dxw_security_Plugin_Recommendation {
   private $review_data;
   private $css_class;
 
-  public function __construct($name, $version, $slug, $review_data, $heading, $body, $dialog_intro="", $css_class="") {
+  public function __construct($name, $version, $slug, $review_data, $heading, $body, $dialog_intro="") {
     $this->name = $name;
     $this->version = $version;
     $this->slug = $slug;
@@ -14,7 +14,7 @@ class dxw_security_Plugin_Recommendation {
     $this->review_data = $review_data;
     $this->heading = $heading;
     $this->dialog_intro = $dialog_intro;
-    $this->css_class = $css_class;
+
   }
 
   public function render() {
@@ -30,7 +30,7 @@ class dxw_security_Plugin_Recommendation {
 
   protected function render_dialog(){
     ?>
-      <div id="<?php echo esc_attr($this->dialog_id()); ?>" style="display:none;" class="dialog review-message <?php echo esc_attr($this->slug); ?> <?php echo esc_attr($this->css_class) ?>">
+      <div id="<?php echo esc_attr($this->dialog_id()); ?>" style="display:none;" class="dialog review-message <?php echo esc_attr($this->slug); ?>">
 
         <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url('/assets/dxw-logo.png' , dirname(__FILE__)); ?>" alt="dxw logo" /></a>
 
@@ -68,7 +68,7 @@ class dxw_security_Plugin_Recommendation_Other_Versions_Reviewed {
     $dialog_intro =  "<p class='intro'>The installed version ({$version}) has not yet been reviewed, but here are some reviews of other versions:</p>";
     $heading = "<span class='icon-no-info'></span> Not yet reviewed";
     $body =  "<p class='more-info'>Other versions:</p> {$other_reviews_data->render_versions()}"; // TODO: Passing around a chunk of html is kind of nasty
-    $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, $heading, $body, $dialog_intro, "other-{$latest_result}");
+    $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, "other-versions-reviewed", $other_reviews_data, $heading, $body, $dialog_intro);
   }
   public function render() {
     $this->recommendation->render();

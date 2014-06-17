@@ -137,45 +137,8 @@
     margin-bottom: 0; // The default styling spaces the text above and below equally - doesn't look good.
   }
 
-
-  // TODO: cribbed from OCS - can this be cleaned up further?
-  .corner_triangle(@colour) {
-    position: relative;
-    overflow: hidden;
-    &:after {
-      content: "";
-      width: 0;
-      height: 0;
-      border-left: 28px solid transparent;
-      border-right: 29px solid transparent;
-      border-bottom: 29px solid @colour;
-      display: inline-block;
-      position: absolute;
-      bottom: -4px;
-      right: -18px;
-      opacity: 1;
-      filter: alpha(opacity=100);
-      .rotation(135deg);
-      .transition(border-color 0.3s ease-in-out);
-
-      // TODO: I think using this requires using modernizr to add the .lt-1e9 class. Is there any other way we can do this?
-      // .lt-ie9 & {
-      //   display: none;
-      //   visibility: hidden;
-      // }
-    }
-  }
-
   &.dialog-link {
-    &.other-use-with-caution {
-      .corner_triangle(@amber);
-    }
-    &.other-potentially-unsafe {
-      .corner_triangle(@wp-red);
-    }
-    &.other-no-issues-found {
-      .corner_triangle(@green);
-    }
+// STYLING OTHER VERSUIBS HERE
   }
 }
 
