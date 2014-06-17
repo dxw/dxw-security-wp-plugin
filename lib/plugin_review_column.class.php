@@ -29,14 +29,19 @@ class dxw_security_Plugin_Review_Column {
     $name = $plugin_data['Name'];
     $installed_version = $plugin_data['Version'];
 
+    // TODO - perhaps this function shouldn't be responsible for this logic?
+    $latest_version = $this->get_latest_version($plugin_file);
+    if (!$latest_version) { $latest_version = $installed_version; }
+
     // Stop making requests after a certain number of failures:
     if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $recommendation = $this->handle_api_fatal_error();
     } else {
       $api = new dxw_security_Plugin_Review_API($plugin_file);
+
       try {
         $reviews = $api->call();
-        $recommendation = $this->handle_api_response($reviews, $name, $installed_version);
+        $recommendation = $this->handle_api_response($reviews, $name, $installed_version, $latest_version);
       } catch (\Exception $e) {
         $recommendation = $this->handle_api_error($e);
       }
@@ -45,9 +50,10 @@ class dxw_security_Plugin_Review_Column {
     $recommendation->render();
   }
 
-  private function handle_api_response($reviews, $name, $installed_version) {
+  private function handle_api_response($reviews, $name, $installed_version, $latest_version) {
     if (empty($reviews)) {
       $review_data = new dxw_security_Review_Data($installed_version, "not-found");
+      // TODO - it's a bit odd that we're creating a class which implies that the plugin has been reviewed...
       $recommendation = new dxw_security_Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
     } else{
 
@@ -57,11 +63,10 @@ class dxw_security_Plugin_Review_Column {
         $status = $review->recommendation;
         $reason = $review->reason;
         $link = $review->review_link;
-
         $review_data = new dxw_security_Review_Data($version, $status, $reason, $link);
 
         // $review->version might be a list of versions, so we need to do a little work to compare it
-        if (dxw_security_Review_Data::version_matches($installed_version, $review->version)) {
+        if ($review_data->version_matches($installed_version)) {
           $recommendation = new dxw_security_Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
         } else {
           $other_version_reviews[] = $review_data;
@@ -70,7 +75,7 @@ class dxw_security_Plugin_Review_Column {
       if (empty($recommendation)) {
         // TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
         //   - if something went wrong then that might not be the case ...(?)
-        $other_version_reviews_data = new dxw_security_Other_Version_Reviews_Data(array_reverse($other_version_reviews)); // Reversed so that we get the latest review first
+        $other_version_reviews_data = new dxw_security_Other_Version_Reviews_Data(array_reverse($other_version_reviews), $latest_version); // Reversed so that we get the latest review first
         $recommendation = new dxw_security_Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
       }
     }
@@ -86,6 +91,17 @@ class dxw_security_Plugin_Review_Column {
 
   private function handle_api_fatal_error() {
     return new dxw_security_Null_Plugin_Recommendation();
+  }
+
+  // Cribbed from wp-admin/includes/update.php in core
+  // TODO: Should be defined elsewhere? Should be static?
+  private function get_latest_version($file) {
+    $plugin_updates = get_site_transient( 'update_plugins' );
+    if ( !isset( $plugin_updates->response[ $file ] ) )
+      return false;
+
+    $r = $plugin_updates->response[ $file ];
+    return $r->new_version;
   }
 }
 ?>

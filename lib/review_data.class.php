@@ -65,17 +65,17 @@ class dxw_security_Review_Data {
     return implode(", ", explode(",", $this->version));
   }
 
-  // Compares a single version string to a comma separated list of versions
-  public static function version_matches($version, $list) {
-    $versions = explode( ',', $list );
-    return in_array($version, $versions);
+  // Compares a single version to the versions which this review applies to (may be a comma-separated list)
+  public function version_matches($version) {
+    return dxw_security_Plugin_Version_Comparer::version_matches($version, $this->version);
   }
 }
 
 class dxw_security_Other_Version_Reviews_Data {
   # Expects an array of Review_Data objects
-  public function __construct($reviews) {
+  public function __construct($reviews, $latest_version) {
     $this->reviews = $reviews;
+    $this->latest_version = $latest_version;
   }
 
   public function render() {
@@ -108,11 +108,27 @@ class dxw_security_Other_Version_Reviews_Data {
   public function render_versions() {
     $list_items = "";
     foreach($this->reviews as &$review) {
-      $list_items .= "<li>{$review->icon()} {$review->version()}</li>";
+      $list_item = "<li>{$review->icon()} {$review->version()}";
+      if ($review->version_matches($this->latest_version)) {
+        $list_item .= " (Latest)";
+      }
+      $list_item .= "</li>";
+
+      $list_items .= $list_item;
     }
 
     return "<ul class='reviewed_versions'>{$list_items}</ul>";
   }
 
 }
+
+class dxw_security_Plugin_Version_Comparer {
+  // Compares a single version to a comma-separated list of versions
+  public static function version_matches($version, $list) {
+    $versions = explode( ',', $list );
+    return in_array($version, $versions);
+  }
+}
+
+
 ?>

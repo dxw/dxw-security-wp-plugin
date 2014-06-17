@@ -79,7 +79,7 @@ class dxw_security_Dashboard_Widget {
 
       foreach($reviews as &$review) {
         // $review->version might be a list of versions, so we can't just do a straightforward comparison
-        if (dxw_security_Review_Data::version_matches($installed_version, $review->version)) {
+        if (dxw_security_Plugin_Version_Comparer::version_matches($installed_version, $review->version)) {
           switch ($review->recommendation) {
           case "red":
             $this->red++;
