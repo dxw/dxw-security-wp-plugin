@@ -8,6 +8,15 @@ class dxw_security_Plugin_File {
     $this->plugin_slug = $this->plugin_slug($plugin_file);
   }
 
+  // Cribbed from wp-admin/includes/update.php in core
+  public function latest_version() {
+    $plugin_updates = get_site_transient( 'update_plugins' );
+    if ( !isset( $plugin_updates->response[ $this->plugin_file ] ) )
+      return false;
+
+    return $plugin_updates->response[ $this->plugin_file ]->new_version;
+  }
+
   private function plugin_slug() {
     // Versions of php before 5.4 don't allow array indexes to be accessed directly on the output of functions
     //   http://www.php.net/manual/en/migration54.new-features.php - "Function array dereferencing"

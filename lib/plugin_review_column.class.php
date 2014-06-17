@@ -27,13 +27,12 @@ class dxw_security_Plugin_Review_Column {
   }
 
   private function data($plugin_file, $plugin_data) {
-    $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
-
     $name = $plugin_data['Name'];
     $installed_version = $plugin_data['Version'];
 
-    // TODO - perhaps this function shouldn't be responsible for this logic?
-    $latest_version = $this->get_latest_version($plugin_file);
+    $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
+    // TODO - perhaps this function shouldn't be responsible for the following logic?
+    $latest_version = $plugin_file_object->latest_version();
     if (!$latest_version) { $latest_version = $installed_version; }
 
     // Stop making requests after a certain number of failures:
@@ -94,17 +93,6 @@ class dxw_security_Plugin_Review_Column {
 
   private function handle_api_fatal_error() {
     return new dxw_security_Null_Plugin_Recommendation();
-  }
-
-  // Cribbed from wp-admin/includes/update.php in core
-  // TODO: Should be defined elsewhere? Should be static?
-  private function get_latest_version($file) {
-    $plugin_updates = get_site_transient( 'update_plugins' );
-    if ( !isset( $plugin_updates->response[ $file ] ) )
-      return false;
-
-    $r = $plugin_updates->response[ $file ];
-    return $r->new_version;
   }
 }
 ?>
