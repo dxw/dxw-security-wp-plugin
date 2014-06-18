@@ -57,7 +57,7 @@ class dxw_security_Review_Data {
   }
 
   public function icon() {
-    return "<span class='icon-{$this->slug}'></span>";
+    return "<span class='icon-{$this->slug}' title='{$this->message}'></span>";
   }
 
   // Versions might be a comma separated string with no spaces e.g. "1.9.2,1.9.3"
@@ -123,6 +123,9 @@ class dxw_security_Other_Version_Reviews_Data {
     return "<ul class='reviewed_versions'>{$list_items}</ul>";
   }
 
+  public function icon() {
+    return "<span class='icon-no-info' title='Not yet reviewed'></span>";
+  }
 }
 
 class dxw_security_Plugin_Version_Comparer {
