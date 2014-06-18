@@ -3,7 +3,7 @@ Contributors: dxw, dgmstuart, harrym
 Tags: security, security plugin, plugin security, wordpress security, security vulnerabilities, vulnerability, exploit, code review, security review, CSRF, XSS, injection, SQL injection, arbitrary code
 Requires at least: 3.8.1
 Tested up to: 3.9.1
-Stable tag: 0.2.2
+Stable tag: 0.2.3
 License: GPLv2 or later
 
 Displays a security rating against each of the plugins you have installed
