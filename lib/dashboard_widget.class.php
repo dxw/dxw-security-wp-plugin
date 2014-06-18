@@ -1,4 +1,7 @@
 <?php
+
+defined('ABSPATH') OR exit;
+
 require_once(dirname(__FILE__) . '/api.class.php');
 require_once(dirname(__FILE__) . '/review_data.class.php');
 require_once(dirname(__FILE__) . '/plugin_file.class.php');

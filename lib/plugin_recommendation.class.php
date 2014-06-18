@@ -1,4 +1,7 @@
 <?php
+
+defined('ABSPATH') OR exit;
+
 class dxw_security_Plugin_Recommendation {
   private $name;
   private $version;
