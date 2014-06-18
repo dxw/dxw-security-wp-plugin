@@ -111,7 +111,7 @@ class dxw_security_Other_Version_Reviews_Data {
   public function render_versions() {
     $list_items = "";
     foreach($this->reviews as &$review) {
-      $list_item = "<li>{$review->icon()} {$review->version()}";
+      $list_item = "<li class='{$review->slug}'>{$review->icon()} {$review->version()}";
       if ($review->version_matches($this->latest_version)) {
         $list_item .= " (Latest)";
       }
