@@ -1,4 +1,7 @@
 <?php
+
+defined('ABSPATH') OR exit;
+
 class dxw_security_Plugin_Review_API extends dxw_security_API {
 
   private $plugin_slug;

@@ -1,4 +1,7 @@
 <?php
+
+defined('ABSPATH') OR exit;
+
 class dxw_security_Plugin_File {
   private $plugin_file;
   public $plugin_slug;

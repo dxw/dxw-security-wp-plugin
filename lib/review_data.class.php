@@ -1,4 +1,7 @@
 <?php
+
+defined('ABSPATH') OR exit;
+
 class dxw_security_Review_Data {
   public $version;
   public $slug;
