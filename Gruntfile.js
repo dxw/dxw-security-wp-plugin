@@ -58,7 +58,7 @@ module.exports = function(grunt) {
           main: {
             nonull: true,
             options: {
-              archive: 'dxw-security-0_2_2.zip'
+              archive: 'dxw-security-0_2_5.zip'
             },
             files: [
               { cwd: 'build', src: ['**'], dest: 'dxw-security/', filter: 'isFile' },
@@ -88,5 +88,5 @@ module.exports = function(grunt) {
         'uglify',
     ]);
 
-    grunt.registerTask('build', ['copy', 'compress'])
+    grunt.registerTask('build', ['copy', 'compress']);
 };

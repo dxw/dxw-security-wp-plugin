@@ -3,7 +3,7 @@
   * Plugin Name: dxw Security
   * Plugin URI: https://wordpress.org/plugins/dxw-security/
   * Description: Pulls plugin review information from dxw Security into the wordpress plugins screen
-  * Version: 0.2.4
+  * Version: 0.2.5
   * License: GPLv2
   * Author: dxw
   * Author URI: http://dxw.com/
@@ -14,7 +14,7 @@ defined('ABSPATH') OR exit;
 
 // CONFIG:
 if (!defined('DXW_SECURITY_API_ROOT')) {
-  define('DXW_SECURITY_API_ROOT', 'http://app.security.dxw.com/api');
+  define('DXW_SECURITY_API_ROOT', 'https://app.security.dxw.com/api');
 }
 if (!defined('DXW_SECURITY_CACHE_RESPONSES')) {
   define('DXW_SECURITY_CACHE_RESPONSES', true);
