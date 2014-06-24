@@ -16,7 +16,7 @@ class dxw_security_Plugin_Review_API extends dxw_security_API {
   }
 
   protected function cache_slug() {
-    return $this->plugin_slug;
+    return "dxw-security-plugin-review_{$this->plugin_slug}";
   }
 
   // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
