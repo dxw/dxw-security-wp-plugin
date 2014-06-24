@@ -17,7 +17,7 @@ class dxw_security_Plugin_Recommendation {
     $this->slug = $slug;
     $this->body = $body; // Legitimately includes html - defined in this file
     $this->review_data = $review_data;
-    $this->heading = $heading;
+    $this->heading = $heading; // Legitimately includes html - defined within the code of this plugin
     $this->dialog_intro = $dialog_intro;
   }
 

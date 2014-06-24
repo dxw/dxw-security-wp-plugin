@@ -77,6 +77,7 @@ class dxw_security_API {
         case 200:
           $parsed_body = $this->parse_response_body($response['body']);
           $data = $this->extract_data($parsed_body);
+          // TODO: Validate data and raise an error if it's invalid. Children of this class would need to implement a 'validate()' function
           $this->cache_api_data($data);
           return $data;
 
