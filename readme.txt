@@ -3,7 +3,7 @@ Contributors: dxw, dgmstuart, harrym
 Tags: security, security plugin, plugin security, wordpress security, security vulnerabilities, vulnerability, exploit, code review, security review, CSRF, XSS, injection, SQL injection, arbitrary code
 Requires at least: 3.8.1
 Tested up to: 3.9.1
-Stable tag: 0.2.5
+Stable tag: 0.2.6
 License: GPLv2 or later
 
 Displays a security rating against each of the plugins you have installed
@@ -53,6 +53,9 @@ You can see the data we currently record by visiting http://app.security.dxw.com
 
 
 == Changelog ==
+
+= 0.2.6 =
+* Cache keys are now namespaced to minimise the chance of name clashes and accidental overwrites
 
 = 0.2.5 =
 * The api is now accessed over https
