@@ -51,6 +51,7 @@ class dxw_security_API {
   private function get() {
     $api_root = DXW_SECURITY_API_ROOT;
     $api_path = $this->api_path();
+    $query    = "?dxwsec_version=" . DXW_SECURITY_PLUGIN_VERSION;
 
     // this should exist in core, but doesn't seem to:
     // $url = http_build_url(
@@ -60,7 +61,7 @@ class dxw_security_API {
     //     "query" => $query
     //   )
     // );
-    $url = $api_root . $api_path;
+    $url = $api_root . $api_path . $query;
 
     $response = wp_remote_get(esc_url($url));
 

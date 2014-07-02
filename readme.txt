@@ -56,6 +56,8 @@ You can see the data we currently record by visiting http://app.security.dxw.com
 
 = 0.2.6 =
 * Cache keys are now namespaced to minimise the chance of name clashes and accidental overwrites
+* The api now groups counts of plugin requests by the version of the dxw Sec plugin that requested it
+* Minor bugfixes
 
 = 0.2.5 =
 * The api is now accessed over https

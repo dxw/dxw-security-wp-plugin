@@ -8,6 +8,7 @@
   * Author: dxw
   * Author URI: http://dxw.com/
 */
+define('DXW_SECURITY_PLUGIN_VERSION', "0.2.6");
 
 // Prevent Full Path Disclosure
 defined('ABSPATH') OR exit;
