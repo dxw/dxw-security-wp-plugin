@@ -79,14 +79,14 @@ class dxw_security_Dashboard_Widget {
       // TODO: this pattern is duplicated in the security column code
       // Stop making requests after a certain number of failures:
       if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
-        $this->handle_api_fatal_error();
+        $this->handle_api_fatal_error($plugin_file_object->plugin_slug);
       } else {
         $api = new dxw_security_Plugin_Review_API($plugin_file_object->plugin_slug);
         try {
           $reviews = $api->call();
           $this->handle_api_response($reviews, $installed_version, $plugin_file_object->plugin_slug);
         } catch (Exception $e) {
-          $this->handle_api_error($e);
+          $this->handle_api_error($e, $plugin_file_object->plugin_slug);
         }
       }
     }
@@ -127,18 +127,18 @@ class dxw_security_Dashboard_Widget {
     }
   }
 
-  private function handle_api_error($error) {
+  private function handle_api_error($error, $plugin_slug) {
     // TODO: Handle errors actually raised by us in the api class separately from other errors?
     // TODO: in future we should provide some way for users to give us back some useful information when they get an error
     $this->failed_requests++;
-    if (is_null($this->first_failed_requests_slug)) { $this->first_failed_requests_slug = $plugin_slug; }
+    if (is_null($this->first_failed_request_slug)) { $this->first_failed_request_slug = $plugin_slug; }
   }
 
-  private function handle_api_fatal_error() {
+  private function handle_api_fatal_error($plugin_slug) {
     // Assume it would have failed
     //   Keep counting because currently we're just displaying "x failed"
     $this->failed_requests++;
-    if (is_null($this->first_failed_requests_slug)) { $this->first_failed_requests_slug = $plugin_slug; }
+    if (is_null($this->first_failed_request_slug)) { $this->first_failed_request_slug = $plugin_slug; }
     // TODO: instead throw an error here to be captured higher up.
   }
 
