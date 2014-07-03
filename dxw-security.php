@@ -32,14 +32,15 @@ require(dirname(__FILE__) . '/lib/plugin_review_column.class.php');
 
 class dxw_Security {
   public function __construct() {
-    add_action('admin_print_scripts-index.php', array($this, 'enqueue_scripts'));
-    add_action('admin_print_scripts-plugins.php', array($this, 'enqueue_scripts'));
+    add_action('load-index.php', array($this, 'enqueue_scripts'));
+    add_action('load-plugins.php', array($this, 'enqueue_scripts'));
 
     add_action('admin_init', array($this, 'add_security_column'));
     add_action('admin_init', array($this, 'add_dashboard_widget'));
   }
 
   public function enqueue_scripts($hook) {
+    // TODO: split the css up into plugins page/dashboard/common and load in the relevant places?
     wp_enqueue_style('dxw-security-plugin-styles', plugins_url('/assets/main.min.css' , __FILE__));
     wp_enqueue_script('dxw-security-plugin-scripts', plugins_url('/assets/main.min.js' , __FILE__));
 
