@@ -32,18 +32,14 @@ require(dirname(__FILE__) . '/lib/plugin_review_column.class.php');
 
 class dxw_Security {
   public function __construct() {
-    add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
+    add_action('admin_print_scripts-index.php', array($this, 'enqueue_scripts'));
+    add_action('admin_print_scripts-plugins.php', array($this, 'enqueue_scripts'));
+
     add_action('admin_init', array($this, 'add_security_column'));
     add_action('admin_init', array($this, 'add_dashboard_widget'));
   }
 
   public function enqueue_scripts($hook) {
-    // TODO: find a better way to do this conditional
-    //    and/or split the css up into plugins page/dashboard/common
-    //    and/or move those enqueues into the relevant classes
-    // TODO: does using index.php here mean that this gets included on the user-facing index page?
-    if('plugins.php' != $hook && 'index.php' != $hook) { return; }
-
     wp_enqueue_style('dxw-security-plugin-styles', plugins_url('/assets/main.min.css' , __FILE__));
     wp_enqueue_script('dxw-security-plugin-scripts', plugins_url('/assets/main.min.js' , __FILE__));
 
