@@ -27,6 +27,7 @@ class dxw_security_Review_Fetcher {
     $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
 
     // TODO: this pattern is duplicated in the security column code and dashboard widget
+    // It should probably be factored out into another class
     // Stop making requests after a certain number of failures:
     if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $recommendation = $this->handle_api_fatal_error();
@@ -42,8 +43,7 @@ class dxw_security_Review_Fetcher {
     }
   }
 
-  private function handle_api_response() {
-  Whippet::print_r("WORKED!"); }
+  private function handle_api_response() {  }
   private function handle_api_error() {
     $this->failed_requests++;
   }
