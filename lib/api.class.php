@@ -12,7 +12,7 @@ class dxw_security_Plugin_Review_API extends dxw_security_API {
 
   // TODO: Currently this only handles directory plugins
   protected function api_path() {
-    return "/directory_plugins/{$this->plugin_slug}/reviews/";
+    return "/plugins/{$this->plugin_slug}/reviews/";
   }
 
   protected function cache_slug() {
