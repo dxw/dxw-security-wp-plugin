@@ -28,6 +28,7 @@ class dxw_security_Plugin_Review_API extends dxw_security_API {
 
 // php doesn't support nested classes so these need to live outside the API class
 class dxw_security_API_Error extends \Exception { }
+class dxw_security_API_NotFound extends dxw_security_API_Error { }
 class dxw_security_API {
   // TODO: This class doesn't work on it's own, only when extended by a class which defines the following:
   //    functions:
@@ -83,7 +84,9 @@ class dxw_security_API {
           return $data;
 
         case 404:
-          throw new Dxw_Security_NotFound();
+          // This should only get triggered if a bad request was made to the api - e.g. api/v2/foo
+          //    In this scenario we get a usage message - could check for that but there doesn't seem to be much point.
+          throw new dxw_security_API_NotFound();
 
         default:
           // TODO: handle other codes individually?
