@@ -15,7 +15,7 @@ defined('ABSPATH') OR exit;
 
 // CONFIG:
 if (!defined('DXW_SECURITY_API_ROOT')) {
-  define('DXW_SECURITY_API_ROOT', 'https://app.security.dxw.com/api');
+  define('DXW_SECURITY_API_ROOT', 'https://app.security.dxw.com/api/v2');
 }
 if (!defined('DXW_SECURITY_CACHE_RESPONSES')) {
   define('DXW_SECURITY_CACHE_RESPONSES', true);
