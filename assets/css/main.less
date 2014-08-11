@@ -88,11 +88,14 @@
 
   a { text-decoration: none; }
 
-  &.use-with-caution, .other-review.use-with-caution {
-    .amber_colour_box;
+  &.vulnerable, .other-review.vulnerable {
+    .red_colour_box;
   }
   &.potentially-unsafe, .other-review.potentially-unsafe {
     .red_colour_box;
+  }
+  &.use-with-caution, .other-review.use-with-caution {
+    .amber_colour_box;
   }
   &.no-issues-found, .other-review.no-issues-found {
     .green_colour_box;
@@ -125,11 +128,15 @@
 
   // TODO - this isn't the best implementation, but it works. The problem is that if there's one review, we want to display the whole dialog as a colour box,
   //   but if there are several reviews (of different versions) then we need to display a different colour in each case
-  h2.use-with-caution a{
-    color: @amber;
+
+  h2.vulnerable a{
+    color: @wp-red;
   }
   h2.potentially-unsafe a{
     color: @wp-red;
+  }
+  h2.use-with-caution a{
+    color: @amber;
   }
   h2.no-issues-found a{
     color: @green;
@@ -150,14 +157,17 @@
       [class^="icon-"], [class*=" icon-"] {
         margin-right: 3px;
       }
-      &.no-issues-found, .icon-no-issues-found {
-        color: @green;
+      &.vulnerable, .icon-vulnerable {
+        color: @wp-red;
+      }
+      &.potentially-unsafe, .icon-potentially-unsafe {
+        color: @wp-red;
       }
       &.use-with-caution, .icon-use-with-caution {
         color: @amber;
       }
-      &.potentially-unsafe, .icon-potentially-unsafe {
-        color: @wp-red;
+      &.no-issues-found, .icon-no-issues-found {
+        color: @green;
       }
     }
   }
@@ -224,8 +234,7 @@
 
     // a bit hacky - should probably use another class on the li's
     li.plugin_review_count_box {
-      width:33.33%;
-      width: calc(100%/3);
+      width: 25%;
       float: left;
       text-align: center;
     }
@@ -247,6 +256,12 @@
   }
 
   .plugin_review_count_box {
+    .vulnerable {
+      .red_colour_box;
+      &:hover {
+        background-color: @red-highlight-background;
+      }
+    }
     .potentially-unsafe {
       .red_colour_box;
       &:hover {
@@ -313,14 +328,17 @@ body.plugins-php .ui-dialog {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-no-issues-found {
-  &:before { content: "\e601"; }
+.icon-vulnerable {
+  &:before { content: "\e602"; }
+}
+.icon-potentially-unsafe {
+  &:before { content: "\e602"; }
 }
 .icon-use-with-caution {
   &:before { content: "\e600"; }
 }
-.icon-potentially-unsafe {
-  &:before { content: "\e602"; }
+.icon-no-issues-found {
+  &:before { content: "\e601"; }
 }
 .icon-no-info {
   &:before  { content: "\e604"; }

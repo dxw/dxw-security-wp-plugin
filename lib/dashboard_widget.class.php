@@ -42,11 +42,13 @@ class dxw_security_Dashboard_Widget {
 
     $this->get_counts($plugins);
 
+    $vulnerable_slug = dxw_security_Review_Data::$dxw_security_review_statuses["vulnerable"]["slug"];
     $red_slug = dxw_security_Review_Data::$dxw_security_review_statuses["red"]["slug"];
     $yellow_slug = dxw_security_Review_Data::$dxw_security_review_statuses["yellow"]["slug"];
     $green_slug = dxw_security_Review_Data::$dxw_security_review_statuses["green"]["slug"];
     $grey_slug = dxw_security_Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
 
+    $first_vulnerable_plugin_link        = $this->plugin_link($this->first_vulnerable_slug);
     $first_red_plugin_link               = $this->plugin_link($this->first_red_slug);
     $first_yellow_plugin_link            = $this->plugin_link($this->first_yellow_slug);
     $first_green_plugin_link             = $this->plugin_link($this->first_green_slug);
@@ -59,6 +61,7 @@ class dxw_security_Dashboard_Widget {
 
     echo "<p>Of the {$number_of_plugins} plugins installed on this site:</p>";
     echo "<ul class='review_counts'>";
+    $this->plugin_review_count_box($this->vulnerable, $vulnerable_slug, $first_vulnerable_plugin_link, "are known to be vulnerable");
     $this->plugin_review_count_box($this->red, $red_slug, $first_red_plugin_link, "are potentially unsafe");
     $this->plugin_review_count_box($this->yellow, $yellow_slug, $first_yellow_plugin_link, "should be used with caution");
     $this->plugin_review_count_box($this->green, $green_slug, $first_green_plugin_link, "are probably safe");
@@ -102,6 +105,10 @@ class dxw_security_Dashboard_Widget {
         // $review->version might be a list of versions, so we can't just do a straightforward comparison
         if (dxw_security_Plugin_Version_Comparer::version_matches($installed_version, $review->version)) {
           switch ($review->recommendation) {
+          case "vulnerable":
+            $this->vulnerable++;
+            if (is_null($this->first_vulnerable_slug)) { $this->first_vulnerable_slug = $plugin_slug; }
+            break;
           case "red":
             $this->red++;
             if (is_null($this->first_red_slug)) { $this->first_red_slug = $plugin_slug; }
