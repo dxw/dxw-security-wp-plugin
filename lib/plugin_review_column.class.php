@@ -67,8 +67,9 @@ class dxw_security_Plugin_Review_Column {
         $version = $review->version;
         $status = $review->recommendation;
         $reason = $review->reason;
+        $action = $review->action;
         $link = $review->review_link;
-        $review_data = new dxw_security_Review_Data($version, $status, $reason, $link);
+        $review_data = new dxw_security_Review_Data($version, $status, $reason, $action, $link);
 
         // $review->version might be a list of versions, so we need to do a little work to compare it
         if ($review_data->version_matches($installed_version)) {

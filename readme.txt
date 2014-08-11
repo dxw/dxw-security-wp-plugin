@@ -56,6 +56,7 @@ You can see the data we currently record by visiting http://app.security.dxw.com
 
 = 0.2.8 =
 * The plugin now uses version 2 of the api. Mostly this involves under-the-hood changes
+* Reports now include advisories (initially only those published on security.dxw.com)
 
 = 0.2.7 =
 * Plugin reviews are now fetched from the api through a daily wp_cron task. This warms the cache and helps to ensure consistent stats

@@ -8,6 +8,7 @@ class dxw_security_Review_Data {
   private $message;
   private $description;
   private $reason;
+  private $action;
 
   public static $dxw_security_review_statuses = array(
     'green'     => array( 'message' => "No issues found",
@@ -27,9 +28,10 @@ class dxw_security_Review_Data {
                           'description' => "We haven't reviewed this plugin yet. If you like we can review it for you."),
   );
 
-  public function __construct($version, $status, $reason="", $link=DXW_SECURITY_PLUGINS_URL) {
+  public function __construct($version, $status, $reason="", $action="", $link=DXW_SECURITY_PLUGINS_URL) {
     $this->version = $version;
     $this->reason = $reason;
+    $this->action = $action;
     $this->link = $link;
 
     $review_status = self::$dxw_security_review_statuses[$status];
@@ -52,10 +54,15 @@ class dxw_security_Review_Data {
         } else {
           print_r("<h3>Details:</h3>");
           print_r("<p>{$this->reason}</p>");
+          if (!empty($this->action)) {
+            echo("<h3>What should I do?</h3>");
+            print_r("<p>{$this->action}</p>");
+          }
           echo("<a href='{$link}' class='read-more button-primary'> Read more...</a>");
         }
       ?>
     <?php
+    // TODO: the logic above isn't quite right: what happens if there's no reason, but an action? Probably won't happen in the short term.
   }
 
   public function heading() {
