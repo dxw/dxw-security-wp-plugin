@@ -30,14 +30,7 @@ class dxw_security_Plugin_Review_API extends dxw_security_API {
 class dxw_security_API_Error extends \Exception { }
 class dxw_security_API_NotFound extends dxw_security_API_Error { }
 class dxw_security_API {
-  // TODO: This class doesn't work on it's own, only when extended by a class which defines the following:
-  //    functions:
-  //      * $api_path()
-  //      * cache_slug()
-  //      * extract_data($parsed_body)
-  // Is there a standard way of doing this? should it complain on construction if those things aren't defined
-
-  // TODO: re-implement as decorator pattern?
+  // TODO: re-implement as decorator pattern? How?
 
   public function call() {
     $data = $this->retrieve_api_data();
@@ -121,6 +114,16 @@ class dxw_security_API {
     } else {
       return false;
     }
+  }
+
+  protected function api_path() {
+    throw new Exception('Not implemented');
+  }
+  protected function cache_slug() {
+    throw new Exception('Not implemented');
+  }
+  protected function extract_data($parsed_body) {
+    throw new Exception('Not implemented');
   }
 }
 ?>

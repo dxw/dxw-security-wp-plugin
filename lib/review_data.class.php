@@ -42,7 +42,7 @@ class dxw_security_Review_Data {
 
   public function render() {
     // reason is retrieved from the api but might legitimately include html
-    // description and heading might also legitimately include html but come from strings in this code
+    // description heading and action might also legitimately include html but come from strings in this code
     $link = esc_url($this->link)
     ?>
       <h2><a href="<?php echo $link ?>"><?php echo $this->heading() ?></a></h2>
