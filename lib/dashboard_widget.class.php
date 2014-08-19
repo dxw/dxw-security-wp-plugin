@@ -7,6 +7,7 @@ require_once(dirname(__FILE__) . '/review_data.class.php');
 require_once(dirname(__FILE__) . '/plugin_file.class.php');
 
 class dxw_security_Dashboard_Widget {
+  private $vulnerable = 0;
   private $red = 0;
   private $yellow = 0;
   private $green = 0;
@@ -14,6 +15,7 @@ class dxw_security_Dashboard_Widget {
   private $not_reviewed = 0;
   private $failed_requests = 0;
 
+  private $first_vulnerable_slug;
   private $first_red_slug;
   private $first_yellow_slug;
   private $first_green_slug;
