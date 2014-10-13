@@ -30,6 +30,7 @@ define('DXW_SECURITY_PLUGINS_URL', 'https://security.dxw.com/plugins/');
 require(dirname(__FILE__) . '/lib/dashboard_widget.class.php');
 require(dirname(__FILE__) . '/lib/plugin_review_column.class.php');
 require(dirname(__FILE__) . '/lib/cron.class.php');
+require(dirname(__FILE__) . '/lib/intro_modal.class.php');
 
 class dxw_Security {
   public function __construct() {
@@ -38,6 +39,7 @@ class dxw_Security {
 
     add_action('admin_init', array($this, 'add_security_column'));
     add_action('admin_init', array($this, 'add_dashboard_widget'));
+    add_action('admin_init', array($this, 'add_intro_modal'));
 
     new dxw_security_Cron();
   }
@@ -57,6 +59,10 @@ class dxw_Security {
 
   public function add_dashboard_widget() {
     new dxw_security_Dashboard_Widget;
+  }
+
+  public function add_intro_modal(){
+    new dxw_security_Intro_Modal;
   }
 }
 

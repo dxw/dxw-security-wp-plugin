@@ -13,4 +13,13 @@ jQuery( document ).ready(function($) {
     $( this.hash ).dialog( 'open' );
     return false;
   });
+
+  $( ".intro-dialog" ).dialog({
+    modal: true,
+    autoOpen: true,
+    dialogClass: "wp-dialog",
+    width: 500,
+  });
+
+  $( ".intro-dialog" ).dialog( 'open' );
 });
