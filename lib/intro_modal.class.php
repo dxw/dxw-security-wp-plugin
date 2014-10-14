@@ -10,10 +10,10 @@ defined('ABSPATH') OR exit;
 
 class dxw_security_Intro_Modal {
   public function __construct() {
-    $this->render_dialog();
+    add_action( 'admin_notices', array( $this, 'render_dialog' ) );
   }
 
-  private function render_dialog(){
+  public function render_dialog(){
     ?>
       <div id="foo" style="display:none;" class="intro-dialog">
 
@@ -26,6 +26,5 @@ class dxw_security_Intro_Modal {
       </div>
     <?php
   }
-
 }
 ?>

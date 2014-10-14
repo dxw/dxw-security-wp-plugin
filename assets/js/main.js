@@ -1,4 +1,5 @@
 jQuery( document ).ready(function($) {
+  // TODO: All this should only fire on the plugins page
   $( ".dialog" ).dialog({
     modal: true,
     autoOpen: false,

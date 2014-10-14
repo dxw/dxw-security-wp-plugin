@@ -62,8 +62,19 @@ class dxw_Security {
   }
 
   public function add_intro_modal(){
-    new dxw_security_Intro_Modal;
+    if ( is_admin() && get_option( 'Activated_Plugin' ) == 'dxw_Security' ) {
+      delete_option( 'Activated_Plugin' );
+      new dxw_security_Intro_Modal;
+    }
+  }
+
+  public function activate() {
+    add_option( 'Activated_Plugin', 'dxw_Security' );
   }
 }
+// It's not possible to directly call add_action in a function called by the register_activation_hook
+//    So we need to set an option and optionally execute the contents of an add_action defined elsewhere:
+//    http://codex.wordpress.org/Function_Reference/register_activation_hook#Process_Flow
+register_activation_hook( __FILE__, array( "dxw_Security",  'activate' ));
 
 new dxw_Security();
