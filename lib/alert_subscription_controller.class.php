@@ -10,6 +10,7 @@ class dxw_security_Alert_Subscription_Controller {
   public static function create() {
     // TODO: Is exit the right way to do this?
     if ( !current_user_can('install_plugins') ) { exit; }
+    // TODO: Check nonce!!!
 
     $email      = $_POST['subscription']['email'];
     $permission = $_POST['subscription']['permission'];
@@ -18,6 +19,9 @@ class dxw_security_Alert_Subscription_Controller {
 
     if ( $subscription_form->valid() ){
       $api = new dxw_security_Registration_API($email);
+
+      // TODO: catch errors and display an appropriate message
+      //    particularly 'Bad data' errors which correspond to upstream validation errors
       $response = $api->call();
     } else {
       // TODO: Errors don't work yet

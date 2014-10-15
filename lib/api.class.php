@@ -41,13 +41,13 @@ class dxw_security_Registration_API extends dxw_security_API {
   protected function request_args() {
     return array(
         'method' => 'POST',
-        'body' => json_encode(array("registration" => $this->post_data))
+        'body' => array("registration" => $this->post_data)
       );
   }
 
   // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
   protected function extract_data($parsed_body) {
-    return $parsed_body->FOOOOOOOOOOOO;
+    return $parsed_body->subscriber->email;
   }
 }
 
