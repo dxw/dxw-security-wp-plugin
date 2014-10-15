@@ -2,7 +2,7 @@
 
 defined('ABSPATH') OR exit;
 
-class dxw_security_Plugin_Review_API extends dxw_security_API {
+class dxw_security_Plugin_Review_API extends dxw_security_Cached_API {
 
   private $plugin_slug;
 
@@ -25,24 +25,42 @@ class dxw_security_Plugin_Review_API extends dxw_security_API {
   }
 }
 
+class dxw_security_Registration_API extends dxw_security_API {
+
+  private $post_data;
+
+  public function __construct($email) {
+    $this->post_data = array("email" => $email);
+  }
+
+  // TODO: Currently this only handles directory plugins
+  protected function api_path() {
+    return "/registrations";
+  }
+
+  protected function request_args() {
+    return array(
+        'method' => 'POST',
+        'body' => json_encode(array("registration" => $this->post_data))
+      );
+  }
+
+  // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
+  protected function extract_data($parsed_body) {
+    return $parsed_body->FOOOOOOOOOOOO;
+  }
+}
+
 
 // php doesn't support nested classes so these need to live outside the API class
 class dxw_security_API_Error extends \Exception { }
 class dxw_security_API_NotFound extends dxw_security_API_Error { }
+class dxw_security_API_BadData extends dxw_security_API_Error { }
+
 class dxw_security_API {
   // TODO: re-implement as decorator pattern? How?
 
   public function call() {
-    $data = $this->retrieve_api_data();
-
-    // TODO: Transience returns false if it doesn't have the key, but should we also try to retrieve the result if the cache returned empty?
-    if($data === false) {
-      $data = $this->get();
-    }
-    return $data;
-  }
-
-  private function get() {
     $api_root = DXW_SECURITY_API_ROOT;
     $api_path = $this->api_path();
     $query    = "?dxwsec_version=" . DXW_SECURITY_PLUGIN_VERSION;
@@ -57,7 +75,7 @@ class dxw_security_API {
     // );
     $url = $api_root . $api_path . $query;
 
-    $response = wp_remote_get(esc_url($url));
+    $response = wp_remote_request(esc_url($url), $this->request_args());
 
     return $this->handle_response($response);
   }
@@ -73,13 +91,18 @@ class dxw_security_API {
           $parsed_body = $this->parse_response_body($response['body']);
           $data = $this->extract_data($parsed_body);
           // TODO: Validate data and raise an error if it's invalid. Children of this class would need to implement a 'validate()' function
-          $this->cache_api_data($data);
           return $data;
 
         case 404:
           // This should only get triggered if a bad request was made to the api - e.g. api/v2/foo
           //    In this scenario we get a usage message - could check for that but there doesn't seem to be much point.
           throw new dxw_security_API_NotFound();
+
+        case 422:
+          // This should only get triggered if invalid data was posted to the api - e.g. a missing payload or upstream validation errors
+          //    In this scenario we get a json error message
+          $parsed_body = $this->parse_response_body($response['body']);
+          throw new dxw_security_API_BadData($this->extract_error($parsed_body));
 
         default:
           // TODO: handle other codes individually?
@@ -100,6 +123,42 @@ class dxw_security_API {
     }
   }
 
+  private function extract_error($parsed_body) {
+    return $parsed_body->error;
+    // TODO: handle the case where the payload doesn't include an error part
+  }
+
+  protected function request_args() {
+    return array(
+        'method' => 'GET'
+      );
+  }
+
+  protected function api_path() {
+    throw new Exception('Not implemented');
+  }
+  protected function cache_slug() {
+    throw new Exception('Not implemented');
+  }
+  protected function extract_data($parsed_body) {
+    throw new Exception('Not implemented');
+  }
+}
+
+class dxw_security_Cached_API extends dxw_security_API{
+
+  public function call() {
+    $data = $this->retrieve_api_data();
+
+    // TODO: Transience returns false if it doesn't have the key, but should we also try to retrieve the result if the cache returned empty?
+    if($data === false) {
+      $data = parent::call();
+      $this->cache_api_data($data);
+    }
+
+    return $data;
+  }
+
   private function cache_api_data($data) {
     if (DXW_SECURITY_CACHE_RESPONSES) {
       $slug = $this->cache_slug();
@@ -114,16 +173,6 @@ class dxw_security_API {
     } else {
       return false;
     }
-  }
-
-  protected function api_path() {
-    throw new Exception('Not implemented');
-  }
-  protected function cache_slug() {
-    throw new Exception('Not implemented');
-  }
-  protected function extract_data($parsed_body) {
-    throw new Exception('Not implemented');
   }
 }
 ?>

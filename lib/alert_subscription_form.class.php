@@ -9,9 +9,9 @@ class dxw_security_Alert_Subscription_Form {
   private $email;
   private $permission;
 
-  public function __construct($subscription=array()) {
-    $this->email      = $subscription['email'];
-    $this->permission = $subscription['permission'];
+  public function __construct($email=null, $permission=null) {
+    $this->email      = $email;
+    $this->permission = $permission;
   }
 
 
@@ -61,6 +61,7 @@ class dxw_security_Alert_Subscription_Form {
     }
   }
 
+  // TODO: Should we be letting the api handle validation errors instead?
   public function valid() {
     $this->validate_email_format();
     $this->validate_email_presence();
