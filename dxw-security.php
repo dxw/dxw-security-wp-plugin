@@ -32,6 +32,9 @@ require(dirname(__FILE__) . '/lib/plugin_review_column.class.php');
 require(dirname(__FILE__) . '/lib/cron.class.php');
 require(dirname(__FILE__) . '/lib/intro_modal.class.php');
 
+require(dirname(__FILE__) . '/lib/alert_subscription_controller.class.php');
+
+
 class dxw_Security {
   public function __construct() {
     add_action('load-index.php', array($this, 'enqueue_scripts'));
@@ -40,6 +43,8 @@ class dxw_Security {
     add_action('admin_init', array($this, 'add_security_column'));
     add_action('admin_init', array($this, 'add_dashboard_widget'));
     add_action('admin_init', array($this, 'add_intro_modal'));
+
+    add_action('wp_ajax_subscribe', array($this, 'subscription_form'));
 
     new dxw_security_Cron();
   }
@@ -70,6 +75,10 @@ class dxw_Security {
 
   public function activate() {
     add_option( 'Activated_Plugin', 'dxw_Security' );
+  }
+
+  public function subscription_form() {
+    dxw_security_Alert_Subscription_Controller::create();
   }
 }
 // It's not possible to directly call add_action in a function called by the register_activation_hook

@@ -19,8 +19,12 @@ jQuery( document ).ready(function($) {
     modal: true,
     autoOpen: true,
     dialogClass: "wp-dialog",
-    width: 500,
+    width: 800,
   });
 
-  $( ".intro-dialog" ).dialog( 'open' );
+  $( ".intro-dialog" ).each(function () {
+    $( this ).dialog( 'option', 'title', $( this ).data('title') );
+    $( this ).dialog( 'open' );
+  });
+
 });
