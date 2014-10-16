@@ -28,7 +28,7 @@ class dxw_security_Alert_Subscription_Form {
 
           <input name="action" type="hidden" value="subscribe">
 
-          <input name="salt" type="hidden" value="<?php echo $salt; ?>">
+          <input name="salt" id="salt" type="hidden" value="<?php echo $salt; ?>">
           <?php wp_nonce_field(self::nonce_token($salt)); ?>
         </div>
 

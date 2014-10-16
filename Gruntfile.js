@@ -41,7 +41,7 @@ module.exports = function(grunt) {
                     compress: false,
                 },
                 files: {
-                    'assets/main.min.js': 'assets/js/main.js'
+                    'assets/main.min.js': [ 'assets/js/main.js', 'assets/js/registration_ajax.js' ]
                 },
             },
         },
