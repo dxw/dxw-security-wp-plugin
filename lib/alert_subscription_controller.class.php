@@ -22,13 +22,24 @@ class dxw_security_Alert_Subscription_Controller {
       // TODO: catch errors and display an appropriate message
       //    particularly 'Bad data' errors which correspond to upstream validation errors
       $response = $api->call();
+
+      // FIXME: this doesn't work at the moment because of redirects
+      add_action('admin_notices', self::render_success_notice($email));
     } else {
-      // TODO: Errors don't work yet
+      // FIXME: Errors don't work yet
       Whippet::print_r("THERE WERE ERRORS!!!!");
       Whippet::print_r($subscription_form->errors);
     }
 
     wp_redirect("/wp-admin/plugins.php");
+  }
+
+  private static function render_success_notice($email) {
+    ?>
+    <div class="updated">
+      <p><?php echo "You've successfully subscribed to plugin security alerts with {$email}."; ?></p>
+    </div>
+    <?php
   }
 
   private static function check_nonce() {
