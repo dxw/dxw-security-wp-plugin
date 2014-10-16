@@ -21,10 +21,18 @@ class dxw_security_Alert_Subscription_Controller {
 
       // TODO: catch errors and display an appropriate message
       //    particularly 'Bad data' errors which correspond to upstream validation errors
-      $response = $api->call();
 
-      // FIXME: this doesn't work at the moment because of redirects
-      add_action('admin_notices', self::render_success_notice($email));
+      try {
+        $response = $api->call();
+        // FIXME: this doesn't work at the moment because of redirects
+        add_action('admin_notices', self::render_success_notice($email));
+
+      } catch (dxw_security_API_BadData $e) {
+        self::render_error($e->getMessage());
+      } catch (dxw_security_API_Error $e) {
+        // TODO: what about dxw_security_API_NotFound? We shouldn't be able to get this, but it doesn't have a message...
+        self::render_error($e->getMessage());
+      }
     } else {
       // FIXME: Errors don't work yet
       Whippet::print_r("THERE WERE ERRORS!!!!");
@@ -35,9 +43,24 @@ class dxw_security_Alert_Subscription_Controller {
   }
 
   private static function render_success_notice($email) {
+    $message = "You've successfully subscribed to plugin security alerts with {$email}.";
+    self::render_notice("success", $message);
+  }
+
+  private static function render_error($message) {
+    self::render_notice("error", $message);
+  }
+
+  // TODO: I'm surprised there isn't something like this in core...
+  private static function render_notice($type, $message) {
+    if ( $type == "success") {
+      $class = "updated";
+    } else {
+      $class = "error";
+    }
     ?>
-    <div class="updated">
-      <p><?php echo "You've successfully subscribed to plugin security alerts with {$email}."; ?></p>
+    <div class="<?php echo $class; ?>">
+      <p><?php echo esc_html($message); ?></p>
     </div>
     <?php
   }
