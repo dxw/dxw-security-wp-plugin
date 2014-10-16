@@ -28,10 +28,11 @@ class dxw_security_Alert_Subscription_Controller {
         add_action('admin_notices', self::render_success_notice($email));
 
       } catch (dxw_security_API_BadData $e) {
+        // This corresponds to an upstream validation error
         self::render_error($e->getMessage());
       } catch (dxw_security_API_Error $e) {
         // TODO: what about dxw_security_API_NotFound? We shouldn't be able to get this, but it doesn't have a message...
-        self::render_error($e->getMessage());
+        self::render_error("Sorry, the subscription service doesn't seem to b available at the moment. Please try again later.");
       }
     } else {
       // FIXME: Errors don't work yet
