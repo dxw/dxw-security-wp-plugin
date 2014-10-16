@@ -8,9 +8,8 @@ require_once(dirname(__FILE__) . '/alert_subscription_form.class.php');
 class dxw_security_Alert_Subscription_Controller {
 
   public static function create() {
-    // TODO: Is exit the right way to do this?
-    if ( !current_user_can('install_plugins') ) { exit; }
-    // TODO: Check nonce!!!
+    self::check_permissions();
+    self::check_nonce();
 
     $email      = $_POST['subscription']['email'];
     $permission = $_POST['subscription']['permission'];
@@ -30,6 +29,22 @@ class dxw_security_Alert_Subscription_Controller {
     }
 
     wp_redirect("/wp-admin/plugins.php");
+  }
+
+  private static function check_nonce() {
+    $nonce      = $_POST['_wpnonce'];
+    $salt       = $_POST['salt'];
+
+    $nonce_token = dxw_security_Alert_Subscription_Form::nonce_token($salt);
+
+    // TODO: What's a good die message?
+    if ( !wp_verify_nonce($nonce, $nonce_token) ) { wp_die('Security check'); }
+  }
+
+  private static function check_permissions() {
+    // TODO: Is wp_die the right way to do this?
+    // TODO: What's a good die message?
+    if ( !current_user_can('install_plugins') ) { wp_die('Security check'); }
   }
 }
 ?>

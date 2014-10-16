@@ -29,7 +29,7 @@ class dxw_security_Alert_Subscription_Form {
           <input name="action" type="hidden" value="subscribe">
 
           <input name="salt" type="hidden" value="<?php echo $salt; ?>">
-          <?php wp_nonce_field( 'register_'.$salt ); ?>
+          <?php wp_nonce_field(self::nonce_token($salt)); ?>
         </div>
 
         <div>
@@ -53,6 +53,11 @@ class dxw_security_Alert_Subscription_Form {
         </div>
       </form>
     <?php
+  }
+
+  # TODO: I'm not sure nonce_token is an appropriate name...
+  public static function nonce_token($salt) {
+    return 'subscribe_'.$salt;
   }
 
   private function render_errors(){
