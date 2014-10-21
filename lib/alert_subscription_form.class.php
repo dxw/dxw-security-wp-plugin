@@ -82,25 +82,30 @@ class dxw_security_Alert_Subscription_Form {
   }
 
   private function validate_email_format(){
-    if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
-      $this->errors[]= "That doesn't look like a valid email - have you typed it correctly?";
-      return false;
-    }
-    return true;
+    $this->validate(
+      !filter_var($this->email, FILTER_VALIDATE_EMAIL),
+      "That doesn't look like a valid email - have you typed it correctly?"
+    );
   }
 
   private function validate_email_presence(){
-    if(empty($this->email)) {
-      $this->errors[]= "Please enter an email address";
-      return false;
-    }
-    return true;
+    $this->validate(
+      empty($this->email),
+      "Please enter an email address"
+    );
   }
 
   private function validate_permission_granted(){
     // TODO: is the check for false unnecessary?
-    if(empty($this->permission) || $this->permission == false) {
-      $this->errors[]= "Please check the box to say that you're happy to send your list of plugins";
+    $this->validate(
+      empty($this->permission) || $this->permission == false,
+      "Please check the box to say that you're happy to send your list of plugins"
+    );
+  }
+
+  private function validate($condition, $message) {
+    if($condition) {
+      $this->errors[]= $message;
       return false;
     }
     return true;
