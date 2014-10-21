@@ -67,11 +67,11 @@ jQuery(document).ready(function($){
       })
     );
   }
-  //TODO: Sanitise these messages
+
   function _error_div(message) {
-    return '<div class="error">' + message + '</div>';
+    return $("<div class='error'/>").append($('<p/>').text(message));
   }
   function _success_notice(message) {
-    return '<div class="updated"><p>'+ message +'</p></div>';
+    return $("<div class='updated'/>").append($('<p/>').text(message));
   }
 });
