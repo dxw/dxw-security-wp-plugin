@@ -20,9 +20,13 @@ class dxw_security_Alert_Subscription_Form {
     $salt = rand();
 
     ?>
-      <?php echo $this->render_errors(); ?>
+
 
       <form accept-charset="UTF-8" action="/wp-admin/admin-ajax.php" id="subscription_form" method="post">
+        <div class="errors">
+          <?php echo $this->render_errors(); ?>
+        </div>
+
         <div style="display:none">
           <input name="utf8" type="hidden" value="✓">
 
@@ -35,7 +39,7 @@ class dxw_security_Alert_Subscription_Form {
         <div>
           <label>
             Email
-            <input autofocus="autofocus" id="subscription_email" name="subscription[email]" type="email" value="">
+            <input autofocus="autofocus" id="email" name="subscription[email]" type="email" value="">
           </label>
           <p class="help_text">The email address you'd like to receive alerts at.</p>
         </div>
@@ -68,8 +72,10 @@ class dxw_security_Alert_Subscription_Form {
 
   // TODO: Should we be letting the api handle validation errors instead?
   public function valid() {
-    $this->validate_email_format();
-    $this->validate_email_presence();
+    if ( $this->validate_email_presence() ) {
+      $this->validate_email_format();
+    }
+
     $this->validate_permission_granted();
 
     return empty($this->errors);
@@ -78,20 +84,26 @@ class dxw_security_Alert_Subscription_Form {
   private function validate_email_format(){
     if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
       $this->errors[]= "That doesn't look like a valid email - have you typed it correctly?";
+      return false;
     }
+    return true;
   }
 
   private function validate_email_presence(){
     if(empty($this->email)) {
       $this->errors[]= "Please enter an email address";
+      return false;
     }
+    return true;
   }
 
   private function validate_permission_granted(){
     // TODO: is the check for false unnecessary?
     if(empty($this->permission) || $this->permission == false) {
       $this->errors[]= "Please check the box to say that you're happy to send your list of plugins";
+      return false;
     }
+    return true;
   }
 }
 ?>

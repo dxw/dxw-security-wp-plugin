@@ -1,33 +1,35 @@
 jQuery(document).ready(function($){
   $("form#subscription_form").on('submit', function(e){
-    var email      = $("#email").val();
-    var permission = $("#permission").val();
-    var wpnonce      = $("#_wpnonce").val();
-    var salt       = $("#salt").val();
+    var data = $(this).serialize();
 
     e.preventDefault();
 
     $.ajax({
       type:"POST",
       url: "/wp-admin/admin-ajax.php",
-      data: {
-        action: "subscribe",
-        subscription:{
-          email:email,
-          permission:permission,
-        },
-        salt:salt,
-        _wpnonce:wpnonce,
-      },
-      success:function(body, code, xhr){
-        console.log(code, body, xhr);
-        alert("success");
-        alert(body);
+      data: data,
+      success:function(body){
+        if( body["success"] ) {
+          alert("success");
+        } else {
+          var error_messages = body["data"]["errors"];
+          $('#subscription_form .errors').html(
+            $.map(error_messages, function(message){
+              return error_div(message);
+            })
+          );
+        }
       },
       error:function(data){
+        // TODO: what should happen here?
         alert("ERROR!!!");
+        console.log(data);
       }
     });
     return false;
   });
+
+  function error_div(message) {
+    return "<div class='error'>" + message + "</div>";
+  }
 });

@@ -28,18 +28,22 @@ class dxw_security_Alert_Subscription_Controller {
         // FIXME: this doesn't work at the moment because of redirects
         add_action('admin_notices', self::render_success_notice($email));
         echo json_encode(array('email' => $email));
+        // wp_send_json_success(array('email' => $email));
 
       } catch (dxw_security_API_BadData $e) {
         // This corresponds to an upstream validation error
         self::render_error($e->getMessage());
       } catch (dxw_security_API_Error $e) {
         // TODO: what about dxw_security_API_NotFound? We shouldn't be able to get this, but it doesn't have a message...
-        self::render_error("Sorry, the subscription service doesn't seem to b available at the moment. Please try again later.");
+        self::render_error("Sorry, the subscription service doesn't seem to be available at the moment. Please try again later.");
       }
 
 
     } else {
-      echo json_encode(array('errors' => $subscription_form->errors));
+      // http_response_code(422);
+      // wp_send_json_error("foo");
+      wp_send_json_error(array('errors' => $subscription_form->errors));
+      // echo json_encode(array('errors' => $subscription_form->errors));
       // FIXME: Errors don't work yet
       Whippet::print_r("THERE WERE ERRORS!!!!");
       Whippet::print_r($subscription_form->errors);
@@ -78,6 +82,7 @@ class dxw_security_Alert_Subscription_Controller {
     $salt       = $_POST['salt'];
 
     $nonce_token = dxw_security_Alert_Subscription_Form::nonce_token($salt);
+
     // TODO: What's a good die message?
     if ( !wp_verify_nonce($nonce, $nonce_token) ) { wp_die('Security check - nonce mismatch'); }
   }
