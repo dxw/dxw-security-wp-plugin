@@ -31,12 +31,12 @@ class dxw_security_Alert_Subscription_Controller {
 
       } catch (dxw_security_API_BadData $e) {
         // This corresponds to an upstream validation error
-        self::render_error($e->getMessage());
+        // TODO: THis should probably be wrapped up in a more friendly message
+        wp_send_json_error(array('errors' => [$e->getMessage()]));
       } catch (dxw_security_API_Error $e) {
         // TODO: what about dxw_security_API_NotFound? We shouldn't be able to get this, but it doesn't have a message...
-        self::render_error("Sorry, the subscription service doesn't seem to be available at the moment. Please try again later.");
+        wp_send_json_error(array('errors' => ["Sorry, the subscription service doesn't seem to be available at the moment. Please try again later."]));
       }
-
 
     } else {
       wp_send_json_error(array('errors' => $subscription_form->errors()));
