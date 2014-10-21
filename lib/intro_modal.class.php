@@ -21,6 +21,7 @@ class dxw_security_Intro_Modal {
 
         <div class="inner">
           <h2>Sign up to receive alerts</h2>
+          <p>Thank you for choosing the dxw Security plugin.</p>
           <p>
             When a vulnerability is discovered with any plugin you're using, it's important to know about it as soon as possible so that you can take action to protect your site.
           </p>
@@ -40,6 +41,13 @@ class dxw_security_Intro_Modal {
             <li>We also monitor reports from the wider security community</li>
             <li>When we find out about an issue with one of the plugins you have installed, we'll send you an email recommending a course of action to keep your site safe.</li>
           </ol>
+
+          <h3>Need more convincing?</h3>
+          <p>
+            Send us an email at <a href="mailto:security@dxw.com" title="dxw Security vulnerability alerts">security@dxw.com</a>
+            and we'll be happy to explain how the service works in more detail.
+          </p>
+
         </div>
 
       </div>

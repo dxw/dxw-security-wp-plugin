@@ -23,6 +23,8 @@
 @grey-highlight: darken(@grey, 20%);
 @grey-highlight-background: darken(@grey-background, 10%);
 
+@border-grey: #e5e5e5;
+@light-border: 1px solid @border-grey;
 
 
 // Generic mixins - TODO can we get at these more easily?
@@ -356,4 +358,28 @@ body.plugins-php .ui-dialog {
 }
 .icon-no-info {
   &:before  { content: "\e604"; }
+}
+
+
+// Subscription Form
+body.plugins-php {
+  #subscription_form {
+    border: @light-border;
+    padding: 20px;
+    margin: 20px 0;
+    .field-group {
+      margin-bottom: 15px;
+    }
+    label[for="email"] {
+      display: block;
+    }
+    .help-text {
+      margin-left: 15px;
+      font-style: italic;
+    }
+    .submit {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
 }

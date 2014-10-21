@@ -31,15 +31,13 @@ class dxw_security_Alert_Subscription_Form {
           <?php wp_nonce_field(self::nonce_token($salt)); ?>
         </div>
 
-        <div>
-          <label>
-            Email
-            <input autofocus="autofocus" id="email" name="subscription[email]" type="email" value="">
-          </label>
-          <p class="help_text">The email address you'd like to receive alerts at.</p>
+        <div class="field-group">
+          <label for="email">Email</label>
+          <input autofocus="autofocus" id="email" name="subscription[email]" type="email" value="">
+          <span class="help-text">The email address you'd like to receive alerts at</span>
         </div>
 
-        <div>
+        <div class="field-group">
           <label for="permission">
             <input name="subscription[permission]" type="hidden" value="0">
             <input id="permission" name="subscription[permission]" type="checkbox" value="1">
@@ -47,9 +45,7 @@ class dxw_security_Alert_Subscription_Form {
           </label>
         </div>
 
-        <div>
-          <?php submit_button( "Subscribe to alerts", "primary") ?>
-        </div>
+        <?php submit_button( "Subscribe to alerts", "primary") ?>
       </form>
     <?php
   }
