@@ -12,12 +12,8 @@ jQuery(document).ready(function($){
         if( body["success"] ) {
           alert("success");
         } else {
-          var error_messages = body["data"]["errors"];
-          $('#subscription_form .errors').html(
-            $.map(error_messages, function(message){
-              return error_div(message);
-            })
-          );
+          error_messages = body["data"]["errors"];
+          _show_errors(error_messages)
         }
       },
       error:function(data){
@@ -29,7 +25,15 @@ jQuery(document).ready(function($){
     return false;
   });
 
-  function error_div(message) {
+  function _show_errors(error_messages) {
+    $('#subscription_form .errors').html(
+      $.map(error_messages, function(message){
+        return _error_div(message);
+      })
+    );
+  }
+
+  function _error_div(message) {
     return "<div class='error'>" + message + "</div>";
   }
 });

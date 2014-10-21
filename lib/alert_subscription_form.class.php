@@ -2,16 +2,13 @@
 
 defined('ABSPATH') OR exit;
 
+require_once(dirname(__FILE__) . '/alert_subscription_validator.class.php');
+
 class dxw_security_Alert_Subscription_Form {
-
-  public $errors = array();
-
-  private $email;
-  private $permission;
+  private $validator;
 
   public function __construct($email=null, $permission=null) {
-    $this->email      = $email;
-    $this->permission = $permission;
+    $this->validator  = new dxw_security_Subscription_Validator($email, $permission);
   }
 
 
@@ -20,8 +17,6 @@ class dxw_security_Alert_Subscription_Form {
     $salt = rand();
 
     ?>
-
-
       <form accept-charset="UTF-8" action="/wp-admin/admin-ajax.php" id="subscription_form" method="post">
         <div class="errors">
           <?php echo $this->render_errors(); ?>
@@ -65,50 +60,18 @@ class dxw_security_Alert_Subscription_Form {
   }
 
   private function render_errors(){
-    foreach ($this->errors as &$error) {
+    $errors = $this->errors();
+    foreach ($errors as &$error) {
       echo "<div class='error'>{$error}</div>";
     }
   }
 
-  // TODO: Should we be letting the api handle validation errors instead?
   public function valid() {
-    if ( $this->validate_email_presence() ) {
-      $this->validate_email_format();
-    }
-
-    $this->validate_permission_granted();
-
-    return empty($this->errors);
+    return $this->validator->valid();
   }
 
-  private function validate_email_format(){
-    $this->validate(
-      !filter_var($this->email, FILTER_VALIDATE_EMAIL),
-      "That doesn't look like a valid email - have you typed it correctly?"
-    );
-  }
-
-  private function validate_email_presence(){
-    $this->validate(
-      empty($this->email),
-      "Please enter an email address"
-    );
-  }
-
-  private function validate_permission_granted(){
-    // TODO: is the check for false unnecessary?
-    $this->validate(
-      empty($this->permission) || $this->permission == false,
-      "Please check the box to say that you're happy to send your list of plugins"
-    );
-  }
-
-  private function validate($condition, $message) {
-    if($condition) {
-      $this->errors[]= $message;
-      return false;
-    }
-    return true;
+  public function errors() {
+    return $this->validator->errors;
   }
 }
 ?>

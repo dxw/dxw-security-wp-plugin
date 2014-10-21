@@ -42,7 +42,7 @@ class dxw_security_Alert_Subscription_Controller {
     } else {
       // http_response_code(422);
       // wp_send_json_error("foo");
-      wp_send_json_error(array('errors' => $subscription_form->errors));
+      wp_send_json_error(array('errors' => $subscription_form->errors()));
       // echo json_encode(array('errors' => $subscription_form->errors));
       // FIXME: Errors don't work yet
       Whippet::print_r("THERE WERE ERRORS!!!!");
