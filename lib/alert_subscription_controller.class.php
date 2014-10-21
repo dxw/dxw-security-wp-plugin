@@ -24,14 +24,11 @@ class dxw_security_Alert_Subscription_Controller {
 
       try {
         $response = $api->call();
-        // FIXME: this doesn't work at the moment because of redirects
-        add_action('admin_notices', self::render_success_notice($email));
-        echo json_encode(array('email' => $email));
-        // wp_send_json_success(array('email' => $email));
+        wp_send_json_success(array('email' => $email));
 
       } catch (dxw_security_API_BadData $e) {
         // This corresponds to an upstream validation error
-        // TODO: THis should probably be wrapped up in a more friendly message
+        // TODO: This should probably be wrapped up in a more friendly message
         wp_send_json_error(array('errors' => [$e->getMessage()]));
       } catch (dxw_security_API_Error $e) {
         // TODO: what about dxw_security_API_NotFound? We shouldn't be able to get this, but it doesn't have a message...
