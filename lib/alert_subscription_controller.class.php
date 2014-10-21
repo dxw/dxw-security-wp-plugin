@@ -12,16 +12,15 @@ class dxw_security_Alert_Subscription_Controller {
     self::check_permissions();
     self::check_nonce();
 
-    $email      = $_POST['subscription']['email'];
-    $permission = $_POST['subscription']['permission'];
+    $subscription_data = $_POST['subscription'];
+
+    $email      = $subscription_data['email'];
+    $permission = $subscription_data['permission'];
 
     $subscription_form = new dxw_security_Alert_Subscription_Form($email, $permission);
 
     if ( $subscription_form->valid() ){
       $api = new dxw_security_Registration_API($email);
-
-      // TODO: catch errors and display an appropriate message
-      //    particularly 'Bad data' errors which correspond to upstream validation errors
 
       try {
         $response = $api->call();
@@ -40,17 +39,8 @@ class dxw_security_Alert_Subscription_Controller {
 
 
     } else {
-      // http_response_code(422);
-      // wp_send_json_error("foo");
       wp_send_json_error(array('errors' => $subscription_form->errors()));
-      // echo json_encode(array('errors' => $subscription_form->errors));
-      // FIXME: Errors don't work yet
-      Whippet::print_r("THERE WERE ERRORS!!!!");
-      Whippet::print_r($subscription_form->errors);
     }
-
-    // TODO: Is this no longer needed?
-    // wp_redirect("/wp-admin/plugins.php");
     exit();
   }
 
@@ -83,14 +73,17 @@ class dxw_security_Alert_Subscription_Controller {
 
     $nonce_token = dxw_security_Alert_Subscription_Form::nonce_token($salt);
 
-    // TODO: What's a good die message?
-    if ( !wp_verify_nonce($nonce, $nonce_token) ) { wp_die('Security check - nonce mismatch'); }
+    if ( !wp_verify_nonce($nonce, $nonce_token) ) {
+      // TODO: What's a good error message?
+      wp_send_json_error(array('errors' => ['Security error - nonce mismatch']));
+    }
   }
 
   private static function check_permissions() {
-    // TODO: Is wp_die the right way to do this?
-    // TODO: What's a good die message?
-    if ( !current_user_can('install_plugins') ) { wp_die("Security check - you don't have permission to view this page"); }
+    if ( !current_user_can('install_plugins') ) {
+      // TODO: What's a good error message?
+      wp_send_json_error(array('errors' => ["Security error- you don't have permission to view this page"]));
+    }
   }
 }
 ?>
