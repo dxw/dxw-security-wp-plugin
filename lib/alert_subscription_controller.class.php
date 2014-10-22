@@ -25,7 +25,12 @@ class dxw_security_Alert_Subscription_Controller {
       try {
         $response = $api->call();
         // TODO: API should return a token. We should save this token in WP-options
-        // TODO: it should get this email from the RESPONSE, not the input data!
+
+        // TODO: this should probably be in a separate class concerned with model-type operations
+        // TODO: check if result = false (option already exists) and behave differently?
+        // TODO: store the token here instead? Date subscribed doesn't need to be stored here - can be stored in the api
+        add_option( 'dxw_security_subscribed_at', date('Y-m-d') );
+
         wp_send_json_success(
           array(
             "email" => $response->email,

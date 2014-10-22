@@ -42,9 +42,11 @@ class dxw_Security {
 
     add_action('admin_init', array($this, 'add_security_column'));
     add_action('admin_init', array($this, 'add_dashboard_widget'));
-    add_action('admin_init', array($this, 'add_intro_modal'));
 
-    add_action('wp_ajax_subscribe', array($this, 'subscription_form'));
+    if( !get_option('dxw_security_subscribed_at') ) {
+      add_action('admin_init', array($this, 'add_intro_modal'));
+      add_action('wp_ajax_subscribe', array($this, 'subscription_form'));
+    }
 
     new dxw_security_Cron();
   }
