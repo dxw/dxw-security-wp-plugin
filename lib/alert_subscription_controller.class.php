@@ -24,12 +24,22 @@ class dxw_security_Alert_Subscription_Controller {
 
       try {
         $response = $api->call();
-        wp_send_json_success(array('email' => $email));
+        // TODO: API should return a token. We should save this token in WP-options
+        // TODO: it should get this email from the RESPONSE, not the input data!
+        wp_send_json_success(
+          array(
+            "email" => $response->email,
+          )
+        );
 
       } catch (dxw_security_API_BadData $e) {
         // This corresponds to an upstream validation error
         // TODO: This should probably be wrapped up in a more friendly message
-        wp_send_json_error(array('errors' => [$e->getMessage()]));
+        wp_send_json_error(array('errors' => [
+          "Sorry, there was an issue connecting to the subscription service.
+          This is probably a bug, so if you could report it to security@dxw.com
+          that would be much appreciated: {$e->getMessage()}"
+        ]));
       } catch (dxw_security_API_Error $e) {
         // TODO: what about dxw_security_API_NotFound? We shouldn't be able to get this, but it doesn't have a message...
         wp_send_json_error(array('errors' => ["Sorry, the subscription service doesn't seem to be available at the moment. Please try again later."]));
@@ -38,7 +48,7 @@ class dxw_security_Alert_Subscription_Controller {
     } else {
       wp_send_json_error(array('errors' => $subscription_form->errors()));
     }
-    exit();
+    exit(); //All the above wp_send_json_ statements should exit anyway so we shouldn't get this far.
   }
 
   private static function render_success_notice($email) {
