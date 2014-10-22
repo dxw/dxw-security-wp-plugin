@@ -17,17 +17,17 @@ jQuery(document).ready(function($){
       },
       error:function(data){
         // TODO: what should happen here?
-        error_messages = new Array(_fatal_error_message(_unknown_error_code));
-        _show_errors(error_messages);
+        _show_fatal_error(_unknown_error_code);
       }
     });
     return false;
   });
+
   function _handle_success(body) {
     if( !body.hasOwnProperty("data") ) {
-      error_messages = new Array(_fatal_error_message(_no_data_code));
+      _show_fatal_error(_no_data_code);
     } else if ( !body["data"].hasOwnProperty("email") ) {
-      error_messages = new Array(_fatal_error_message(_no_email_code));
+      _show_fatal_error(_no_email_code);
     } else {
 
       $('#subscription_form .errors').empty();
@@ -39,13 +39,12 @@ jQuery(document).ready(function($){
 
   function _handle_errors(body) {
     if( !body.hasOwnProperty("data") ) {
-      error_messages = new Array(_fatal_error_message(_no_data_code));
+      _show_fatal_error(_no_data_code);
     } else if ( !body["data"].hasOwnProperty("errors") ) {
-      error_messages = new Array(_fatal_error_message(_no_error_code));
+      _show_fatal_error(_no_errors_code);
     } else {
-      error_messages = body["data"]["errors"];
+      _show_errors(body["data"]["errors"]);
     }
-    _show_errors(error_messages);
   }
 
   var _no_data_code = 1;
@@ -58,6 +57,11 @@ jQuery(document).ready(function($){
     return "Sorry, an error occurred. This is probably a bug.\
     If you could report it to security@dxw.com, quoting code '"+ code +"' it would\
     be much appreciated.";
+  }
+
+  function _show_fatal_error(code) {
+    error_message = new Array(_fatal_error_message(code));
+    _show_errors(error_message);
   }
 
   function _show_errors(error_messages) {
