@@ -33,6 +33,7 @@ require(dirname(__FILE__) . '/lib/cron.class.php');
 require(dirname(__FILE__) . '/lib/intro_modal.class.php');
 
 require(dirname(__FILE__) . '/lib/alert_subscription_controller.class.php');
+require(dirname(__FILE__) . '/lib/alert_subscription_banner.class.php');
 
 
 class dxw_Security {
@@ -43,8 +44,9 @@ class dxw_Security {
     add_action('admin_init', array($this, 'add_security_column'));
     add_action('admin_init', array($this, 'add_dashboard_widget'));
 
-    if( !get_option('dxw_security_subscribed_at') ) {
-      add_action('admin_init', array($this, 'add_intro_modal'));
+    if( is_admin() && !get_option('dxw_security_subscribed_at') ) {
+      add_action('load-plugins.php', array($this, 'add_subscription_banner'));
+      add_action('load-plugins.php', array($this, 'add_intro_modal'));
       add_action('wp_ajax_subscribe', array($this, 'subscription_form'));
     }
 
@@ -69,14 +71,15 @@ class dxw_Security {
   }
 
   public function add_intro_modal(){
-    if ( is_admin() && get_option( 'Activated_Plugin' ) == 'dxw_Security' ) {
-      delete_option( 'Activated_Plugin' );
-      new dxw_security_Intro_Modal;
-    }
+    new dxw_security_Intro_Modal;
   }
 
   public function activate() {
     add_option( 'Activated_Plugin', 'dxw_Security' );
+  }
+
+  public function add_subscription_banner() {
+    new dxw_security_Alert_Subscription_Banner;
   }
 
   public function subscription_form() {

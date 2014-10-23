@@ -13,9 +13,16 @@ class dxw_security_Intro_Modal {
   }
 
   public function render_dialog(){
+    if ( get_option( 'Activated_Plugin' ) == 'dxw_Security' ) {
+      $activated = true;
+      delete_option( 'Activated_Plugin' );
+    } else {
+      $activated = false;
+    }
+
     $registration_form = new dxw_security_Alert_Subscription_Form
     ?>
-      <div style="display:none;" class="intro-dialog" data-title="Welcome to dxw Security">
+      <div style="display:none;" class="intro-dialog" data-title="Welcome to dxw Security" data-activated="<?php echo $activated ?>">
 
         <a href="http://security.dxw.com" id="dxw-sec-link"><img src="<?php echo plugins_url('/assets/dxw-logo.png' , dirname(__FILE__)); ?>" alt="dxw logo" /></a>
 

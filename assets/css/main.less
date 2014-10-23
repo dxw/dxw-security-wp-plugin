@@ -382,4 +382,14 @@ body.plugins-php {
       padding-bottom: 0;
     }
   }
+
+  #dxw_security_alert_subscription_banner {
+    a {
+      margin-left: 20px;
+      &:active {
+        // The wp default is to apply vertical-align: top, which messes up alignment;
+        vertical-align: inherit;
+      }
+    }
+  }
 }

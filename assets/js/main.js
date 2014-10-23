@@ -15,16 +15,26 @@ jQuery( document ).ready(function($) {
     return false;
   });
 
-  $( ".intro-dialog" ).dialog({
-    modal: true,
-    autoOpen: true,
-    dialogClass: "wp-dialog",
-    width: 800,
+  if( $( ".intro-dialog" ).data("activated") ) {
+    intro_dialog();
+  }
+
+  $( ".alert_subscription_button" ).on('click', function(e) {
+    // Override the default link behaviour:
+    e.preventDefault();
+    intro_dialog();
   });
 
-  $( ".intro-dialog" ).each(function () {
-    $( this ).dialog( 'option', 'title', $( this ).data('title') );
-    $( this ).dialog( 'open' );
-  });
+  function intro_dialog() {
+    node = $( ".intro-dialog" );
+    $( node ).dialog({
+      modal: true,
+      autoOpen: true,
+      dialogClass: "wp-dialog",
+      width: 800,
+    });
+    $( node ).dialog( 'option', 'title', $( node ).data('title') );
+    $( node ).dialog( 'open' );
+  }
 
 });
