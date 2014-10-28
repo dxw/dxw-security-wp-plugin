@@ -102,6 +102,7 @@ class dxw_security_API {
           // This should only get triggered if invalid data was posted to the api - e.g. a missing payload or upstream validation errors
           //    In this scenario we get a json error message
           $parsed_body = $this->parse_response_body($response['body']);
+
           throw new dxw_security_API_BadData($this->extract_error($parsed_body));
 
         default:
@@ -124,8 +125,13 @@ class dxw_security_API {
   }
 
   private function extract_error($parsed_body) {
-    return $parsed_body->error;
+    $error = $parsed_body->error;
     // TODO: handle the case where the payload doesn't include an error part
+
+    if( is_array($error) ) { $error = implode(", ", $error); }
+
+Whippet::print_r($error);
+    return $error;
   }
 
   protected function request_args() {

@@ -27,9 +27,10 @@ class dxw_security_Alert_Subscription_Controller {
         // TODO: API should return a token. We should save this token in WP-options
 
         // TODO: this should probably be in a separate class concerned with model-type operations
-        // TODO: check if result = false (option already exists) and behave differently?
+        // TODO: using update here means we'll overwrite any existing value, but will work
+        //    even if the field exists but is blank. Not sure what the correct approach is.
         // TODO: store the token here instead? Date subscribed doesn't need to be stored here - can be stored in the api
-        add_option( 'dxw_security_subscribed_at', date('Y-m-d') );
+        update_option( 'dxw_security_subscribed_at', date('Y-m-d') );
 
         wp_send_json_success(
           array(
@@ -38,12 +39,10 @@ class dxw_security_Alert_Subscription_Controller {
         );
 
       } catch (dxw_security_API_BadData $e) {
-        // This corresponds to an upstream validation error
-        // TODO: This should probably be wrapped up in a more friendly message
+        // This corresponds to either an upstream validation error,
+        //    or the plugin calling the api incorrectly
         wp_send_json_error(array('errors' => [
-          "Sorry, there was an issue connecting to the subscription service.
-          This is probably a bug, so if you could report it to security@dxw.com
-          that would be much appreciated: {$e->getMessage()}"
+          "Sorry, we couldn't complete your subscription: {$e->getMessage()}"
         ]));
       } catch (dxw_security_API_Error $e) {
         // TODO: what about dxw_security_API_NotFound? We shouldn't be able to get this, but it doesn't have a message...
