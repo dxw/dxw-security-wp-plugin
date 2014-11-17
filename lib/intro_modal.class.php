@@ -38,6 +38,7 @@ class dxw_security_Intro_Modal {
 
           <?php $this->registration_form->render() ?>
 
+          <p>By submitting this form you're giving the dxw Security plugin permission to send a list of this site's plugins to the dxw Security team.</p>
           <p>We promise not to spam you with lots of emails, and we'll only use your plugin list to send you alerts, and to work out which plugins we should be reviewing next.</p>
 
           <h3>How does it work?</h3>

@@ -15,9 +15,8 @@ class dxw_security_Alert_Subscription_Controller {
     $subscription_data = $_POST['subscription'];
 
     $email      = $subscription_data['email'];
-    $permission = $subscription_data['permission'];
 
-    $subscription_form = new dxw_security_Alert_Subscription_Form($email, $permission);
+    $subscription_form = new dxw_security_Alert_Subscription_Form($email);
 
     if ( $subscription_form->valid() ){
       $api = new dxw_security_Registration_API($email);

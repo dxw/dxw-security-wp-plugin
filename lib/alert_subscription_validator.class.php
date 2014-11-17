@@ -5,18 +5,14 @@ defined('ABSPATH') OR exit;
 class dxw_security_Subscription_Validator {
   public $errors = array();
 
-  public function __construct($email, $permission) {
+  public function __construct($email) {
     $this->email      = $email;
-    $this->permission = $permission;
   }
 
   public function valid() {
     if ( $this->validate_email_presence() ) {
       $this->validate_email_format();
     }
-
-    $this->validate_permission_granted();
-
     return empty($this->errors);
   }
 
@@ -31,14 +27,6 @@ class dxw_security_Subscription_Validator {
     $this->validate(
       empty($this->email),
       "Please enter an email address"
-    );
-  }
-
-  private function validate_permission_granted(){
-    // TODO: is the check for false unnecessary?
-    $this->validate(
-      empty($this->permission) || $this->permission == false,
-      "Please check the box to say that you're happy to send your list of plugins"
     );
   }
 

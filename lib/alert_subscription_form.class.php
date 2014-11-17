@@ -7,8 +7,8 @@ require_once(dirname(__FILE__) . '/alert_subscription_validator.class.php');
 class dxw_security_Alert_Subscription_Form {
   private $validator;
 
-  public function __construct($email=null, $permission=null) {
-    $this->validator  = new dxw_security_Subscription_Validator($email, $permission);
+  public function __construct($email=null) {
+    $this->validator  = new dxw_security_Subscription_Validator($email);
   }
 
 
@@ -35,14 +35,6 @@ class dxw_security_Alert_Subscription_Form {
           <label for="email">Email</label>
           <input autofocus="autofocus" id="email" name="subscription[email]" type="email" value="">
           <span class="help-text">The email address you'd like to receive alerts at</span>
-        </div>
-
-        <div class="field-group">
-          <label for="permission">
-            <input name="subscription[permission]" type="hidden" value="0">
-            <input id="permission" name="subscription[permission]" type="checkbox" value="1">
-            I'm happy for this site to send a list of it's plugins to dxw Security
-          </label>
         </div>
 
         <?php submit_button( "Subscribe to alerts", "primary") ?>
