@@ -23,13 +23,11 @@ class dxw_security_Alert_Subscription_Controller {
 
       try {
         $response = $api->call();
-        // TODO: API should return a token. We should save this token in WP-options
 
         // TODO: this should probably be in a separate class concerned with model-type operations
         // TODO: using update here means we'll overwrite any existing value, but will work
         //    even if the field exists but is blank. Not sure what the correct approach is.
-        // TODO: store the token here instead? Date subscribed doesn't need to be stored here - can be stored in the api
-        update_option( 'dxw_security_subscribed_at', date('Y-m-d') );
+        update_option( 'dxw_security_subscription_token', $response->auth_token );
 
         wp_send_json_success(
           array(
