@@ -25,6 +25,7 @@ jQuery( document ).ready(function($) {
     intro_dialog();
   });
 
+
   function intro_dialog() {
     node = $( ".intro-dialog" );
     $( node ).dialog({
@@ -32,6 +33,8 @@ jQuery( document ).ready(function($) {
       autoOpen: true,
       dialogClass: "wp-dialog",
       width: 800,
+      open: function() { $("#dxw_security_alert_subscription_banner").hide(); },
+      close: function() { $("#dxw_security_alert_subscription_banner").show(); },
     });
     $( node ).dialog( 'option', 'title', $( node ).data('title') );
     $( node ).dialog( 'open' );

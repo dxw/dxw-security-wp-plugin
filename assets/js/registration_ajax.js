@@ -31,6 +31,8 @@ jQuery(document).ready(function($){
     } else {
 
       $('#subscription_form .errors').empty();
+      // Now that we're subscribed we no longer need the banner:
+      $("#dxw_security_alert_subscription_banner").remove();
       $('.intro-dialog').dialog( 'close' );
       // TODO: this is a fragile way of adding notices, but I can't see a better way
       $('div.wrap h2:first').after(_success_notice("You've successfully subscribed to dxw Security alerts with "+ body["data"]["email"]));
