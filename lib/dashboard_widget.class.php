@@ -61,6 +61,8 @@ class dxw_security_Dashboard_Widget {
     // Is this reliable?
     $plugins_page_url = "plugins.php";
 
+    print_r($this->subscription_link());
+
     echo "<p>Of the {$number_of_plugins} plugins installed on this site:</p>";
     echo "<ul class='review_counts'>";
     $this->plugin_review_count_box($this->vulnerable, $vulnerable_slug, $first_vulnerable_plugin_link, "are known to be vulnerable");
@@ -186,6 +188,19 @@ class dxw_security_Dashboard_Widget {
     // TODO: Also - duplication
     $plugins_page_url = "plugins.php";
     return "{$plugins_page_url}#{$plugin_slug}";
+  }
+
+  private function subscription_link() {
+    // TODO: duplication with the  dxw_security_Alert_Subscription_Banner class
+    ?>
+      <div class="subscription_link">
+        <h4>Security alerts</h4>
+        <p>
+          Want to get notified of security issues with your plugins?
+        </p>
+        <a href="#" class="alert_subscription_button button-primary">Subscribe to alerts</a>
+      </div>
+    <?php
   }
 
 }

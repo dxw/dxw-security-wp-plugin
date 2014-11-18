@@ -47,6 +47,7 @@ class dxw_Security {
     if( is_admin() && !get_option('dxw_security_subscription_token') ) {
       add_action('load-plugins.php', array($this, 'add_subscription_banner'));
       add_action('load-plugins.php', array($this, 'add_intro_modal'));
+      add_action('load-index.php', array($this, 'add_intro_modal'));
       add_action('wp_ajax_subscribe', array($this, 'subscription_form'));
     }
 
