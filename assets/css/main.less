@@ -371,7 +371,7 @@ body.plugins-php .ui-dialog {
 
 
 // Subscription Form
-body.plugins-php {
+body.plugins-php, body.index-php {
   #subscription_form {
     border: @light-border;
     padding: 20px;
@@ -393,8 +393,13 @@ body.plugins-php {
   }
 
   #dxw_security_alert_subscription_link {
+    &.updated{
+      // i.e. the banner
+      a {
+        margin-left: 20px;
+      }
+    }
     a {
-      margin-left: 20px;
       &:active {
         // The wp default is to apply vertical-align: top, which messes up alignment;
         vertical-align: inherit;
