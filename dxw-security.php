@@ -44,7 +44,7 @@ class dxw_Security {
     add_action('admin_init', array($this, 'add_security_column'));
     add_action('admin_init', array($this, 'add_dashboard_widget'));
 
-    if( is_admin() && !get_option('dxw_security_subscription_token') ) {
+    if( dxw_security_Subscription_Link::can_subscribe() ) {
       add_action('load-plugins.php', array($this, 'add_subscription_banner'));
       add_action('load-plugins.php', array($this, 'add_intro_modal'));
       add_action('load-index.php', array($this, 'add_intro_modal'));

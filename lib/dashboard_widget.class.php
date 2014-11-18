@@ -5,6 +5,7 @@ defined('ABSPATH') OR exit;
 require_once(dirname(__FILE__) . '/api.class.php');
 require_once(dirname(__FILE__) . '/review_data.class.php');
 require_once(dirname(__FILE__) . '/plugin_file.class.php');
+require_once(dirname(__FILE__) . '/subscription_link.class.php');
 
 class dxw_security_Dashboard_Widget {
   private $vulnerable = 0;
@@ -62,7 +63,7 @@ class dxw_security_Dashboard_Widget {
     $plugins_page_url = "plugins.php";
 
     //  TODO - I'm not sure this decision should be made at this point
-    if( is_admin() && !get_option('dxw_security_subscription_token') ) {
+    if( dxw_security_Subscription_Link::can_subscribe() ) {
       print_r($this->subscription_link());
     }
 
@@ -194,14 +195,13 @@ class dxw_security_Dashboard_Widget {
   }
 
   private function subscription_link() {
-    // TODO: duplication with the  dxw_security_Alert_Subscription_Banner class
     ?>
       <div id="dxw_security_alert_subscription_link">
         <h4>Security alerts</h4>
         <p>
           Want to get notified of security issues with your plugins?
         </p>
-        <a href="#" class="alert_subscription_button button-primary">Subscribe to alerts</a>
+        <?php dxw_security_Subscription_Link::render() ?>
       </div>
     <?php
   }
