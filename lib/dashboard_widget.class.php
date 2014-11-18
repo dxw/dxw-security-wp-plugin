@@ -61,7 +61,10 @@ class dxw_security_Dashboard_Widget {
     // Is this reliable?
     $plugins_page_url = "plugins.php";
 
-    print_r($this->subscription_link());
+    //  TODO - I'm not sure this decision should be made at this point
+    if( is_admin() && !get_option('dxw_security_subscription_token') ) {
+      print_r($this->subscription_link());
+    }
 
     echo "<p>Of the {$number_of_plugins} plugins installed on this site:</p>";
     echo "<ul class='review_counts'>";
