@@ -193,7 +193,7 @@ class dxw_security_Dashboard_Widget {
   private function subscription_link() {
     // TODO: duplication with the  dxw_security_Alert_Subscription_Banner class
     ?>
-      <div class="subscription_link">
+      <div id="dxw_security_alert_subscription_link">
         <h4>Security alerts</h4>
         <p>
           Want to get notified of security issues with your plugins?

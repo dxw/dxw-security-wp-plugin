@@ -33,8 +33,8 @@ jQuery( document ).ready(function($) {
       autoOpen: true,
       dialogClass: "wp-dialog",
       width: 800,
-      open: function() { $("#dxw_security_alert_subscription_banner").hide(); },
-      close: function() { $("#dxw_security_alert_subscription_banner").show(); },
+      open: function() { $("#dxw_security_alert_subscription_link").hide(); },
+      close: function() { $("#dxw_security_alert_subscription_link").show(); },
     });
     $( node ).dialog( 'option', 'title', $( node ).data('title') );
     $( node ).dialog( 'open' );
