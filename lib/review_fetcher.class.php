@@ -11,9 +11,9 @@ require_once(dirname(__FILE__) . '/plugin_file.class.php');
 class dxw_security_Review_Fetcher {
   private $failed_requests = 0;
 
-  public function __construct() {
+  public function __construct($cron_task_name) {
     // Define a hook for wp_cron to call:
-    add_action('dxw_security_daily_fetch_reviews', array($this, 'fetch_reviews') );
+    add_action($cron_task_name, array($this, 'fetch_reviews') );
   }
 
   public function fetch_reviews() {

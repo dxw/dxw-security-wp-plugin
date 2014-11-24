@@ -36,20 +36,10 @@ require(dirname(__FILE__) . '/lib/alert_subscription_controller.class.php');
 require(dirname(__FILE__) . '/lib/alert_subscription_banner.class.php');
 
 
-// TODO: temporary!!!!
-require(dirname(__FILE__) . '/lib/plugin_manifest.class.php');
-require_once(dirname(__FILE__) . '/lib/api.class.php');
-// end temporary
-
 class dxw_Security {
   public function __construct() {
     add_action('load-index.php', array($this, 'enqueue_scripts'));
     add_action('load-plugins.php', array($this, 'enqueue_scripts'));
-
-
-    // TODO: temporary!!!!
-    add_action('load-plugins.php', array($this, 'post_manifest'));
-    // end temporary
 
     add_action('admin_init', array($this, 'add_security_column'));
     add_action('admin_init', array($this, 'add_dashboard_widget'));
@@ -96,19 +86,6 @@ class dxw_Security {
   public function subscription_form() {
     dxw_security_Alert_Subscription_Controller::create();
   }
-
-  // TODO: temporary!!!!
-  public function post_manifest() {
-    // TODO: this get shouldn't live here. In fact perhaps the whole auth token should be part of the API call (AuthenticatedAPI?)
-    $auth_token = get_option( 'dxw_security_subscription_token' );
-    if ($auth_token) {
-      $manifest = new dxw_security_Plugin_Manifest;
-
-      $api = new dxw_security_Manifest_API($manifest, $auth_token);
-      $api->call();
-    }
-  }
-  // end temporary
 }
 // It's not possible to directly call add_action in a function called by the register_activation_hook
 //    So we need to set an option and optionally execute the contents of an add_action defined elsewhere:
