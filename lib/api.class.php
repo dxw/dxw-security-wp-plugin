@@ -33,7 +33,6 @@ class dxw_security_Registration_API extends dxw_security_API {
     $this->post_data = array("email" => $email);
   }
 
-  // TODO: Currently this only handles directory plugins
   protected function api_path() {
     return "/registrations";
   }
@@ -48,6 +47,34 @@ class dxw_security_Registration_API extends dxw_security_API {
   // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
   protected function extract_data($parsed_body) {
     return $parsed_body->subscriber;
+  }
+}
+
+class dxw_security_Manifest_API extends dxw_security_API {
+
+  private $post_data;
+
+  public function __construct($manifest, $auth_token) {
+    $this->post_data = array(
+      "manifest" => $manifest->to_json(),
+      "auth_token" => $auth_token,
+    );
+  }
+
+  protected function api_path() {
+    return "/plugin_manifests";
+  }
+
+  protected function request_args() {
+    return array(
+        'method' => 'POST',
+        'body' => $this->post_data
+      );
+  }
+
+  // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
+  protected function extract_data($parsed_body) {
+    return $parsed_body;
   }
 }
 
@@ -130,7 +157,6 @@ class dxw_security_API {
 
     if( is_array($error) ) { $error = implode(", ", $error); }
 
-Whippet::print_r($error);
     return $error;
   }
 
