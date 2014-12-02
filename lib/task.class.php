@@ -36,5 +36,5 @@ class dxw_security_Task {
     return (bool)wp_next_scheduled($this->hook_name);
   }
 }
-?>
 
+?>
