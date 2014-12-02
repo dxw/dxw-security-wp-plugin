@@ -17,6 +17,11 @@ class dxw_security_Cron {
     self::poster_task()->hook();
   }
 
+  public static function unschedule_and_unhook_tasks() {
+    self::fetcher_task()->unschedule_and_unhook();
+    self::poster_task()->unschedule_and_unhook();
+  }
+
   private static function fetcher_task() {
     return new dxw_security_Task('dxw_security_Review_Fetcher');
   }

@@ -93,6 +93,10 @@ class dxw_Security {
   private function debug_cron() {
     add_action('wp_ajax_dxw_security_cron', array('dxw_security_Plugin_Manifest_Poster', 'run'));
     add_action('wp_ajax_dxw_security_cron', array('dxw_security_Review_Fetcher', 'run'));
+
+    global $wp_filter;
+    $foo =var_dump( $wp_filter['dxw_security_Plugin_Manifest_Poster'] ) ;
+    Whippet::print_r($foo);
   }
 }
 // It's not possible to directly call add_action in a function called by the register_activation_hook
@@ -101,5 +105,6 @@ class dxw_Security {
 register_activation_hook( __FILE__, array( "dxw_Security",  'activate' ));
 
 register_activation_hook( __FILE__, array( "dxw_security_Cron", 'schedule_tasks' ));
+register_deactivation_hook( __FILE__, array( "dxw_security_Cron", 'unschedule_and_unhook_tasks' ));
 
 new dxw_Security();

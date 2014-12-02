@@ -15,8 +15,8 @@ class dxw_security_Task {
     $this->schedule_once($frequency);
   }
 
-  // YAGNI?
-  public function unschedule() {
+  public function unschedule_and_unhook() {
+    remove_action($this->hook_name);
     wp_clear_scheduled_hook($this->hook_name);
   }
 
