@@ -29,6 +29,8 @@ class dxw_security_Alert_Subscription_Controller {
         //    even if the field exists but is blank. Not sure what the correct approach is.
         update_option( 'dxw_security_subscription_token', $response->auth_token );
 
+        self::schedule_manifest_send();
+
         wp_send_json_success(
           array(
             "email" => $response->email,
@@ -92,6 +94,11 @@ class dxw_security_Alert_Subscription_Controller {
       // TODO: What's a good error message?
       wp_send_json_error(array('errors' => ["Security error- you don't have permission to view this page"]));
     }
+  }
+
+  private static function schedule_manifest_send() {
+    $task = new dxw_security_Task('dxw_security_Plugin_Manifest_Poster');
+    $task->schedule('daily');
   }
 }
 ?>

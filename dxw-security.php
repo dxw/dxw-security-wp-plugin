@@ -93,10 +93,6 @@ class dxw_Security {
   private function debug_cron() {
     add_action('wp_ajax_dxw_security_cron', array('dxw_security_Plugin_Manifest_Poster', 'run'));
     add_action('wp_ajax_dxw_security_cron', array('dxw_security_Review_Fetcher', 'run'));
-
-    global $wp_filter;
-    $foo =var_dump( $wp_filter['dxw_security_Plugin_Manifest_Poster'] ) ;
-    Whippet::print_r($foo);
   }
 }
 // It's not possible to directly call add_action in a function called by the register_activation_hook
