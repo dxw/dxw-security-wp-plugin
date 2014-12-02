@@ -53,12 +53,8 @@ class dxw_Security {
 
     dxw_security_Cron::hook_tasks();
 
-// define('DXW_SECURITY_DEBUG', true);
 
-    // if (defined('DXW_SECURITY_DEBUG')) {
-      add_action('wp_ajax_dxw_security_cron', array('dxw_security_Plugin_Manifest_Poster', 'run'));
-      add_action('wp_ajax_dxw_security_cron', array('dxw_security_Review_Fetcher', 'run'));
-    // }
+    if (defined('DXW_SECURITY_DEBUG')) { $this->debug_cron(); }
   }
 
   public function enqueue_scripts($hook) {
@@ -93,13 +89,17 @@ class dxw_Security {
   public function subscription_form() {
     dxw_security_Alert_Subscription_Controller::create();
   }
+
+  private function debug_cron() {
+    add_action('wp_ajax_dxw_security_cron', array('dxw_security_Plugin_Manifest_Poster', 'run'));
+    add_action('wp_ajax_dxw_security_cron', array('dxw_security_Review_Fetcher', 'run'));
+  }
 }
 // It's not possible to directly call add_action in a function called by the register_activation_hook
 //    So we need to set an option and optionally execute the contents of an add_action defined elsewhere:
 //    http://codex.wordpress.org/Function_Reference/register_activation_hook#Process_Flow
 register_activation_hook( __FILE__, array( "dxw_Security",  'activate' ));
 
-
-register_activation_hook( __FILE__, array("dxw_security_Cron", 'schedule_tasks' ));
+register_activation_hook( __FILE__, array( "dxw_security_Cron", 'schedule_tasks' ));
 
 new dxw_Security();
