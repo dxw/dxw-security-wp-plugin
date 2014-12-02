@@ -51,8 +51,7 @@ class dxw_Security {
       add_action('wp_ajax_subscribe', array($this, 'subscription_form'));
     }
 
-    new dxw_security_Cron();
-
+    dxw_security_Cron::hook_tasks();
 
 // define('DXW_SECURITY_DEBUG', true);
 
@@ -99,5 +98,8 @@ class dxw_Security {
 //    So we need to set an option and optionally execute the contents of an add_action defined elsewhere:
 //    http://codex.wordpress.org/Function_Reference/register_activation_hook#Process_Flow
 register_activation_hook( __FILE__, array( "dxw_Security",  'activate' ));
+
+
+register_activation_hook( __FILE__, array("dxw_security_Cron", 'schedule_tasks' ));
 
 new dxw_Security();
