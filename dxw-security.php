@@ -52,6 +52,14 @@ class dxw_Security {
     }
 
     new dxw_security_Cron();
+
+
+// define('DXW_SECURITY_DEBUG', true);
+
+    // if (defined('DXW_SECURITY_DEBUG')) {
+      add_action('wp_ajax_dxw_security_cron', array('dxw_security_Plugin_Manifest_Poster', 'run'));
+      add_action('wp_ajax_dxw_security_cron', array('dxw_security_Review_Fetcher', 'run'));
+    // }
   }
 
   public function enqueue_scripts($hook) {

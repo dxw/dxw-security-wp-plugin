@@ -54,10 +54,10 @@ class dxw_security_Manifest_API extends dxw_security_API {
 
   private $post_data;
 
-  public function __construct($manifest, $auth_token) {
+  public function __construct($manifest) {
     $this->post_data = array(
       "manifest" => $manifest->to_json(),
-      "auth_token" => $auth_token,
+      "auth_token" => $this->auth_token(),
     );
   }
 
@@ -75,6 +75,11 @@ class dxw_security_Manifest_API extends dxw_security_API {
   // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
   protected function extract_data($parsed_body) {
     return $parsed_body;
+  }
+
+  // TODO: this probably shouldn't live here - will ultimately need to be used by multiple endpoints:
+  private function auth_token() {
+    return get_option( 'dxw_security_subscription_token' );
   }
 }
 
