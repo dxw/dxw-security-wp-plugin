@@ -15,9 +15,7 @@ class dxw_security_Task {
     $this->schedule_once($frequency);
   }
 
-  //  TODO - is it necessary to remove the action??
-  public function unschedule_and_unhook() {
-    remove_action($this->hook_name);
+  public function unschedule() {
     wp_clear_scheduled_hook($this->hook_name);
   }
 

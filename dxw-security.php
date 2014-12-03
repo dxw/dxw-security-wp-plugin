@@ -101,6 +101,6 @@ class dxw_Security {
 register_activation_hook( __FILE__, array( "dxw_Security",  'activate' ));
 
 register_activation_hook( __FILE__, array( "dxw_security_Cron", 'schedule_tasks' ));
-register_deactivation_hook( __FILE__, array( "dxw_security_Cron", 'unschedule_and_unhook_tasks' ));
+register_deactivation_hook( __FILE__, array( "dxw_security_Cron", 'unschedule_tasks' ));
 
 new dxw_Security();

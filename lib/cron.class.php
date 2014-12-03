@@ -3,6 +3,7 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/task.class.php');
+// Without these requires, the tasks will silently fail to execute:
 require_once(dirname(__FILE__) . '/review_fetcher.class.php');
 require_once(dirname(__FILE__) . '/plugin_manifest_poster.class.php');
 
@@ -19,10 +20,9 @@ class dxw_security_Cron {
     self::poster_task()->hook();
   }
 
-  //  TODO - is it necessary to unhook??
-  public static function unschedule_and_unhook_tasks() {
-    self::fetcher_task()->unschedule_and_unhook();
-    self::poster_task()->unschedule_and_unhook();
+  public static function unschedule_tasks() {
+    self::fetcher_task()->unschedule();
+    self::poster_task()->unschedule();
   }
 
   private static function fetcher_task() {
