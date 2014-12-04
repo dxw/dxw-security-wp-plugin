@@ -29,11 +29,14 @@ define('DXW_SECURITY_PLUGINS_URL', 'https://security.dxw.com/plugins/');
 
 require(dirname(__FILE__) . '/lib/dashboard_widget.class.php');
 require(dirname(__FILE__) . '/lib/plugin_review_column.class.php');
-require(dirname(__FILE__) . '/lib/cron.class.php');
-require(dirname(__FILE__) . '/lib/intro_modal.class.php');
 
+require(dirname(__FILE__) . '/lib/intro_modal.class.php');
 require(dirname(__FILE__) . '/lib/alert_subscription_controller.class.php');
 require(dirname(__FILE__) . '/lib/alert_subscription_banner.class.php');
+
+
+require(dirname(__FILE__) . '/lib/cron.class.php');
+require(dirname(__FILE__) . '/lib/update_checker.class.php');
 
 
 class dxw_Security {
@@ -102,5 +105,12 @@ register_activation_hook( __FILE__, array( "dxw_Security",  'activate' ));
 
 register_activation_hook( __FILE__, array( "dxw_security_Cron", 'schedule_tasks' ));
 register_deactivation_hook( __FILE__, array( "dxw_security_Cron", 'unschedule_tasks' ));
+
+// TODO: should this be in the constructor instead?
+register_activation_hook( __FILE__, array( "dxw_security_Update_Checker", 'record_version' ));
+if (dxw_security_Update_Checker::updated() ) {
+  dxw_security_Cron::schedule_tasks();
+  dxw_security_Update_Checker::record_version(); // TODO: Should this be abstracted into the update_checker class?
+}
 
 new dxw_Security();
