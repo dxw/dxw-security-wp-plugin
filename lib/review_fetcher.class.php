@@ -22,7 +22,7 @@ class dxw_security_Review_Fetcher {
     $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
 
     // TODO: this pattern is duplicated in the security column code and dashboard widget
-    // It should probably be factored out into another class
+    //    It should probably be factored out into another class
     // Stop making requests after a certain number of failures:
     if (self::$failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $recommendation = self::handle_api_fatal_error();
@@ -31,18 +31,21 @@ class dxw_security_Review_Fetcher {
 
       try {
         $reviews = $api->call();
-        self::handle_api_response();
       } catch (\Exception $e) {
         self::handle_api_error($e);
       }
     }
   }
 
-  private static function handle_api_response() {  }
   private static function handle_api_error() {
     self::$failed_requests++;
   }
-  private static function handle_api_fatal_error() {  }
+  private static function handle_api_fatal_error() {
+    // In this case we won't get stats, but the user's experience won't be impacted
+    // except for slow loading the next time they visit the plugins page (because
+    // the reviews won't be cached), at which point they'll see an error,
+    // so it's probably OK to do nothing here.
+  }
 
   private static function get_plugins() {
     if ( ! function_exists( 'get_plugins' ) ) {
