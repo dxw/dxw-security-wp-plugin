@@ -37,6 +37,7 @@ require(dirname(__FILE__) . '/lib/alert_subscription_banner.class.php');
 
 require(dirname(__FILE__) . '/lib/cron.class.php');
 require(dirname(__FILE__) . '/lib/update_checker.class.php');
+require_once(dirname(__FILE__) . '/lib/activation_checker.class.php');
 
 
 class dxw_Security {
@@ -44,18 +45,17 @@ class dxw_Security {
     add_action('load-index.php', array($this, 'enqueue_scripts'));
     add_action('load-plugins.php', array($this, 'enqueue_scripts'));
 
-    add_action('admin_init', array($this, 'add_security_column'));
-    add_action('admin_init', array($this, 'add_dashboard_widget'));
+    add_action('admin_init', array("dxw_security_Plugin_Review_Column", 'setup'));
+    add_action('admin_init', array("dxw_security_Dashboard_Widget", 'setup'));
 
     if( dxw_security_Subscription_Link::can_subscribe() ) {
-      add_action('load-plugins.php', array($this, 'add_subscription_banner'));
-      add_action('load-plugins.php', array($this, 'add_intro_modal'));
-      add_action('load-index.php', array($this, 'add_intro_modal'));
-      add_action('wp_ajax_subscribe', array($this, 'subscription_form'));
+      add_action('load-plugins.php', array("dxw_security_Alert_Subscription_Banner", 'setup'));
+      add_action('load-plugins.php', array("dxw_security_Intro_Modal", 'setup'));
+      add_action('load-index.php', array("dxw_security_Intro_Modal", 'setup'));
+      add_action('wp_ajax_subscribe', array("dxw_security_Alert_Subscription_Controller", 'create'));
     }
 
     dxw_security_Cron::hook_tasks();
-
 
     if (defined('DXW_SECURITY_DEBUG')) { $this->debug_cron(); }
   }
@@ -69,30 +69,6 @@ class dxw_Security {
     wp_enqueue_script('jquery-ui-dialog');
   }
 
-  public function add_security_column() {
-    new dxw_security_Plugin_Review_Column;
-  }
-
-  public function add_dashboard_widget() {
-    new dxw_security_Dashboard_Widget;
-  }
-
-  public function add_intro_modal(){
-    new dxw_security_Intro_Modal;
-  }
-
-  public function activate() {
-    add_option( 'Activated_Plugin', 'dxw_Security' );
-  }
-
-  public function add_subscription_banner() {
-    new dxw_security_Alert_Subscription_Banner;
-  }
-
-  public function subscription_form() {
-    dxw_security_Alert_Subscription_Controller::create();
-  }
-
   private function debug_cron() {
     add_action('wp_ajax_dxw_security_cron', array('dxw_security_Plugin_Manifest_Poster', 'run'));
     add_action('wp_ajax_dxw_security_cron', array('dxw_security_Review_Fetcher', 'run'));
@@ -101,13 +77,13 @@ class dxw_Security {
 // It's not possible to directly call add_action in a function called by the register_activation_hook
 //    So we need to set an option and optionally execute the contents of an add_action defined elsewhere:
 //    http://codex.wordpress.org/Function_Reference/register_activation_hook#Process_Flow
-register_activation_hook( __FILE__, array( "dxw_Security",  'activate' ));
+register_activation_hook( __FILE__, array( "dxw_security_Activation_Checker",  'activate' ));
 
 register_activation_hook( __FILE__, array( "dxw_security_Cron", 'schedule_tasks' ));
 register_deactivation_hook( __FILE__, array( "dxw_security_Cron", 'unschedule_tasks' ));
 
-// TODO: should this be in the constructor instead?
 register_activation_hook( __FILE__, array( "dxw_security_Update_Checker", 'record_version' ));
+// TODO: should this `if` be in the constructor instead?
 if (dxw_security_Update_Checker::updated() ) {
   dxw_security_Cron::schedule_tasks();
   dxw_security_Update_Checker::record_version(); // TODO: Should this be abstracted into the update_checker class?

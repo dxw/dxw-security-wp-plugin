@@ -11,25 +11,25 @@ require_once(dirname(__FILE__) . '/plugin_file.class.php');
 class dxw_security_Plugin_Review_Column {
   // Track the number of failed requests so that we can stop trying after a certain number.
   // TODO: This should apply per page load, but ideally this behaviour might be better handled by the API class (?)
-  private $failed_requests = 0;
+  private static $failed_requests = 0;
 
-  public function __construct() {
-    add_filter('manage_plugins_columns', array($this, 'manage_plugins_columns'));
-    add_action('manage_plugins_custom_column', array($this, 'manage_plugins_custom_column'), 10, 3);
+  public static function setup() {
+    add_filter('manage_plugins_columns', array(get_called_class(), 'manage_plugins_columns'));
+    add_action('manage_plugins_custom_column', array(get_called_class(), 'manage_plugins_custom_column'), 10, 3);
   }
 
-  public function manage_plugins_columns($columns) {
+  public static function manage_plugins_columns($columns) {
     $columns['security_review'] = "Security";
     return $columns;
   }
 
-  public function manage_plugins_custom_column($column_name, $plugin_file, $plugin_data) {
+  public static function manage_plugins_custom_column($column_name, $plugin_file, $plugin_data) {
     if($column_name == 'security_review') {
-      $this->data($plugin_file, $plugin_data);
+      self::data($plugin_file, $plugin_data);
     }
   }
 
-  private function data($plugin_file, $plugin_data) {
+  private static function data($plugin_file, $plugin_data) {
     $name = $plugin_data['Name'];
     $installed_version = $plugin_data['Version'];
 
@@ -39,23 +39,23 @@ class dxw_security_Plugin_Review_Column {
     if (!$latest_version) { $latest_version = $installed_version; }
 
     // Stop making requests after a certain number of failures:
-    if ($this->failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
-      $recommendation = $this->handle_api_fatal_error();
+    if (self::$failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
+      $recommendation = self::handle_api_fatal_error();
     } else {
       $api = new dxw_security_Plugin_Review_API($plugin_file_object->plugin_slug);
 
       try {
         $reviews = $api->call();
-        $recommendation = $this->handle_api_response($reviews, $name, $installed_version, $latest_version);
+        $recommendation = self::handle_api_response($reviews, $name, $installed_version, $latest_version);
       } catch (\Exception $e) {
-        $recommendation = $this->handle_api_error($e);
+        $recommendation = self::handle_api_error($e);
       }
     }
 
     $recommendation->render();
   }
 
-  private function handle_api_response($reviews, $name, $installed_version, $latest_version) {
+  private static function handle_api_response($reviews, $name, $installed_version, $latest_version) {
     if (empty($reviews)) {
       $review_data = new dxw_security_Review_Data($installed_version, "not-found");
       // TODO - it's a bit odd that we're creating a class which implies that the plugin has been reviewed...
@@ -88,14 +88,14 @@ class dxw_security_Plugin_Review_Column {
     return $recommendation;
   }
 
-  private function handle_api_error($error) {
+  private static function handle_api_error($error) {
     // TODO: Handle errors actually raised by us in the api class separately?
     // TODO: in future we should provide some way for users to give us back some useful information when they get an error
-    $this->failed_requests++;
+    self::$failed_requests++;
     return new dxw_security_Null_Plugin_Recommendation();
   }
 
-  private function handle_api_fatal_error() {
+  private static function handle_api_fatal_error() {
     return new dxw_security_Null_Plugin_Recommendation();
   }
 }

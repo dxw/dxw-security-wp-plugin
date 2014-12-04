@@ -3,22 +3,15 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/alert_subscription_form.class.php');
+require_once(dirname(__FILE__) . '/activation_checker.class.php');
 
 class dxw_security_Intro_Modal {
-  private $registration_form;
-
-  public function __construct() {
-    add_action( 'admin_notices', array( $this, 'render_dialog' ) );
-    $this->registration_form = new dxw_security_Alert_Subscription_Form;
+  public static function setup() {
+    add_action('admin_notices', array(get_called_class(), 'render_dialog'));
   }
 
-  public function render_dialog(){
-    if ( get_option( 'Activated_Plugin' ) == 'dxw_Security' ) {
-      $activated = true;
-      delete_option( 'Activated_Plugin' );
-    } else {
-      $activated = false;
-    }
+  public static function render_dialog(){
+    $activated = dxw_security_Activation_Checker::check();
 
     $registration_form = new dxw_security_Alert_Subscription_Form
     ?>
@@ -36,7 +29,7 @@ class dxw_security_Intro_Modal {
             We can send you alerts by email as soon as a vulnerability is discovered - either by us or by others in the security community.
           </p>
 
-          <?php $this->registration_form->render() ?>
+          <?php $registration_form->render() ?>
 
           <p>By submitting this form you're giving the dxw Security plugin permission to send a list of this site's plugins to the dxw Security team.</p>
           <p>We promise not to spam you with lots of emails, and we'll only use your plugin list to send you alerts, and to work out which plugins we should be reviewing next.</p>
