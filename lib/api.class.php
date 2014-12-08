@@ -29,8 +29,12 @@ class dxw_security_Plugin_Review_API extends dxw_security_API {
 // php doesn't support nested classes so these need to live outside the API class
 class dxw_security_API_Error extends \Exception { }
 class dxw_security_API_NotFound extends dxw_security_API_Error { }
-class dxw_security_API {
+abstract class dxw_security_API {
   // TODO: re-implement as decorator pattern? How?
+
+  abstract protected function api_path();
+  abstract protected function cache_slug();
+  abstract protected function extract_data($parsed_body);
 
   public function call() {
     $data = $this->retrieve_api_data();
@@ -57,7 +61,7 @@ class dxw_security_API {
     // );
     $url = $api_root . $api_path . $query;
 
-    $response = wp_remote_get(esc_url($url));
+    $response = wp_remote_get($url);
 
     return $this->handle_response($response);
   }
@@ -114,16 +118,6 @@ class dxw_security_API {
     } else {
       return false;
     }
-  }
-
-  protected function api_path() {
-    throw new Exception('Not implemented');
-  }
-  protected function cache_slug() {
-    throw new Exception('Not implemented');
-  }
-  protected function extract_data($parsed_body) {
-    throw new Exception('Not implemented');
   }
 }
 ?>
