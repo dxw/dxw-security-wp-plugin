@@ -25,31 +25,6 @@ class dxw_security_Plugin_Review_API extends dxw_security_Cached_API {
   }
 }
 
-class dxw_security_Registration_API extends dxw_security_API {
-
-  private $post_data;
-
-  public function __construct($email) {
-    $this->post_data = array("email" => $email);
-  }
-
-  protected function api_path() {
-    return "/registrations";
-  }
-
-  protected function request_args() {
-    return array(
-        'method' => 'POST',
-        'body' => array("registration" => $this->post_data)
-      );
-  }
-
-  // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
-  protected function extract_data($parsed_body) {
-    return $parsed_body->subscriber;
-  }
-}
-
 class dxw_security_Manifest_API extends dxw_security_API {
 
   private $post_data;

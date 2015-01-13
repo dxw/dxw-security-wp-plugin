@@ -14,30 +14,4 @@ jQuery( document ).ready(function($) {
     $( this.hash ).dialog( 'open' );
     return false;
   });
-
-  if( $( ".intro-dialog" ).data("activated") ) {
-    intro_dialog();
-  }
-
-  $( ".alert_subscription_button" ).on('click', function(e) {
-    // Override the default link behaviour:
-    e.preventDefault();
-    intro_dialog();
-  });
-
-
-  function intro_dialog() {
-    node = $( ".intro-dialog" );
-    $( node ).dialog({
-      modal: true,
-      autoOpen: true,
-      dialogClass: "wp-dialog",
-      width: 800,
-      open: function() { $("#dxw_security_alert_subscription_link").hide(); },
-      close: function() { $("#dxw_security_alert_subscription_link").show(); },
-    });
-    $( node ).dialog( 'option', 'title', $( node ).data('title') );
-    $( node ).dialog( 'open' );
-  }
-
 });
