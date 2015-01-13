@@ -106,7 +106,7 @@ abstract class dxw_security_API {
         case 404:
           // This should only get triggered if a bad request was made to the api - e.g. api/v2/foo
           //    In this scenario we get a usage message - could check for that but there doesn't seem to be much point.
-          throw new dxw_security_API_NotFound();
+          throw new dxw_security_API_NotFound("Invalid endpoint (404)");
 
         case 422:
           // This should only get triggered if invalid data was posted to the api - e.g. a missing payload or upstream validation errors
