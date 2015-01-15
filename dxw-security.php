@@ -30,6 +30,9 @@ define('DXW_SECURITY_PLUGINS_URL', 'https://security.dxw.com/plugins/');
 require(dirname(__FILE__) . '/lib/dashboard_widget.class.php');
 require(dirname(__FILE__) . '/lib/plugin_review_column.class.php');
 
+require_once(dirname(__FILE__) . '/lib/settings_page.class.php');
+require_once(dirname(__FILE__) . '/lib/subscription_activation_form.class.php');
+
 require(dirname(__FILE__) . '/lib/alert_subscription_banner.class.php');
 
 require(dirname(__FILE__) . '/lib/cron.class.php');
@@ -44,6 +47,9 @@ class dxw_Security {
 
     add_action('admin_init', array("dxw_security_Plugin_Review_Column", 'setup'));
     add_action('admin_init', array("dxw_security_Dashboard_Widget", 'setup'));
+
+    add_action('admin_menu', array("dxw_security_Settings_Page", 'setup'));
+    add_action('admin_init', array("dxw_security_Subscription_Activation_Form", 'setup'));
 
     if( dxw_security_Subscription_Link::can_subscribe() ) {
       add_action('load-plugins.php', array("dxw_security_Alert_Subscription_Banner", 'setup'));
