@@ -10,7 +10,7 @@ class dxw_security_Subscription_Activation_Form {
     add_settings_section("activate_subscription", "Activate your subscription", array(get_called_class(),'section_text'), "dxw_security-key-config");
 
     add_settings_field(self::$api_key_field, 'Manually enter an API key', array(get_called_class(),'subscription_api_key_input_field'), 'dxw_security-key-config', "activate_subscription");
-    register_setting( 'dxw_security-key-config', self::$api_key_field );
+    register_setting( 'dxw_security-key-config', self::$api_key_field, array(get_called_class(),'validate_subscription_api_key'));
   }
 
   public static function section_text() {
@@ -20,6 +20,17 @@ class dxw_security_Subscription_Activation_Form {
   public static function subscription_api_key_input_field() {
     echo '<input type="text" name="'.self::$api_key_field.'" value="'.esc_attr(get_option(self::$api_key_field)).'" size="50">';
     echo '<p class="help-text">(if you already know your api key)</p>';
+  }
+
+  public static function validate_subscription_api_key($input) {
+
+    $output = trim($input);
+
+    if ( ! preg_match('/^[a-zA-Z0-9]*$/', $output) ) {
+      // TODO: I can't see why that esc_attr is necessary, but it's in the example docs...
+      add_settings_error(self::$api_key_field, esc_attr('not_alphanumeric'), "That doesn't look like a valid API key: subscription keys only contain numbers and letters");
+    }
+    return $output;
   }
 
   public static function render() {
