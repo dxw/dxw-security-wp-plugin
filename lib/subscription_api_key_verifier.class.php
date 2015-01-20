@@ -16,9 +16,10 @@ class dxw_security_Subscription_Api_Key_Verifier {
 
     try {
       $api->call();
-    } catch (\Exception $e) {
-      // TODO: distinguish between "token doesn't match" and other errors.
+    } catch (dxw_security_API_Unauthorised $e) {
       add_settings_error($field, esc_attr('unverified'), "The api key you entered doesn't match our records. Please double-check it.");
+    } catch (\Exception $e) {
+      add_settings_error($field, esc_attr('error'), "Sorry - there seems to be some problem with our systems. Please try again later and/or contact <a href=\"mailto:security@dxw.com\">security@dxw.com</a>");
     }
   }
 }

@@ -58,6 +58,7 @@ class dxw_security_Manifest_API extends dxw_security_API {
 class dxw_security_API_Error extends \Exception { }
 class dxw_security_API_NotFound extends dxw_security_API_Error { }
 class dxw_security_API_BadData extends dxw_security_API_Error { }
+class dxw_security_API_Unauthorised extends dxw_security_API_Error { }
 
 abstract class dxw_security_API {
   // TODO: re-implement as decorator pattern? How?
@@ -97,6 +98,13 @@ abstract class dxw_security_API {
           $data = $this->extract_data($parsed_body);
           // TODO: Validate data and raise an error if it's invalid. Children of this class would need to implement a 'validate()' function
           return $data;
+
+        case 401:
+          // Raised if an api call was not properly authenitcated with the auth token (api key)
+          // TODO: Do we need to consume the json error message here, or can we just return a generic message here?
+          $parsed_body = $this->parse_response_body($response['body']);
+
+          throw new dxw_security_API_Unauthorised($this->extract_error($parsed_body));
 
         case 404:
           // This should only get triggered if a bad request was made to the api - e.g. api/v2/foo
