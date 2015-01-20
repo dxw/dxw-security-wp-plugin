@@ -28,10 +28,12 @@ class dxw_security_Subscription_Activation_Form {
 
     if ( empty($output) ) {
       add_settings_error(self::$api_key_field, esc_attr('empty'), "Please enter an API key");
+      $output = "";
     }
     else if ( ! preg_match('/^[a-zA-Z0-9]*$/', $output) ) {
       // TODO: I can't see why that esc_attr is necessary, but it's in the example docs...
       add_settings_error(self::$api_key_field, esc_attr('not_alphanumeric'), "That doesn't look like a valid API key: subscription keys only contain numbers and letters");
+      $output = "";
     }
 
     return $output;
