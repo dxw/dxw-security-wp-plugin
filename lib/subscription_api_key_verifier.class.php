@@ -19,8 +19,15 @@ class dxw_security_Subscription_Api_Key_Verifier {
     } catch (dxw_security_API_Unauthorised $e) {
       add_settings_error($field, esc_attr('unverified'), "The api key you entered doesn't match our records. Please double-check it.");
     } catch (\Exception $e) {
-      add_settings_error($field, esc_attr('error'), "Sorry - there seems to be some problem with our systems. Please try again later and/or contact <a href=\"mailto:security@dxw.com\">security@dxw.com</a>");
+      $email_link = self::email_link('Failed to verify "subscription" api key');
+      add_settings_error($field, esc_attr('error'), "Sorry - there seems to be some problem with our systems. Please try again later and/or contact {$email_link}");
     }
+  }
+
+  private static function email_link($subject) {
+    $email = "security@dxw.com";
+    $subject = esc_attr($subject);
+    return "<a href=\"mailto:{$email}?subject={$subject}\">{$email}</a>";
   }
 }
 ?>
