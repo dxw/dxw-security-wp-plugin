@@ -2,6 +2,8 @@
 
 defined('ABSPATH') OR exit;
 
+require_once(dirname(__FILE__) . '/subscription_api_key_validator.class.php');
+
 class dxw_security_Subscription_Activation_Form {
 
   private static $api_key_field = 'dxw_security_subscription_token';
@@ -23,13 +25,13 @@ class dxw_security_Subscription_Activation_Form {
   }
 
   public static function validate_subscription_api_key($input) {
-
     $output = trim($input);
 
-    self::validate_presence($output);
-    self::validate_alphanumeric($output);
+    $validator = new dxw_security_Subscription_Api_Key_Validator($output, self::$api_key_field);
+    $validator->validate();
 
     // Don't save invalid api keys to the database:
+    // TODO: Should it instead return the old value? http://kovshenin.com/2012/the-wordpress-settings-api/
     if ( self::has_errors() ) {
       $output = "";
     }
@@ -37,21 +39,8 @@ class dxw_security_Subscription_Activation_Form {
     return $output;
   }
 
-  private static function validate_presence($value) {
-    if ( empty($value) ) {
-      add_settings_error(self::$api_key_field, esc_attr('empty'), "Please enter an API key");
-    }
-  }
-
-  private static function validate_alphanumeric($value) {
-    if ( ! preg_match('/^[a-zA-Z0-9]*$/', $value) ) {
-      // TODO: I can't see why that esc_attr is necessary, but it's in the example docs...
-      add_settings_error(self::$api_key_field, esc_attr('not_alphanumeric'), "That doesn't look like a valid API key: subscription keys only contain numbers and letters");
-    }
-  }
-
   private static function has_errors() {
-    ! empty(get_settings_errors());
+    return ! empty(get_settings_errors());
   }
 
   public static function render() {
