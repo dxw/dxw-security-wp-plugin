@@ -3,6 +3,7 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/subscription_api_key_validator.class.php');
+require_once(dirname(__FILE__) . '/subscription_api_key_verifier.class.php');
 
 class dxw_security_Subscription_Activation_Form {
 
@@ -27,16 +28,25 @@ class dxw_security_Subscription_Activation_Form {
   public static function validate_subscription_api_key($input) {
     $output = trim($input);
 
-    $validator = new dxw_security_Subscription_Api_Key_Validator($output, self::$api_key_field);
-    $validator->validate();
-
     // Don't save invalid api keys to the database:
     // TODO: Should it instead return the old value? http://kovshenin.com/2012/the-wordpress-settings-api/
-    if ( self::has_errors() ) {
+    if ( self::is_invalid($output) || self::could_not_be_verified($output) ) {
       $output = "";
     }
 
     return $output;
+  }
+
+  private static function is_invalid($value) {
+    $validator = new dxw_security_Subscription_Api_Key_Validator($value, self::$api_key_field);
+    $validator->validate();
+    return self::has_errors();
+  }
+
+  private static function could_not_be_verified($value) {
+    // This makes a call to the api, so only run it if the value has been successfully validated
+    dxw_security_Subscription_Api_Key_Verifier::verify($value, self::$api_key_field);
+    return self::has_errors();
   }
 
   private static function has_errors() {
