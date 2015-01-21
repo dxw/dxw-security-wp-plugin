@@ -30,7 +30,7 @@ module.exports = function(grunt) {
                     yuicompress: true,
                 },
                 files: {
-                    "assets/main.min.css": "assets/css/main.less"
+                    "assets/main.min.css": [ "assets/css/main.less", "assets/css/settings.less" ]
                 },
             },
         },
