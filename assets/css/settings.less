@@ -1,5 +1,18 @@
-.dxw_security_settings_box {
-  padding: 30px;
-  margin-right: 10px;
-  background-color: #fff;
+#dxw-security-settings {
+  max-width: 700px;
+  padding-right: 10px; // For small screens
+  h2 {
+    font-size: 40px;
+  }
+  p.submit {
+    margin-top: 0; // To make it sit close to the form field above. Forms are wrapped in tables with internal padding.
+  }
+  .dxw_security_settings_box {
+    padding: 20px 30px;
+    margin-bottom: 30px;
+    background-color: #fff;
+    &.lowlight {
+      background-color: #ddd;
+    }
+  }
 }

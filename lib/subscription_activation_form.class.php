@@ -48,7 +48,7 @@ class dxw_security_Subscription_Activation_Form {
       <?php
     } else {
       ?>
-        <p>To activate your subscription and start receiving notifications you'll need an API key:</p>
+        <p>If you already know your API key you can enter it here to activate your subscription and start receiving notifications:</p>
       <?php
     }
   }
@@ -57,19 +57,12 @@ class dxw_security_Subscription_Activation_Form {
     if ( dxw_security_Subscription::is_active() ) {
       return "Your API key:";
     } else {
-      return "Manually enter an API key";
+      return "Enter an API key";
     }
   }
 
   public static function subscription_api_key_input_field() {
     echo '<input type="text" name="'.dxw_security_Subscription::$api_key_field.'" value="'.esc_attr(dxw_security_Subscription::auth_token()).'" size="50">';
-
-    if ( dxw_security_Subscription::is_active() ) {
-      // do nothing
-    } else {
-      echo '<p class="help-text">(if you already know your api key)</p>';
-    }
-
   }
 
   public static function validate_subscription_api_key($input) {
@@ -108,7 +101,7 @@ class dxw_security_Subscription_Activation_Form {
     <form action="options.php" method="POST">
       <?php settings_fields('dxw_security-key-config') ?>
       <?php do_settings_sections('dxw_security-key-config') ?>
-      <?php submit_button() ?>
+      <?php submit_button("Save", "secondary") ?>
     </form>
     <?php
   }
