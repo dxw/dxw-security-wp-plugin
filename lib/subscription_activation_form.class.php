@@ -9,19 +9,67 @@ require_once(dirname(__FILE__) . '/subscription.class.php');
 class dxw_security_Subscription_Activation_Form {
 
   public static function setup() {
-    add_settings_section("activate_subscription", "Activate your subscription", array(get_called_class(),'section_text'), "dxw_security-key-config");
+    add_settings_section(
+      "activate_subscription",
+      self::section_heading(),
+      array(get_called_class(), 'section_text'),
+      "dxw_security-key-config"
+    );
 
-    add_settings_field(dxw_security_Subscription::$api_key_field, 'Manually enter an API key', array(get_called_class(),'subscription_api_key_input_field'), 'dxw_security-key-config', "activate_subscription");
-    register_setting( 'dxw_security-key-config', dxw_security_Subscription::$api_key_field, array(get_called_class(),'validate_subscription_api_key'));
+    add_settings_field(
+      dxw_security_Subscription::$api_key_field,
+      self::field_label(),
+      array(get_called_class(),'subscription_api_key_input_field'),
+      'dxw_security-key-config',
+      "activate_subscription"
+    );
+
+    register_setting(
+      'dxw_security-key-config',
+      dxw_security_Subscription::$api_key_field,
+      array(get_called_class(),'validate_subscription_api_key')
+    );
+  }
+
+  public static function section_heading() {
+    if ( dxw_security_Subscription::is_active() ) {
+      return "Your subscription is active";
+    } else {
+      return "Activate your subscription";
+    }
   }
 
   public static function section_text() {
-    echo "To activate your subscription and start receiving notifications you'll need an API key:";
+    if ( dxw_security_Subscription::is_active() ) {
+      ?>
+        <p>We'll notify you by email if we any security issues are with plugins you have installed.</p>
+        <p>We'll use the email address you provided when you registered. If you would like to change this,
+          or if you have any problems or comments, please contact security@dxw.com</p>
+      <?php
+    } else {
+      ?>
+        <p>To activate your subscription and start receiving notifications you'll need an API key:</p>
+      <?php
+    }
+  }
+
+  public static function field_label() {
+    if ( dxw_security_Subscription::is_active() ) {
+      return "Your API key:";
+    } else {
+      return "Manually enter an API key";
+    }
   }
 
   public static function subscription_api_key_input_field() {
     echo '<input type="text" name="'.dxw_security_Subscription::$api_key_field.'" value="'.esc_attr(dxw_security_Subscription::auth_token()).'" size="50">';
-    echo '<p class="help-text">(if you already know your api key)</p>';
+
+    if ( dxw_security_Subscription::is_active() ) {
+      // do nothing
+    } else {
+      echo '<p class="help-text">(if you already know your api key)</p>';
+    }
+
   }
 
   public static function validate_subscription_api_key($input) {
