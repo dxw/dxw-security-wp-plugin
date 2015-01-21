@@ -4,17 +4,15 @@ defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/subscription_api_key_validator.class.php');
 require_once(dirname(__FILE__) . '/subscription_api_key_verifier.class.php');
-require_once(dirname(__FILE__) . '/cron.class.php');
+require_once(dirname(__FILE__) . '/subscription.class.php');
 
 class dxw_security_Subscription_Activation_Form {
-
-  private static $api_key_field = 'dxw_security_subscription_token';
 
   public static function setup() {
     add_settings_section("activate_subscription", "Activate your subscription", array(get_called_class(),'section_text'), "dxw_security-key-config");
 
-    add_settings_field(self::$api_key_field, 'Manually enter an API key', array(get_called_class(),'subscription_api_key_input_field'), 'dxw_security-key-config', "activate_subscription");
-    register_setting( 'dxw_security-key-config', self::$api_key_field, array(get_called_class(),'validate_subscription_api_key'));
+    add_settings_field(dxw_security_Subscription::$api_key_field, 'Manually enter an API key', array(get_called_class(),'subscription_api_key_input_field'), 'dxw_security-key-config', "activate_subscription");
+    register_setting( 'dxw_security-key-config', dxw_security_Subscription::$api_key_field, array(get_called_class(),'validate_subscription_api_key'));
   }
 
   public static function section_text() {
@@ -22,7 +20,7 @@ class dxw_security_Subscription_Activation_Form {
   }
 
   public static function subscription_api_key_input_field() {
-    echo '<input type="text" name="'.self::$api_key_field.'" value="'.esc_attr(get_option(self::$api_key_field)).'" size="50">';
+    echo '<input type="text" name="'.dxw_security_Subscription::$api_key_field.'" value="'.esc_attr(dxw_security_Subscription::auth_token()).'" size="50">';
     echo '<p class="help-text">(if you already know your api key)</p>';
   }
 
@@ -33,23 +31,23 @@ class dxw_security_Subscription_Activation_Form {
     // TODO: Should it instead return the old value? http://kovshenin.com/2012/the-wordpress-settings-api/
     if ( self::is_invalid($output) || self::could_not_be_verified($output) ) {
       $output = "";
-      dxw_security_Cron::unschedule_manifest_poster_task();
+      dxw_security_Subscription::deactivate();
     } else {
-      dxw_security_Cron::schedule_manifest_poster_task();
+      dxw_security_Subscription::activate();
     }
 
     return $output;
   }
 
   private static function is_invalid($value) {
-    $validator = new dxw_security_Subscription_Api_Key_Validator($value, self::$api_key_field);
+    $validator = new dxw_security_Subscription_Api_Key_Validator($value, dxw_security_Subscription::$api_key_field);
     $validator->validate();
     return self::has_errors();
   }
 
   private static function could_not_be_verified($value) {
     // This makes a call to the api, so only run it if the value has been successfully validated
-    dxw_security_Subscription_Api_Key_Verifier::verify($value, self::$api_key_field);
+    dxw_security_Subscription_Api_Key_Verifier::verify($value, dxw_security_Subscription::$api_key_field);
     return self::has_errors();
   }
 
