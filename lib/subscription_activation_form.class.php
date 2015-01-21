@@ -4,6 +4,7 @@ defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/subscription_api_key_validator.class.php');
 require_once(dirname(__FILE__) . '/subscription_api_key_verifier.class.php');
+require_once(dirname(__FILE__) . '/cron.class.php');
 
 class dxw_security_Subscription_Activation_Form {
 
@@ -32,6 +33,9 @@ class dxw_security_Subscription_Activation_Form {
     // TODO: Should it instead return the old value? http://kovshenin.com/2012/the-wordpress-settings-api/
     if ( self::is_invalid($output) || self::could_not_be_verified($output) ) {
       $output = "";
+      dxw_security_Cron::unschedule_manifest_poster_task();
+    } else {
+      dxw_security_Cron::schedule_manifest_poster_task();
     }
 
     return $output;

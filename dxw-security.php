@@ -35,7 +35,7 @@ require_once(dirname(__FILE__) . '/lib/subscription_activation_form.class.php');
 
 require(dirname(__FILE__) . '/lib/alert_subscription_banner.class.php');
 
-require(dirname(__FILE__) . '/lib/cron.class.php');
+require_once(dirname(__FILE__) . '/lib/cron.class.php');
 require(dirname(__FILE__) . '/lib/update_checker.class.php');
 require_once(dirname(__FILE__) . '/lib/activation_checker.class.php');
 
