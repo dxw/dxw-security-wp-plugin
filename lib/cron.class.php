@@ -10,9 +10,9 @@ require_once(dirname(__FILE__) . '/subscription.class.php');
 
 class dxw_security_Cron {
   public static function schedule_tasks() {
-    self::fetcher_task()->schedule('daily');
+    self::schedule_review_fetcher_task();
     if (dxw_security_Subscription::is_active()) {
-      self::poster_task()->schedule('daily');
+      self::schedule_manifest_poster_task();
     }
   }
 
@@ -22,7 +22,21 @@ class dxw_security_Cron {
   }
 
   public static function unschedule_tasks() {
+    self::unschedule_review_fetcher_task();
+    self::unschedule_manifest_poster_task();
+  }
+
+  public static function schedule_review_fetcher_task() {
+    self::fetcher_task()->schedule('daily');
+  }
+  public static function unschedule_review_fetcher_task() {
     self::fetcher_task()->unschedule();
+  }
+
+  public static function schedule_manifest_poster_task() {
+    self::poster_task()->schedule('daily');
+  }
+  public static function unschedule_manifest_poster_task() {
     self::poster_task()->unschedule();
   }
 
