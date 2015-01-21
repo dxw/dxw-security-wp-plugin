@@ -3,11 +3,12 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/settings_page.class.php');
+require_once(dirname(__FILE__) . '/subscription.class.php');
 
 class dxw_security_Subscription_Link {
 
   public static function can_subscribe() {
-    return (is_admin() && !get_option('dxw_security_subscription_token'));
+    return (is_admin() && !dxw_security_Subscription::is_active());
   }
 
   public static function render() {

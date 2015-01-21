@@ -6,11 +6,12 @@ require_once(dirname(__FILE__) . '/task.class.php');
 // Without these requires, the tasks will silently fail to execute:
 require_once(dirname(__FILE__) . '/review_fetcher.class.php');
 require_once(dirname(__FILE__) . '/plugin_manifest_poster.class.php');
+require_once(dirname(__FILE__) . '/subscription.class.php');
 
 class dxw_security_Cron {
   public static function schedule_tasks() {
     self::fetcher_task()->schedule('daily');
-    if (self::subscribed()) {
+    if (dxw_security_Subscription::is_active()) {
       self::poster_task()->schedule('daily');
     }
   }
@@ -30,10 +31,6 @@ class dxw_security_Cron {
   }
   private static function poster_task() {
     return new dxw_security_Task('dxw_security_Plugin_Manifest_Poster');
-  }
-
-  private static function subscribed() {
-    return (bool)get_option( 'dxw_security_subscription_token' );
   }
 }
 

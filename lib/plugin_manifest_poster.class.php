@@ -5,12 +5,13 @@ defined('ABSPATH') OR exit;
 require_once(dirname(__FILE__) . '/plugin_manifest.class.php');
 require_once(dirname(__FILE__) . '/api.class.php');
 require_once(dirname(__FILE__) . '/email.class.php');
+require_once(dirname(__FILE__) . '/subscription.class.php');
 
 class dxw_security_Plugin_Manifest_Poster {
   public static function run() {
     $manifest = new dxw_security_Plugin_Manifest;
 
-    $api = new dxw_security_Manifest_API($manifest, self::auth_token());
+    $api = new dxw_security_Manifest_API($manifest, dxw_security_Subscription::auth_token());
 
     // TODO: this pattern is similar to the security column code and dashboard widget
     //    It should probably be factored out into another class
@@ -39,11 +40,6 @@ EOF;
     $message = $error->getMessage();
     if ( empty($message) ) { $message = "(no message provided)"; }
     return $message;
-  }
-
-  // TODO: this probably shouldn't live here - will ultimately need to be used in many places:
-  private static function auth_token() {
-    return get_option( 'dxw_security_subscription_token' );
   }
 }
 
