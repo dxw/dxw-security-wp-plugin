@@ -3,6 +3,7 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/subscription_activation_form.class.php');
+require_once(dirname(__FILE__) . '/subscription.class.php');
 
 class dxw_security_Settings_Page {
 
@@ -19,16 +20,24 @@ class dxw_security_Settings_Page {
         <h2>dxw Security</h2>
         <p>The dxw Security plugin keeps an eye on plugin security issues and can let you know as soon as one of your plugins is found to be unsafe.</p>
 
-        <div class="dxw_security_settings_box">
-          <h3>Sign up</h3>
-          <p>To start receiving security notifications you'll need to create an account and get your API key</p>
-          <p><a href="mailto:security@dxw.com" class="button-primary">Get your API key</a></p>
-        </div>
+        <?php if ( ! dxw_security_Subscription::is_active() ) {
+          self::render_sign_up_box();
+        }?>
 
         <div class="dxw_security_settings_box lowlight">
           <?php dxw_security_Subscription_Activation_Form::render(); ?>
         </div>
 
+      </div>
+    <?php
+  }
+
+  private static function render_sign_up_box() {
+    ?>
+      <div class="dxw_security_settings_box">
+        <h3>Sign up</h3>
+        <p>To start receiving security notifications you'll need to create an account and get your API key</p>
+        <p><a href="mailto:security@dxw.com" class="button-primary">Get your API key</a></p>
       </div>
     <?php
   }
