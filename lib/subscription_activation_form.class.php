@@ -44,7 +44,7 @@ class dxw_security_Subscription_Activation_Form {
       ?>
         <p>We'll notify you by email if we any security issues are with plugins you have installed.</p>
         <p>We'll use the email address you provided when you registered. If you would like to change this,
-          or if you have any problems or comments, please contact security@dxw.com</p>
+          or if you have any problems or comments, please contact <a href="security@dxw.com">security@dxw.com</a>.</p>
       <?php
     } else {
       ?>
