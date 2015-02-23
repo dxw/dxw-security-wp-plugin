@@ -107,9 +107,15 @@ abstract class dxw_security_API {
           throw new dxw_security_API_Unauthorised($this->extract_error($parsed_body));
 
         case 404:
+          // DEPRECATED - this scenario should now only return 400
           // This should only get triggered if a bad request was made to the api - e.g. api/v2/foo
           //    In this scenario we get a usage message - could check for that but there doesn't seem to be much point.
           throw new dxw_security_API_NotFound("Invalid endpoint (404)");
+
+        case 400:
+          // This should only get triggered if a bad request was made to the api - e.g. api/v2/foo
+          //    In this scenario we get a usage message - could check for that but there doesn't seem to be much point.
+          throw new dxw_security_API_NotFound("Invalid endpoint (400)");
 
         case 422:
           // This should only get triggered if invalid data was posted to the api - e.g. a missing payload or upstream validation errors

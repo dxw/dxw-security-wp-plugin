@@ -54,6 +54,10 @@ You can see the data we currently record by visiting http://app.security.dxw.com
 
 == Changelog ==
 
+= 0.2.9 =
+* TODO!!!
+* Under-the-hood changes to error handling
+
 = 0.2.8 =
 * The plugin now uses version 2 of the api. Mostly this involves under-the-hood changes
 * Reports now include advisories (initially only those published on security.dxw.com)
