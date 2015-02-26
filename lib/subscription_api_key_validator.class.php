@@ -23,9 +23,9 @@ class dxw_security_Subscription_Api_Key_Validator {
   }
 
   private function validate_alphanumeric() {
-    if ( ! preg_match('/^[a-zA-Z0-9_]*$/', $this->value) ) {
+    if ( ! preg_match('/^[a-z0-9]*$/', $this->value) ) {
       // TODO: I can't see why that esc_attr is necessary, but it's in the example docs...
-      add_settings_error($this->field, esc_attr('not_alphanumeric'), "That doesn't look like a valid API key: subscription keys only contain numbers, letters and underscores");
+      add_settings_error($this->field, esc_attr('not_alphanumeric'), "That doesn't look like a valid API key: subscription keys only contain numbers, and lowercase letters");
     }
   }
 }
