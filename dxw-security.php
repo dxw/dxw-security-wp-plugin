@@ -1,14 +1,14 @@
 <?php
 /**
-  * Plugin Name: dxw Security
+  * Plugin Name: Mongoose
   * Plugin URI: https://wordpress.org/plugins/dxw-security/
-  * Description: Pulls plugin review information from dxw Security into the wordpress plugins screen
-  * Version: 0.2.8
+  * Description: Security alerts for plugin vulnerabilities
+  * Version: 0.3.0
   * License: GPLv2
   * Author: dxw
   * Author URI: http://dxw.com/
 */
-define('DXW_SECURITY_PLUGIN_VERSION', "0.2.8");
+define('DXW_SECURITY_PLUGIN_VERSION', "0.3.0");
 
 // Prevent Full Path Disclosure
 defined('ABSPATH') OR exit;
