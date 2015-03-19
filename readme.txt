@@ -10,11 +10,11 @@ Displays a security rating against each of the plugins you have installed
 
 == Description ==
 
-The dxw Security plugin helps you to judge whether or not the plugins installed on your site are safe to use.
+MongooseWP helps you to judge whether or not the plugins installed on your site are safe to use.
 
-It displays a security rating against each plugin on your plugins page, based on the security reviews on https://security.dxw.com/.
+Out of the box it displays a security rating against each plugin on your plugins page, based on the security reviews on https://security.dxw.com/.
 
-It also displays a widget on the dashboard showing the totals of each plugin review status.
+If you sign up to notifications (a paid service: coming soon) then we'll send you emails when plugins on your site are found to be vulnerable
 
 ### Developers
 
@@ -53,6 +53,9 @@ You can see the data we currently record by visiting http://app.security.dxw.com
 
 
 == Changelog ==
+= 0.3.0 =
+* Rebranded as MongooseWP
+* Add functionality to subscribe to security alerts about installed plugins (Not yet live)
 
 = 0.2.8 =
 * The plugin now uses version 2 of the api. Mostly this involves under-the-hood changes
