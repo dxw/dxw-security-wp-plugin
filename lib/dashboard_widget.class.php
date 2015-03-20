@@ -23,7 +23,7 @@ class dxw_security_Dashboard_Widget {
   // Function used in the action hook
   public static function add_dashboard_widgets() {
     // could use wp_add_dashboard_widget, but that puts it at the bottom of the left column which isn't very visible;
-    add_meta_box('dashboard_dxw_security', 'dxw Security', array(get_called_class(), 'dashboard_widget_content'), 'dashboard', 'side', 'high');
+    add_meta_box('dashboard_mongoose', 'MongooseWP', array(get_called_class(), 'dashboard_widget_content'), 'dashboard', 'side', 'high');
   }
 
   public static function dashboard_widget_content() {
