@@ -92,10 +92,12 @@ class dxw_security_Dashboard_Widget {
       if (self::$failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
         self::handle_api_fatal_error($plugin_file_object->plugin_slug);
       } else {
-        $api = new dxw_security_Plugin_Review_API($plugin_file_object->plugin_slug);
+        $api = new dxw_security_Advisories_API($plugin_file_object->plugin_slug, $installed_version);
         try {
           $reviews = $api->call();
           self::handle_api_response($reviews, $installed_version, $plugin_file_object->plugin_slug);
+        } catch (dxw_security_API_NotFound $e) {
+          self::handle_api_not_found($plugin_file_object->plugin_slug);
         } catch (Exception $e) {
           self::handle_api_error($e, $plugin_file_object->plugin_slug);
         }
@@ -103,42 +105,15 @@ class dxw_security_Dashboard_Widget {
     }
   }
 
-  private static function handle_api_response($reviews, $installed_version, $plugin_slug) {
-    if (empty($reviews)) {
-      self::$not_reviewed++;
-      if (is_null(self::$first_not_reviewed_slug)) { self::$first_not_reviewed_slug = $plugin_slug; }
-    } else{
+  private static function handle_api_not_found($plugin_slug) {
+    self::$not_reviewed++;
+    if (is_null(self::$first_not_reviewed_slug)) { self::$first_not_reviewed_slug = $plugin_slug; }
+  }
 
-      foreach($reviews as &$review) {
-        // $review->version might be a list of versions, so we can't just do a straightforward comparison
-        if (dxw_security_Plugin_Version_Comparer::version_matches($installed_version, $review->version)) {
-          switch ($review->recommendation) {
-          case "vulnerable":
-            self::$vulnerable++;
-            if (is_null(self::$first_vulnerable_slug)) { self::$first_vulnerable_slug = $plugin_slug; }
-            break;
-          case "red":
-            self::$red++;
-            if (is_null(self::$first_red_slug)) { self::$first_red_slug = $plugin_slug; }
-            break;
-          case "yellow":
-            self::$yellow++;
-            if (is_null(self::$first_yellow_slug)) { self::$first_yellow_slug = $plugin_slug; }
-            break;
-          case "green":
-            self::$green++;
-            if (is_null(self::$first_green_slug)) { self::$first_green_slug = $plugin_slug; }
-            break;
-          }
-          return;
-        }
-      }
-
-      // If an exact version matched then we won't get this far because of that return
-      // Assumption: if there were some reviews, but no review of the installed version,
-      //  then there must be reviews of other versions
-      self::$different_version++;
-      if (is_null(self::$first_different_version_slug)) { self::$first_different_version_slug = $plugin_slug; }
+  private static function handle_api_response($review, $installed_version, $plugin_slug) {
+    if (dxw_security_Plugin_Version_Comparer::version_matches($installed_version, $review->version)) {
+      self::$vulnerable++;
+      if (is_null(self::$first_vulnerable_slug)) { self::$first_vulnerable_slug = $plugin_slug; }
     }
   }
 
