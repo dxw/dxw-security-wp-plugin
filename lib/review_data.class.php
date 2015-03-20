@@ -23,9 +23,9 @@ class dxw_security_Review_Data {
     'vulnerable'=> array( 'message' => "Vulnerable",
                           'slug' => "vulnerable",
                           'description' => "This plugin has a proven vulnerability. It might be safe to use under certain conditions but you should very carefully consider the details of the vulnerability before using it."),
-    'not-found' => array( 'message' => "Not yet reviewed",
+    'not-found' => array( 'message' => "No known vulnerabilities",
                           'slug' => "no-info",
-                          'description' => "We haven't reviewed this plugin yet. If you like we can review it for you."),
+                          'description' => "We have not found any vulnerabilities in this plugin."),
   );
 
   public function __construct($version, $status, $reason="", $action="", $link=DXW_SECURITY_PLUGINS_URL) {
