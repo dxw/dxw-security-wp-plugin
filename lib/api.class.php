@@ -2,29 +2,6 @@
 
 defined('ABSPATH') OR exit;
 
-class dxw_security_Plugin_Review_API extends dxw_security_Cached_API {
-
-  private $plugin_slug;
-
-  public function __construct($plugin_slug) {
-    $this->plugin_slug = $plugin_slug;
-  }
-
-  // TODO: Currently this only handles directory plugins
-  protected function api_path() {
-    return "/plugins/{$this->plugin_slug}/reviews/";
-  }
-
-  protected function cache_slug() {
-    return "dxw-security-plugin-review_{$this->plugin_slug}";
-  }
-
-  // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
-  protected function extract_data($parsed_body) {
-    return $parsed_body->reviews;
-  }
-}
-
 class dxw_security_Advisories_API extends dxw_security_Cached_API {
 
   private $plugin_slug;
