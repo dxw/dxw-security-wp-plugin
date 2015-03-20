@@ -42,10 +42,17 @@ class dxw_security_Plugin_Review_Column {
     if (self::$failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $recommendation = self::handle_api_fatal_error();
     } else {
-      $api = new dxw_security_Plugin_Review_API($plugin_file_object->plugin_slug);
+      $api = new dxw_security_Advisories_API($plugin_file_object->plugin_slug, $installed_version);
 
       try {
-        $reviews = $api->call();
+        $review = $api->call();
+        // Small refactoring step: we're now only expecting 1 or no results,
+        //    but the code expects an array, so let's give it one:
+        $reviews = array($review1);
+        $recommendation = self::handle_api_response($review, $name, $installed_version, $latest_version);
+      } catch (dxw_security_API_NotFound $e) {
+        // TODO: currently this gets caught lower down. Maybe should be handled here with "handle_api_not_found"
+        $reviews = [];
         $recommendation = self::handle_api_response($reviews, $name, $installed_version, $latest_version);
       } catch (\Exception $e) {
         $recommendation = self::handle_api_error($e);

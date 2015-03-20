@@ -25,6 +25,31 @@ class dxw_security_Plugin_Review_API extends dxw_security_Cached_API {
   }
 }
 
+class dxw_security_Advisories_API extends dxw_security_Cached_API {
+
+  private $plugin_slug;
+  private $plugin_version;
+
+  public function __construct($plugin_slug, $plugin_version) {
+    $this->plugin_slug    = $plugin_slug;
+    $this->plugin_version = $plugin_version;
+  }
+
+  // TODO: Currently this only handles directory plugins
+  protected function api_path() {
+    return "/plugins/{$this->plugin_slug}/advisories/{$this->plugin_version}";
+  }
+
+  protected function cache_slug() {
+    return "dxw-security-plugin-review_{$this->plugin_slug}_version_{$this->plugin_version}";
+  }
+
+  // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
+  protected function extract_data($parsed_body) {
+    return $parsed_body->advisory;
+  }
+}
+
 class dxw_security_Manifest_API extends dxw_security_API {
 
   private $post_data;
@@ -107,10 +132,8 @@ abstract class dxw_security_API {
           throw new dxw_security_API_Unauthorised($this->extract_error($parsed_body));
 
         case 404:
-          // DEPRECATED - this scenario should now only return 400
-          // This should only get triggered if a bad request was made to the api - e.g. api/v2/foo
-          //    In this scenario we get a usage message - could check for that but there doesn't seem to be much point.
-          throw new dxw_security_API_NotFound("Invalid endpoint (404)");
+          // This should only be raised if a resource is not found
+          throw new dxw_security_API_NotFound("Not Found (404)");
 
         case 400:
           // This should only get triggered if a bad request was made to the api - e.g. api/v2/foo
