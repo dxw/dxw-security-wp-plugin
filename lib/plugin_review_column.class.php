@@ -46,14 +46,9 @@ class dxw_security_Plugin_Review_Column {
 
       try {
         $review = $api->call();
-        // Small refactoring step: we're now only expecting 1 or no results,
-        //    but the code expects an array, so let's give it one:
-        $reviews = array($review1);
-        $recommendation = self::handle_api_response($review, $name, $installed_version, $latest_version);
+        $recommendation = self::handle_api_response($review, $name, $installed_version);
       } catch (dxw_security_API_NotFound $e) {
-        // TODO: currently this gets caught lower down. Maybe should be handled here with "handle_api_not_found"
-        $reviews = [];
-        $recommendation = self::handle_api_response($reviews, $name, $installed_version, $latest_version);
+        $recommendation = self::handle_api_not_found($name, $installed_version);
       } catch (\Exception $e) {
         $recommendation = self::handle_api_error($e);
       }
@@ -62,37 +57,22 @@ class dxw_security_Plugin_Review_Column {
     $recommendation->render();
   }
 
-  private static function handle_api_response($reviews, $name, $installed_version, $latest_version) {
-    if (empty($reviews)) {
-      $review_data = new dxw_security_Review_Data($installed_version, "not-found");
-      // TODO - it's a bit odd that we're creating a class which implies that the plugin has been reviewed...
-      $recommendation = new dxw_security_Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
-    } else{
+  private static function handle_api_not_found($name, $installed_version) {
+    $review_data = new dxw_security_Review_Data($installed_version, "not-found");
+    // TODO - it's a bit odd that we're creating a class which implies that the plugin has been reviewed...
+    return new dxw_security_Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
+  }
 
-      $other_version_reviews = array();
-      foreach($reviews as &$review) {
-        $version = $review->version;
-        $status = $review->recommendation;
-        $reason = $review->reason;
-        $action = $review->action;
-        $link = $review->review_link;
-        $review_data = new dxw_security_Review_Data($version, $status, $reason, $action, $link);
+  private static function handle_api_response($review, $name, $installed_version) {
 
-        // $review->version might be a list of versions, so we need to do a little work to compare it
-        if ($review_data->version_matches($installed_version)) {
-          $recommendation = new dxw_security_Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
-        } else {
-          $other_version_reviews[] = $review_data;
-        }
-      }
-      if (empty($recommendation)) {
-        // TODO: We're assuming that if $recommendation is empty then there was no review for the current version, but we DID find reviews for previous versions
-        //   - if something went wrong then that might not be the case ...(?)
-        $other_version_reviews_data = new dxw_security_Other_Version_Reviews_Data(array_reverse($other_version_reviews), $latest_version); // Reversed so that we get the latest review first
-        $recommendation = new dxw_security_Plugin_Recommendation_Other_Versions_Reviewed($name, $installed_version, $other_version_reviews_data);
-      }
-    }
-    return $recommendation;
+    $version = $review->version;
+    $status = $review->recommendation;
+    $reason = $review->reason;
+    $action = $review->action;
+    $link = $review->review_link;
+    $review_data = new dxw_security_Review_Data($version, $status, $reason, $action, $link);
+
+    return new dxw_security_Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
   }
 
   private static function handle_api_error($error) {
