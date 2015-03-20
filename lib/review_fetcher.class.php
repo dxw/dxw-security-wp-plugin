@@ -20,6 +20,7 @@ class dxw_security_Review_Fetcher {
 
   private static function fetch_review($plugin_file, $plugin_data) {
     $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
+    $plugin_version = $plugin_data['Version'];
 
     // TODO: this pattern is duplicated in the security column code and dashboard widget
     //    It should probably be factored out into another class
@@ -27,7 +28,7 @@ class dxw_security_Review_Fetcher {
     if (self::$failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
       $recommendation = self::handle_api_fatal_error();
     } else {
-      $api = new dxw_security_Plugin_Review_API($plugin_file_object->plugin_slug);
+      $api = new dxw_security_Advisories_API($plugin_file_object->plugin_slug, $plugin_version);
 
       try {
         $reviews = $api->call();
