@@ -23,15 +23,16 @@ class dxw_security_Plugin_Manifest_Poster {
   }
 
   private static function handle_api_error($e) {
-    $subject = "Your WordPress site failed to send a plugin list to dxw Security";
+    $subject = "Your WordPress site failed to send a plugin list to MongooseWP";
     $error_message = self::error_message($e);
+    $email = DXW_SECURITY_EMAIL; // TODO: Why do I have to assign this constant to a variable in order to output it?
     $message = <<<EOF
-Your WordPress site is configured to regularly send a list of your plugins to dxw Security.
+Your WordPress site is configured to regularly send a list of your plugins to MongooseWP.
 The most recent time it tried to do this, it failed with the following message:
 
 {$error_message}
 
-You might want to consider forwarding this email to security@dxw.com to see if we can diagnose the issue.
+You might want to consider forwarding this email to {$email} to see if we can diagnose the issue.
 EOF;
     dxw_security_Email::deliver($subject, $message);
   }

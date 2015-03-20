@@ -1,6 +1,6 @@
-# dxw Security (WordPress Plugin)
+# MongooseWP (WordPress Plugin)
 
-The dxw Security plugin helps you to judge whether or not the plugins installed on your site are safe to use. See the [readme.txt](readme.txt) for more details and installation instructions.
+The Mongoose Wordpress plugin lets you know about security vulnerabilities in the plugins installed on your site. See the [readme.txt](readme.txt) for more details and installation instructions.
 
 ## Development with Grunt
 

@@ -1,8 +1,8 @@
-=== dxw Security ===
+=== Mongoose ===
 Contributors: dxw, dgmstuart, harrym
 Tags: security, security plugin, plugin security, wordpress security, security vulnerabilities, vulnerability, exploit, code review, security review, CSRF, XSS, injection, SQL injection, arbitrary code
 Requires at least: 3.8.1
-Tested up to: 3.9.1
+Tested up to: 4.1.1
 Stable tag: 0.2.8
 License: GPLv2 or later
 
@@ -24,7 +24,7 @@ The code in WordPress' SVN is a deployable version. If you'd like to contribute 
 
 1. Installation options:
 
-    * via Admin Dashboard: Go to 'Plugins > Add New', search for "dxw Security", click "install"
+    * via Admin Dashboard: Go to 'Plugins > Add New', search for "Mongoose", click "install"
     * _OR_ via direct zip upload: Upload the zip package via 'Plugins > Add New > Upload' in your WP Admin
     * _OR_ via FTP upload: Upload the `dxw-security' folder to the /wp-content/plugins/ directory
 

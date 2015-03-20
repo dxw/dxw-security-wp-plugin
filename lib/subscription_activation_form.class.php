@@ -13,19 +13,19 @@ class dxw_security_Subscription_Activation_Form {
       "activate_subscription",
       self::section_heading(),
       array(get_called_class(), 'section_text'),
-      "dxw_security-key-config"
+      "mongoose-key-config"
     );
 
     add_settings_field(
       dxw_security_Subscription::$api_key_field,
       self::field_label(),
       array(get_called_class(),'subscription_api_key_input_field'),
-      'dxw_security-key-config',
+      'mongoose-key-config',
       "activate_subscription"
     );
 
     register_setting(
-      'dxw_security-key-config',
+      'mongoose-key-config',
       dxw_security_Subscription::$api_key_field,
       array(get_called_class(),'validate_subscription_api_key')
     );
@@ -44,7 +44,7 @@ class dxw_security_Subscription_Activation_Form {
       ?>
         <p>We'll notify you by email if we any security issues are with plugins you have installed.</p>
         <p>We'll use the email address you provided when you registered. If you would like to change this,
-          or if you have any problems or comments, please contact <a href="security@dxw.com">security@dxw.com</a>.</p>
+          or if you have any problems or comments, please contact <?php self::email_link() ?>.</p>
       <?php
     } else {
       ?>
@@ -80,6 +80,14 @@ class dxw_security_Subscription_Activation_Form {
     return $output;
   }
 
+  private static function email_link() {
+    // The closing tags need to be up against the end to avoid spaces between
+    // the email and the full stop in the output
+    ?>
+      <a href="mailto:<?php echo constant('DXW_SECURITY_EMAIL') ?>">
+        <?php echo constant('DXW_SECURITY_EMAIL') ?></a><?php
+  }
+
   private static function is_invalid($value) {
     $validator = new dxw_security_Subscription_Api_Key_Validator($value, dxw_security_Subscription::$api_key_field);
     $validator->validate();
@@ -99,8 +107,8 @@ class dxw_security_Subscription_Activation_Form {
   public static function render() {
     ?>
     <form action="options.php" method="POST">
-      <?php settings_fields('dxw_security-key-config') ?>
-      <?php do_settings_sections('dxw_security-key-config') ?>
+      <?php settings_fields('mongoose-key-config') ?>
+      <?php do_settings_sections('mongoose-key-config') ?>
       <?php submit_button("Save", "secondary") ?>
     </form>
     <?php

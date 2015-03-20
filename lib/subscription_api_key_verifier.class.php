@@ -25,7 +25,7 @@ class dxw_security_Subscription_Api_Key_Verifier {
   }
 
   private static function email_link($subject) {
-    $email = "security@dxw.com";
+    $email = DXW_SECURITY_EMAIL;
     $subject = esc_attr($subject);
     return "<a href=\"mailto:{$email}?subject={$subject}\">{$email}</a>";
   }
