@@ -9,18 +9,10 @@ require_once(dirname(__FILE__) . '/subscription_link.class.php');
 
 class dxw_security_Dashboard_Widget {
   private static $vulnerable = 0;
-  private static $red = 0;
-  private static $yellow = 0;
-  private static $green = 0;
-  private static $different_version = 0;
   private static $not_reviewed = 0;
   private static $failed_requests = 0;
 
   private static $first_vulnerable_slug;
-  private static $first_red_slug;
-  private static $first_yellow_slug;
-  private static $first_green_slug;
-  private static $first_different_version_slug;
   private static $first_not_reviewed_slug;
   private static $first_failed_request_slug;
 
@@ -46,16 +38,11 @@ class dxw_security_Dashboard_Widget {
     self::get_counts($plugins);
 
     $vulnerable_slug = dxw_security_Review_Data::$dxw_security_review_statuses["vulnerable"]["slug"];
-    $red_slug = dxw_security_Review_Data::$dxw_security_review_statuses["red"]["slug"];
-    $yellow_slug = dxw_security_Review_Data::$dxw_security_review_statuses["yellow"]["slug"];
-    $green_slug = dxw_security_Review_Data::$dxw_security_review_statuses["green"]["slug"];
+    // $green_slug = dxw_security_Review_Data::$dxw_security_review_statuses["green"]["slug"];
     $grey_slug = dxw_security_Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
 
+
     $first_vulnerable_plugin_link        = self::plugin_link(self::$first_vulnerable_slug);
-    $first_red_plugin_link               = self::plugin_link(self::$first_red_slug);
-    $first_yellow_plugin_link            = self::plugin_link(self::$first_yellow_slug);
-    $first_green_plugin_link             = self::plugin_link(self::$first_green_slug);
-    $first_different_version_plugin_link = self::plugin_link(self::$first_different_version_slug);
     $first_not_reviewed_plugin_link      = self::plugin_link(self::$first_not_reviewed_slug);
     $first_failed_request_plugin_link    = self::plugin_link(self::$first_failed_request_slug);
 
@@ -70,11 +57,7 @@ class dxw_security_Dashboard_Widget {
     echo "<p>Of the {$number_of_plugins} plugins installed on this site:</p>";
     echo "<ul class='review_counts'>";
     self::plugin_review_count_box(self::$vulnerable, $vulnerable_slug, $first_vulnerable_plugin_link, "are known to be vulnerable");
-    self::plugin_review_count_box(self::$red, $red_slug, $first_red_plugin_link, "are potentially unsafe");
-    self::plugin_review_count_box(self::$yellow, $yellow_slug, $first_yellow_plugin_link, "should be used with caution");
-    self::plugin_review_count_box(self::$green, $green_slug, $first_green_plugin_link, "are probably safe");
-    if (self::$different_version > 0) { self::plugin_review_not_reviewed_box(self::$different_version, $grey_slug, $first_different_version_plugin_link, "have reviews for different versions"); }
-    if (self::$not_reviewed > 0) {      self::plugin_review_not_reviewed_box(self::$not_reviewed, $grey_slug, $first_not_reviewed_plugin_link, "have not yet been reviewed"); }
+    self::plugin_review_count_box(self::$not_reviewed, $grey_slug, $first_not_reviewed_plugin_link, "have no known vulnerabilities");
     if (self::$failed_requests > 0) {   self::plugin_review_not_reviewed_box(self::$failed_requests, $grey_slug, $first_failed_request_plugin_link, "could not be checked due to errors. Please try again later."); }
 
     echo "</ul>";
