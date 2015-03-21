@@ -6,51 +6,54 @@ Tested up to: 4.1.1
 Stable tag: 0.2.8
 License: GPLv2 or later
 
-Displays a security rating against each of the plugins you have installed
+MongooseWP alerts you about vulnerabilities in your plugins and shows you what they are. MongooseWP is currently in Alpha.
 
 == Description ==
 
 MongooseWP helps you to judge whether or not the plugins installed on your site are safe to use.
 
-Out of the box it displays a security rating against each plugin on your plugins page, based on the security reviews on https://security.dxw.com/.
+It displays information about known vulnerabilities in the plugins you're using, and sends you email alerts when new vulnerabilities are found.
 
-If you sign up to notifications then we'll send you emails when plugins on your site are found to be vulnerable
+MongooseWP requires a paid subscription to work. for more information, visit www.mongoosewp.com.
 
 ### Developers
 
-The code in WordPress' SVN is a deployable version. If you'd like to contribute to this plugin, you can find the development files on github: https://github.com/dxw/dxw-security-wp-plugin
+If you'd like to have a good look at this plugin before you install it (which you should!), you can find the code on github (https://github.com/dxw/dxw-security-wp-plugin) on the mongoosifying_plugin branch.
 
 == Installation ==
 
 1. Installation options:
 
-    * via Admin Dashboard: Go to 'Plugins > Add New', search for "Mongoose", click "install"
-    * _OR_ via direct zip upload: Upload the zip package via 'Plugins > Add New > Upload' in your WP Admin
+    * Direct zip upload: Upload the zip package (http://www.mongoosewp.com/mongoose-latest.zip) via 'Plugins > Add New > Upload' in your WP Admin
     * _OR_ via FTP upload: Upload the `dxw-security' folder to the /wp-content/plugins/ directory
+    * _OR_ via git: clone this repository into your plugins directory and move to the mongoosifying_plugin branch.
 
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Look at your plugins page - a box will show on the far right showing the result of security reviews of your plugins
-4. Look at the dashboard - a box will show detailing the numbers of each status of review.
+3. Look at your plugins page - a box will show on the far right showing any vulnerabilities we're currently aware of.
+4. Look at the dashboard - a box will show giving you an overview of what we've found.
 
 == Frequently Asked Questions ==
 
 = Do you collect information about the plugins I'm using? =
-In short, no. We value your privacy.
 
-We do record aggregate numbers of requests for reviews of individual plugins (so that we can work out what we should be reviewing next)
-but we don't associate these with individual users, sites or IP addresses (and we will never do so without your consent).
+Yes. Every day, we save a list of the plugins you're using. When we find new vulnerabilities, we use this list to check if we need to send you an alert.
 
-We only record the name of the plugin - not the version or any other specific information.
+= How do you keep it safe? =
 
-You can see the data we currently record by visiting http://app.security.dxw.com/api/plugin_requests
+We realise that keeping data about vulnerable plugins and the sites using them might make us a target. We've given this a lot of thought!
 
-== Screenshots ==
+Behind the scenes, there are several systems that make MongooseWP work. The systems that store user data, lists of plugins and vulnerability data are all built and hosted separately. To be able to join up data about plugin use to a particular site would require an attacker to compromise at least two systems. 
 
-1. The security ratings displayed on your plugins page
-2. Information about a potentially unsafe plugin on the plugins page
-3. The dashboard widget showing the security ratings of your plugins
+Even then, they would hopefully struggle - because we don't save the name or domain name of your site anywhere. We identify you using a randomly generated API key. But we took the steps above anyway, because we realise that a lot of customers' sites will be indirectly identified via their email address.
 
+All that said: MongooseWP is currently in Alpha. We have a lot of experience delivering and hosting secure sites, but we don't expect you to take our word for it and MongooseWP remains under active development. 
 
+If you have feedback, comments or concerns about the security of your data, we would love to talk to you. You can email the team on contact@mongoosewp.com.
+
+= Why do you save plugin data at all? Why not email the alerts locally? =
+
+We went back and forth on this one! In the end, we decided that we didn't want the reliablility of our product to depend on the mailserver configurations of hundreds of WordPress sites hosted by third parties. It's very important that we can reliably contact our customers to alert them when we find problems, and we want to maintain control of that process.
+   
 
 == Changelog ==
 = 0.3.0 =
