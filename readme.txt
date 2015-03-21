@@ -64,11 +64,13 @@ Mongooses eat snakes. Snakes hide in plugins. And planes.
 
 
 == Changelog ==
-= 0.3.0 =
+= 0.1.0 =
 * Rebranded as MongooseWP
 * Under-the-hood changes to error handling
 * Add functionality to subscribe to security alerts about installed plugins 
 * Remove functionality around displaying inspections and reviews
+
+AT THIS POINT THE PLUGIN WAS FORKED AND VERSION HISTORY RE-STARTED AT 0.1
 
 = 0.2.8 =
 * The plugin now uses version 2 of the api. Mostly this involves under-the-hood changes

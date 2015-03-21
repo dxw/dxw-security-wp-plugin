@@ -50,7 +50,7 @@ module.exports = function(grunt) {
             nonull: true,
             files: [
               { src: ['assets/*'], dest: 'build/', filter: 'isFile' },
-              { src: ['assets/fonts/**', 'dxw-security.php', 'lib/*', 'readme.txt'], dest: 'build/' },
+              { src: ['assets/fonts/**', 'mongoosewp.php', 'lib/*', 'readme.txt'], dest: 'build/' },
             ]
           }
         },
@@ -58,10 +58,10 @@ module.exports = function(grunt) {
           main: {
             nonull: true,
             options: {
-              archive: 'dxw-security-0_3_0.zip'
+              archive: 'mongoose-0.1.0.zip'
             },
             files: [
-              { cwd: 'build', src: ['**'], dest: 'dxw-security/', filter: 'isFile' },
+              { cwd: 'build', src: ['**'], dest: 'mongoosewp/', filter: 'isFile' },
             ]
           }
         },
