@@ -46,14 +46,22 @@ Behind the scenes, there are several systems that make MongooseWP work. The syst
 
 Even then, they would hopefully struggle - because we don't save the name or domain name of your site anywhere. We identify you using a randomly generated API key. But we took the steps above anyway, because we realise that a lot of customers' sites will be indirectly identified via their email address.
 
-All that said: MongooseWP is currently in Alpha. We have a lot of experience delivering and hosting secure sites, but we don't expect you to take our word for it and MongooseWP remains under active development. 
+All that said: MongooseWP is currently in Alpha. We have a lot of experience delivering and hosting secure sites, but MongooseWP remains under active development. It's ready for public testing, but not for anything mission critical. 
 
 If you have feedback, comments or concerns about the security of your data, we would love to talk to you. You can email the team on contact@mongoosewp.com.
+
+Or, if you'd like to hear more as MongooseWP develops, sign up for updates at http://eepurl.com/bgxzc5.
 
 = Why do you save plugin data at all? Why not email the alerts locally? =
 
 We went back and forth on this one! In the end, we decided that we didn't want the reliablility of our product to depend on the mailserver configurations of hundreds of WordPress sites hosted by third parties. It's very important that we can reliably contact our customers to alert them when we find problems, and we want to maintain control of that process.
    
+
+= Why Mongoose? = 
+
+Mongooses eat snakes. Snakes hide in plugins. And planes.
+
+
 
 == Changelog ==
 = 0.3.0 =
