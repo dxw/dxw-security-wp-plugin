@@ -14,7 +14,7 @@ MongooseWP helps you to judge whether or not the plugins installed on your site 
 
 Out of the box it displays a security rating against each plugin on your plugins page, based on the security reviews on https://security.dxw.com/.
 
-If you sign up to notifications (a paid service: coming soon) then we'll send you emails when plugins on your site are found to be vulnerable
+If you sign up to notifications then we'll send you emails when plugins on your site are found to be vulnerable
 
 ### Developers
 
@@ -56,7 +56,8 @@ You can see the data we currently record by visiting http://app.security.dxw.com
 = 0.3.0 =
 * Rebranded as MongooseWP
 * Under-the-hood changes to error handling
-* Add functionality to subscribe to security alerts about installed plugins (Not yet live)
+* Add functionality to subscribe to security alerts about installed plugins 
+* Remove functionality around displaying inspections and reviews
 
 = 0.2.8 =
 * The plugin now uses version 2 of the api. Mostly this involves under-the-hood changes
