@@ -21,7 +21,7 @@ class dxw_security_Task {
 
   public function hook() {
     // Define a hook for wp_cron to call:
-    remove_action($this->hook_name);
+    remove_action($this->hook_name, $this->task);
     add_action($this->hook_name, $this->task);
   }
 
