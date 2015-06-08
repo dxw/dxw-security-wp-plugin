@@ -55,6 +55,33 @@ class dxw_security_Manifest_API extends dxw_security_API {
   }
 }
 
+class dxw_security_Reports_API extends dxw_security_API {
+
+  private $post_data;
+
+  public function __construct($auth_token) {
+    $this->post_data = array(
+      "auth_token" => $auth_token,
+    );
+  }
+
+  protected function api_path() {
+    return "/reports";
+  }
+
+  protected function request_args() {
+    return array(
+        'method' => 'POST',
+        'body' => $this->post_data
+      );
+  }
+
+  // The API will return a json body. This function defines how we get the data we want out of that (once it's been parsed into a php object)
+  protected function extract_data($parsed_body) {
+    return $parsed_body;
+  }
+}
+
 
 // php doesn't support nested classes so these need to live outside the API class
 class dxw_security_API_Error extends \Exception { }

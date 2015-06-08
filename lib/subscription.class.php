@@ -3,6 +3,7 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/cron.class.php');
+require_once(dirname(__FILE__) . '/report_requester.class.php');
 
 class dxw_security_Subscription {
 
@@ -19,6 +20,7 @@ class dxw_security_Subscription {
   // Tasks to be executed on activation of the subscription
   public static function activate() {
     dxw_security_Cron::schedule_manifest_poster_task();
+    dxw_security_Report_Requester::request(self::auth_token());
   }
 
   // Cleanup that needs to happen on deactivation of the subscription
