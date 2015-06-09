@@ -15,14 +15,8 @@ class dxw_security_Report_Requester {
       $api->call();
     } catch (dxw_security_API_Unauthorised $e) {
       // Do nothing?
-
-      Whippet::print_r("FAILED1");
-      Whippet::print_r($e);
     } catch (\Exception $e) {
       // Do nothing?
-
-      Whippet::print_r("FAILED2");
-      Whippet::print_r($e);
     }
   }
 }
