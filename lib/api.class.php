@@ -2,6 +2,8 @@
 
 defined('ABSPATH') OR exit;
 
+require_once(dirname(__FILE__) . '/site.class.php');
+
 class dxw_security_Advisories_API extends dxw_security_Cached_API {
 
   private $plugin_slug;
@@ -35,8 +37,10 @@ class dxw_security_Manifest_API extends dxw_security_API {
     $this->post_data = array(
       "manifest" => $manifest->to_json(),
       "auth_token" => $auth_token,
+      "site_hash" => dxw_security_Site::hash(),
     );
   }
+
 
   protected function api_path() {
     return "/plugin_manifests";
@@ -55,6 +59,7 @@ class dxw_security_Manifest_API extends dxw_security_API {
   }
 }
 
+
 class dxw_security_Reports_API extends dxw_security_API {
 
   private $post_data;
@@ -62,6 +67,7 @@ class dxw_security_Reports_API extends dxw_security_API {
   public function __construct($auth_token) {
     $this->post_data = array(
       "auth_token" => $auth_token,
+      "site_hash" => dxw_security_Site::hash(),
     );
   }
 
@@ -218,4 +224,5 @@ abstract class dxw_security_Cached_API extends dxw_security_API{
     }
   }
 }
+
 ?>
