@@ -74,7 +74,7 @@ class dxw_security_Subscription_Activation_Form {
       $output = "";
       dxw_security_Subscription::deactivate();
     } else {
-      dxw_security_Subscription::activate();
+      dxw_security_Subscription::activate($output);
     }
 
     return $output;

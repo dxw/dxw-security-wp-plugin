@@ -18,9 +18,10 @@ class dxw_security_Subscription {
   }
 
   // Tasks to be executed on activation of the subscription
-  public static function activate() {
+  public static function activate($new_auth_token) {
+    // We need to pass in the auth token because it hasn't been saved yet!
     dxw_security_Cron::schedule_manifest_poster_task();
-    dxw_security_Report_Requester::request(self::auth_token());
+    dxw_security_Report_Requester::request($new_auth_token);
   }
 
   // Cleanup that needs to happen on deactivation of the subscription
