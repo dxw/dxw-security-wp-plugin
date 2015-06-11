@@ -11,15 +11,6 @@ class dxw_security_Review_Data {
   private $action;
 
   public static $dxw_security_review_statuses = array(
-    'green'     => array( 'message' => "No issues found",
-                          'slug' => "no-issues-found",
-                          'description' => "dxw's review didn't find anything worrying in this plugin. It's probably safe."),
-    'yellow'    => array( 'message' => "Use with caution",
-                          'slug' => "use-with-caution",
-                          'description' => "Before using this plugin, you should carefully consider the findings of dxw's review."),
-    'red'       => array( 'message' => "Potentially unsafe",
-                          'slug' => "potentially-unsafe",
-                          'description' => "Before using this plugin, you should very carefully consider its potential problems and should conduct a thorough assessment."),
     'vulnerable'=> array( 'message' => "Vulnerable",
                           'slug' => "vulnerable",
                           'description' => "This plugin has a proven vulnerability. It might be safe to use under certain conditions but you should very carefully consider the details of the vulnerability before using it."),

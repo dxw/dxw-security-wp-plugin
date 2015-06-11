@@ -38,7 +38,6 @@ class dxw_security_Dashboard_Widget {
     self::get_counts($plugins);
 
     $vulnerable_slug = dxw_security_Review_Data::$dxw_security_review_statuses["vulnerable"]["slug"];
-    // $green_slug = dxw_security_Review_Data::$dxw_security_review_statuses["green"]["slug"];
     $grey_slug = dxw_security_Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
 
 
