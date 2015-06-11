@@ -94,10 +94,8 @@ class dxw_security_Dashboard_Widget {
   }
 
   private static function handle_api_response($review, $installed_version, $plugin_slug) {
-    if (dxw_security_Plugin_Version_Comparer::version_matches($installed_version, $review->version)) {
-      self::$vulnerable++;
-      if (is_null(self::$first_vulnerable_slug)) { self::$first_vulnerable_slug = $plugin_slug; }
-    }
+    self::$vulnerable++;
+    if (is_null(self::$first_vulnerable_slug)) { self::$first_vulnerable_slug = $plugin_slug; }
   }
 
   private static function handle_api_error($error, $plugin_slug) {
