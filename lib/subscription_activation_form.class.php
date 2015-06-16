@@ -101,7 +101,8 @@ class dxw_security_Subscription_Activation_Form {
   }
 
   private static function has_errors() {
-    return ! empty(get_settings_errors());
+    $settings_errors = get_settings_errors();
+    return !empty($settings_errors);
   }
 
   public static function render() {
