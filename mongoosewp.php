@@ -3,12 +3,12 @@
   * Plugin Name: Mongoose
   * Plugin URI: https://wordpress.org/plugins/dxw-security/
   * Description: Security alerts for plugin vulnerabilities
-  * Version: 0.3.0
+  * Version: 0.1.0
   * License: GPLv2
   * Author: dxw
   * Author URI: http://dxw.com/
 */
-define('DXW_SECURITY_PLUGIN_VERSION', "0.3.0");
+define('DXW_SECURITY_PLUGIN_VERSION', "0.1.0");
 
 // Prevent Full Path Disclosure
 defined('ABSPATH') OR exit;
