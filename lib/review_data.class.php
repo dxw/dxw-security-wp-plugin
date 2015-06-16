@@ -19,7 +19,7 @@ class dxw_security_Review_Data {
                           'description' => "We do not know of any security issues with this plugin."),
   );
 
-  public function __construct($version, $status, $reason="", $action="", $link=DXW_SECURITY_PLUGINS_URL) {
+  public function __construct($version, $status, $link="", $reason="", $action="") {
     $this->version = $version;
     $this->reason = $reason;
     $this->action = $action;
@@ -32,18 +32,22 @@ class dxw_security_Review_Data {
   }
 
   public function render() {
-    // reason is retrieved from the api but might legitimately include html
-    // description heading and action might also legitimately include html but come from strings in this code
+    if ($this->slug == 'vulnerable') {
+      ?><h2><a href="<?php echo esc_url($this->link) ?>"><?php echo $this->heading() ?></a></h2><?php
+    } else {
+      ?><h2><?php echo $this->heading() ?></h2><?php
+    }
+    $this->render_description();
+    if ($this->slug == 'vulnerable') {
+      $this->render_details();
+      $this->render_action();
+      $this->render_read_more();
+    }
+  }
+
+  private function render_description() {
     ?>
-      <h2><a href="<?php echo $link ?>"><?php echo $this->heading() ?></a></h2>
       <p class="review-status-description"><?php echo $this->description ?></p>
-      <?php
-        if ($this->slug == 'vulnerable') {
-          $this->render_details();
-          $this->render_action();
-          $this->render_read_more();
-        }
-      ?>
     <?php
   }
 
@@ -55,6 +59,7 @@ class dxw_security_Review_Data {
   }
 
   private function render_details() {
+    // reason is retrieved from the api but might legitimately include html so shouldn't be escaped
     if (!empty($this->reason)) {
       print_r("<h3>Details:</h3>");
       print_r("<p>{$this->reason}</p>");

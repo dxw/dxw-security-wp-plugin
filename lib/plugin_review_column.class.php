@@ -70,7 +70,7 @@ class dxw_security_Plugin_Review_Column {
     $reason = $review->reason;
     $action = $review->action;
     $link = $review->review_link;
-    $review_data = new dxw_security_Review_Data($version, $status, $reason, $action, $link);
+    $review_data = new dxw_security_Review_Data($version, $status, $link, $reason, $action);
 
     return new dxw_security_Plugin_Recommendation_Reviewed($name, $installed_version, $review_data);
   }
