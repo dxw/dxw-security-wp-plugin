@@ -1,4 +1,4 @@
-=== Mongoose ===
+=== MongooseWP ===
 Contributors: dxw, dgmstuart, harrym
 Tags: security, security plugin, plugin security, wordpress security, security vulnerabilities, vulnerability, exploit, code review, security review, CSRF, XSS, injection, SQL injection, arbitrary code
 Requires at least: 3.8.1
@@ -16,17 +16,12 @@ It displays information about known vulnerabilities in the plugins you're using,
 
 MongooseWP requires a paid subscription to work. for more information, visit www.mongoosewp.com.
 
-### Developers
-
-If you'd like to have a good look at this plugin before you install it (which you should!), you can find the code on github (https://github.com/dxw/dxw-security-wp-plugin) on the mongoosifying_plugin branch.
-
 == Installation ==
 
 1. Installation options:
 
     * Direct zip upload: Upload the zip package (http://www.mongoosewp.com/mongoose-latest.zip) via 'Plugins > Add New > Upload' in your WP Admin
-    * _OR_ via FTP upload: Upload the `dxw-security' folder to the /wp-content/plugins/ directory
-    * _OR_ via git: clone this repository into your plugins directory and move to the mongoosifying_plugin branch.
+    * _OR_ via FTP upload: Upload the `mongoose' folder to the /wp-content/plugins/ directory
 
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Look at your plugins page - a box will show on the far right showing any vulnerabilities we're currently aware of.
@@ -42,22 +37,20 @@ Yes. Every day, we save a list of the plugins you're using. When we find new vul
 
 We realise that keeping data about vulnerable plugins and the sites using them might make us a target. We've given this a lot of thought!
 
-Behind the scenes, there are several systems that make MongooseWP work. The systems that store user data, lists of plugins and vulnerability data are all built and hosted separately. To be able to join up data about plugin use to a particular site would require an attacker to compromise at least two systems. 
+Behind the scenes, there are several systems that make MongooseWP work. The systems that store user data, lists of plugins and vulnerability data are all built and hosted separately. To be able to join up data about plugin use to a particular site would require an attacker to compromise at least two systems.
 
 Even then, they would hopefully struggle - because we don't save the name or domain name of your site anywhere. We identify you using a randomly generated API key. But we took the steps above anyway, because we realise that a lot of customers' sites will be indirectly identified via their email address.
 
-All that said: MongooseWP is currently in Alpha. We have a lot of experience delivering and hosting secure sites, but MongooseWP remains under active development. It's ready for public testing, but not for anything mission critical. 
+All that said: MongooseWP is currently in Alpha. We have a lot of experience delivering and hosting secure sites, but MongooseWP remains under active development. It's ready for public testing, but not for anything mission critical.
 
 If you have feedback, comments or concerns about the security of your data, we would love to talk to you. You can email the team on contact@mongoosewp.com.
 
-Or, if you'd like to hear more as MongooseWP develops, sign up for updates at http://eepurl.com/bgxzc5.
-
 = Why do you save plugin data at all? Why not email the alerts locally? =
 
-We went back and forth on this one! In the end, we decided that we didn't want the reliablility of our product to depend on the mailserver configurations of hundreds of WordPress sites hosted by third parties. It's very important that we can reliably contact our customers to alert them when we find problems, and we want to maintain control of that process.
-   
+We went back and forth on this one! In the end, we decided that we didn't want the reliability of our product to depend on the mailserver configurations of hundreds of WordPress sites hosted by third parties. It's very important that we can reliably contact our customers to alert them when we find problems, and we want to maintain control of that process.
 
-= Why Mongoose? = 
+
+= Why Mongoose? =
 
 Mongooses eat snakes. Snakes hide in plugins. And planes.
 
@@ -67,7 +60,7 @@ Mongooses eat snakes. Snakes hide in plugins. And planes.
 = 0.1.0 =
 * Rebranded as MongooseWP
 * Under-the-hood changes to error handling
-* Add functionality to subscribe to security alerts about installed plugins 
+* Add functionality to subscribe to security alerts about installed plugins
 * Remove functionality around displaying inspections and reviews
 
 AT THIS POINT THE PLUGIN WAS FORKED AND VERSION HISTORY RE-STARTED AT 0.1

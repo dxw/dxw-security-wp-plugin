@@ -58,7 +58,7 @@ module.exports = function(grunt) {
           main: {
             nonull: true,
             options: {
-              archive: 'mongoose-0.1.0.zip'
+              archive: 'mongoosewp-0.1.0.zip'
             },
             files: [
               { cwd: 'build', src: ['**'], dest: 'mongoosewp/', filter: 'isFile' },

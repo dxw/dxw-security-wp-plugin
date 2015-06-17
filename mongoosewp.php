@@ -1,7 +1,7 @@
 <?php
 /**
-  * Plugin Name: Mongoose
-  * Plugin URI: https://wordpress.org/plugins/dxw-security/
+  * Plugin Name: MongooseWP
+  * Plugin URI: https://www.mongoosewp.com
   * Description: Security alerts for plugin vulnerabilities
   * Version: 0.1.0
   * License: GPLv2
