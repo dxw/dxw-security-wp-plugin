@@ -55,6 +55,8 @@ class dxw_Security {
     add_action('admin_menu', array("dxw_security_Settings_Page", 'setup'));
     add_action('admin_init', array("dxw_security_Subscription_Activation_Form", 'setup'));
 
+    add_action('activated_plugin', array($this, 'activation_redirect'));
+
     if( dxw_security_Subscription_Link::can_subscribe() ) {
       add_action('load-plugins.php', array("dxw_security_Alert_Subscription_Banner", 'setup'));
     }
@@ -77,6 +79,12 @@ class dxw_Security {
     add_action('wp_ajax_dxw_security_cron', array('dxw_security_Plugin_Manifest_Poster', 'run'));
     add_action('wp_ajax_dxw_security_cron', array('dxw_security_Review_Fetcher', 'run'));
   }
+
+  public function activation_redirect($plugin) {
+    if( $plugin == plugin_basename( __FILE__ ) ) {
+      exit( wp_redirect( admin_url( dxw_security_Settings_Page::url() ) ) );
+    }
+  }
 }
 // It's not possible to directly call add_action in a function called by the register_activation_hook
 //    So we need to set an option and optionally execute the contents of an add_action defined elsewhere:
@@ -94,3 +102,4 @@ if (dxw_security_Update_Checker::updated() ) {
 }
 
 new dxw_Security();
+?>
