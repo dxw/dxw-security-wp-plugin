@@ -20,13 +20,13 @@ class dxw_security_Settings_Page {
         <h2>Mongoose</h2>
         <p>The MongooseWP plugin keeps an eye on plugin security issues and can let you know as soon as one of your plugins is found to be unsafe.</p>
 
-        <?php if ( ! dxw_security_Subscription::is_active() ) {
-          self::render_sign_up_box();
-        }?>
-
         <div class="dxw_security_settings_box lowlight">
           <?php dxw_security_Subscription_Activation_Form::render(); ?>
         </div>
+
+        <?php if ( ! dxw_security_Subscription::is_active() ) {
+          self::render_sign_up_box();
+        }?>
 
       </div>
     <?php
