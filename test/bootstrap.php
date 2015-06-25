@@ -5,7 +5,8 @@
 // so we need to define it in order to require them
 define('ABSPATH', true);
 
-require_once(dirname(__FILE__) . '/../mongoosewp.php');
+define('DXW_SECURITY_FAILURE_lIMIT', 1);
+define('DXW_SECURITY_PLUGINS_URL', 'http://example.com');
 
 // WordPress Function Mocks:
 function register_activation_hook() {}
@@ -23,4 +24,13 @@ function get_site_option() {}
 function get_transient() {}
 
 function is_admin() { return true; }
+
+// Until we add proper mocking, this will have to do for all tests:
+function get_plugins() {
+  $plugin_data = array(
+    'Name' => 'foo',
+    'Version' => '1.2.3'
+  );
+  return(array($plugin_data));
+}
 ?>

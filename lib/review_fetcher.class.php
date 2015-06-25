@@ -6,13 +6,14 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/api.class.php');
+require_once(dirname(__FILE__) . '/plugin_getter.class.php');
 require_once(dirname(__FILE__) . '/plugin_file.class.php');
 
 class dxw_security_Review_Fetcher {
   private static $failed_requests = 0;
 
   public static function run() {
-    $plugins = self::get_plugins();
+    $plugins = dxw_security_Plugin_Getter::get();
     foreach($plugins as $plugin_file => $data) {
       self::fetch_review($plugin_file, $data);
     }
@@ -46,13 +47,6 @@ class dxw_security_Review_Fetcher {
     // except for slow loading the next time they visit the plugins page (because
     // the reviews won't be cached), at which point they'll see an error,
     // so it's probably OK to do nothing here.
-  }
-
-  private static function get_plugins() {
-    if ( ! function_exists( 'get_plugins' ) ) {
-      require_once ABSPATH . 'wp-admin/includes/plugin.php';
-    }
-    return get_plugins(); // From core
   }
 }
 ?>
