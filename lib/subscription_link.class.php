@@ -3,7 +3,7 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/settings_page.class.php');
-require_once(dirname(__FILE__) . '/subscription.class.php');
+require_once(dirname(__FILE__) . '/models/subscription.class.php');
 
 class dxw_security_Subscription_Link {
 

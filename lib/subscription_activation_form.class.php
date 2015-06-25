@@ -4,7 +4,7 @@ defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/subscription_api_key_validator.class.php');
 require_once(dirname(__FILE__) . '/subscription_api_key_verifier.class.php');
-require_once(dirname(__FILE__) . '/subscription.class.php');
+require_once(dirname(__FILE__) . '/models/subscription.class.php');
 require_once(dirname(__FILE__) . '/subscription_activator.class.php');
 
 class dxw_security_Subscription_Activation_Form {
