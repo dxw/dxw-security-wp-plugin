@@ -2,10 +2,11 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/task.class.php');
+require_once(dirname(__FILE__) . '/cron_tasks/task.class.php');
 // Without these requires, the tasks will silently fail to execute:
-require_once(dirname(__FILE__) . '/review_fetcher.class.php');
-require_once(dirname(__FILE__) . '/plugin_manifest_poster.class.php');
+require_once(dirname(__FILE__) . '/cron_tasks/review_fetcher.class.php');
+require_once(dirname(__FILE__) . '/cron_tasks/plugin_manifest_poster.class.php');
+
 require_once(dirname(__FILE__) . '/models/subscription.class.php');
 
 class dxw_security_Cron {

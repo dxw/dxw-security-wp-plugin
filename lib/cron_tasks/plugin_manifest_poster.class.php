@@ -2,10 +2,10 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/models/plugin_manifest.class.php');
-require_once(dirname(__FILE__) . '/models/subscription.class.php');
-require_once(dirname(__FILE__) . '/api.class.php');
-require_once(dirname(__FILE__) . '/email.class.php');
+require_once(dirname(__FILE__) . '/../models/plugin_manifest.class.php');
+require_once(dirname(__FILE__) . '/../models/subscription.class.php');
+require_once(dirname(__FILE__) . '/../api.class.php');
+require_once(dirname(__FILE__) . '/../email.class.php');
 
 
 class dxw_security_Plugin_Manifest_Poster {
