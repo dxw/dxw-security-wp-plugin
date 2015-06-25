@@ -29,6 +29,8 @@ require_once(dirname(__FILE__) . '/lib/cron.class.php');
 require(dirname(__FILE__) . '/lib/update_checker.class.php');
 require_once(dirname(__FILE__) . '/lib/activation_checker.class.php');
 
+require_once(dirname(__FILE__) . '/lib/models/user.class.php');
+
 class dxw_Security {
   public function __construct() {
     add_action('load-index.php', array($this, 'enqueue_scripts'));
@@ -43,7 +45,7 @@ class dxw_Security {
 
     add_action('activated_plugin', array($this, 'activation_redirect'));
 
-    if( dxw_security_Subscription_Link::can_subscribe() ) {
+    if( dxw_security_User::can_subscribe() ) {
       add_action('load-plugins.php', array("dxw_security_Alert_Subscription_Banner", 'setup'));
     }
 
