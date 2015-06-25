@@ -2,7 +2,7 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/plugin_getter.class.php');
+require_once(dirname(__FILE__) . '/../plugin_getter.class.php');
 
 class dxw_security_Plugin_Manifest {
   private $manifest; // An array of plugin slugs and versions

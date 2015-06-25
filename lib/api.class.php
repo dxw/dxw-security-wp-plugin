@@ -2,7 +2,7 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/site.class.php');
+require_once(dirname(__FILE__) . '/models/site.class.php');
 
 class dxw_security_Advisories_API extends dxw_security_Cached_API {
 

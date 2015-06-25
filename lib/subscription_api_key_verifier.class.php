@@ -2,7 +2,7 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/plugin_manifest.class.php');
+require_once(dirname(__FILE__) . '/models/plugin_manifest.class.php');
 require_once(dirname(__FILE__) . '/api.class.php');
 
 // Checks that the api key exists in the downstream subscriber records

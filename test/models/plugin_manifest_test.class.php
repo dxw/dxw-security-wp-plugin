@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../lib/plugin_manifest.class.php');
+require_once(dirname(__FILE__) . '/../../lib/models/plugin_manifest.class.php');
 
 class dxw_security_Plugin_Manifest_Test extends PHPUnit_Framework_TestCase {
 
