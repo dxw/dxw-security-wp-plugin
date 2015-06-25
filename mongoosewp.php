@@ -1,4 +1,8 @@
 <?php
+
+// Prevent Full Path Disclosure
+defined('ABSPATH') OR exit;
+
 /**
   * Plugin Name: MongooseWP
   * Plugin URI: https://www.mongoosewp.com
@@ -8,27 +12,10 @@
   * Author: dxw
   * Author URI: http://dxw.com/
 */
+
 define('DXW_SECURITY_PLUGIN_VERSION', "0.1.0");
 
-// Prevent Full Path Disclosure
-defined('ABSPATH') OR exit;
-
-// CONFIG:
-if (!defined('DXW_SECURITY_API_ROOT')) {
-  define('DXW_SECURITY_API_ROOT', 'https://app.security.dxw.com/api/v2');
-}
-if (!defined('DXW_SECURITY_EMAIL')) {
-  define('DXW_SECURITY_EMAIL', 'contact@mongoosewp.com');
-}
-if (!defined('DXW_SECURITY_CACHE_RESPONSES')) {
-  define('DXW_SECURITY_CACHE_RESPONSES', true);
-}
-
-// CONSTANTS:
-// How many failed requests will we tolerate?
-define('DXW_SECURITY_FAILURE_lIMIT', 5);
-// The URL we link to when we don't have any info about a plugin
-define('DXW_SECURITY_PLUGINS_URL', 'https://security.dxw.com/plugins/');
+require(dirname(__FILE__) . '/lib/config.php');
 
 require(dirname(__FILE__) . '/lib/dashboard_widget.class.php');
 require(dirname(__FILE__) . '/lib/plugin_review_column.class.php');
@@ -41,7 +28,6 @@ require(dirname(__FILE__) . '/lib/alert_subscription_banner.class.php');
 require_once(dirname(__FILE__) . '/lib/cron.class.php');
 require(dirname(__FILE__) . '/lib/update_checker.class.php');
 require_once(dirname(__FILE__) . '/lib/activation_checker.class.php');
-
 
 class dxw_Security {
   public function __construct() {
