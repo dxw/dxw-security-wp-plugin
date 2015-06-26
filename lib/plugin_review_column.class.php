@@ -79,11 +79,11 @@ class dxw_security_Plugin_Review_Column {
     // TODO: Handle errors actually raised by us in the api class separately?
     // TODO: in future we should provide some way for users to give us back some useful information when they get an error
     self::$failed_requests++;
-    return new dxw_security_Null_Plugin_Recommendation();
+    return new dxw_security_Plugin_Recommendation_Error();
   }
 
   private static function handle_api_fatal_error() {
-    return new dxw_security_Null_Plugin_Recommendation();
+    return new dxw_security_Plugin_Recommendation_Error();
   }
 }
 ?>

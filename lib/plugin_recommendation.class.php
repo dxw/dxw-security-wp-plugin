@@ -33,7 +33,7 @@ class dxw_security_Plugin_Recommendation {
 }
 
 
-class dxw_security_Null_Plugin_Recommendation {
+class dxw_security_Plugin_Recommendation_Error {
   public function render(){
     ?>
     <a href='<?php echo(esc_url(DXW_SECURITY_PLUGINS_URL)); ?>' class="review-message review-error">
