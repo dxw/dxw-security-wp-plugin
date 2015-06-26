@@ -2,64 +2,33 @@
 
 defined('ABSPATH') OR exit;
 
+require_once(dirname(__FILE__) . '/views/plugin_recommendation_dialog.class.php');
+require_once(dirname(__FILE__) . '/views/plugin_recommendation_panel.class.php');
+
 class dxw_security_Plugin_Recommendation {
   private $name;
   private $version;
-  private $slug;
-  private $body;
   private $review_data;
-  private $heading;
-  private $dialog_intro;
 
-  public function __construct($name, $version, $slug, $review_data, $heading, $body, $dialog_intro="") {
-    $this->name = $name;
-    $this->version = $version;
-    $this->slug = $slug;
-    $this->body = $body; // Legitimately includes html - defined in this file
+  public function __construct($name, $version, $review_data) {
+    $this->name        = $name;
+    $this->version     = $version;
     $this->review_data = $review_data;
-    $this->heading = $heading; // Legitimately includes html - defined within the code of this plugin
-    $this->dialog_intro = $dialog_intro;
   }
 
   public function render() {
-    ?>
-      <a href="#<?php echo esc_attr($this->dialog_id()); ?>" data-title="<?php echo esc_attr($this->name); ?> - <?php echo esc_attr($this->version); ?>" class="dialog-link review-message <?php echo esc_attr($this->slug) ?>">
-        <h3><?php echo $this->heading; ?></h3>
-
-        <?php echo $this->body; ?>
-      </a>
-    <?php
+    $panel = new dxw_security_Plugin_Recommendation_Panel($this->name, $this->version, $this->review_data, $this->dialog_id());
+    $panel->render();
     print_r($this->render_dialog());
   }
 
   protected function render_dialog(){
-    ?>
-      <div id="<?php echo esc_attr($this->dialog_id()); ?>" style="display:none;" class="dialog review-message <?php echo esc_attr($this->slug); ?>">
-
-        <div class="inner">
-          <?php print_r($this->dialog_intro) ?>
-          <?php print_r($this->review_data->render()) ?>
-        </div>
-
-      </div>
-    <?php
+    $dialog = new dxw_security_Plugin_Recommendation_Dialog($this->dialog_id(), $this->review_data);
+    $dialog->render();
   }
 
   protected function dialog_id() {
     return "plugin-inspection-results-" . sanitize_title($this->name);
-  }
-}
-
-
-class dxw_security_Plugin_Recommendation_Reviewed {
-  private $recommendation;
-
-  public function __construct($name, $version, $review_data) {
-    $body = "<p class='more-info'>More information</p>";
-    $this->recommendation = new dxw_security_Plugin_Recommendation($name, $version, $review_data->slug, $review_data, $review_data->heading(), $body);
-  }
-  public function render() {
-    $this->recommendation->render();
   }
 }
 
