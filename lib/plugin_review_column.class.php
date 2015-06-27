@@ -3,8 +3,8 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/api.class.php');
-require_once(dirname(__FILE__) . '/review_data.class.php');
-require_once(dirname(__FILE__) . '/plugin_recommendation.class.php');
+require_once(dirname(__FILE__) . '/views/review_data.class.php');
+require_once(dirname(__FILE__) . '/views/plugin_recommendation.class.php');
 require_once(dirname(__FILE__) . '/views/plugin_recommendation_error.class.php');
 require_once(dirname(__FILE__) . '/models/plugin_file.class.php');
 

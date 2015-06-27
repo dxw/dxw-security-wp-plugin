@@ -2,8 +2,8 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/views/plugin_recommendation_dialog.class.php');
-require_once(dirname(__FILE__) . '/views/plugin_recommendation_panel.class.php');
+require_once(dirname(__FILE__) . '/plugin_recommendation_dialog.class.php');
+require_once(dirname(__FILE__) . '/plugin_recommendation_panel.class.php');
 
 class dxw_security_Plugin_Recommendation {
   private $name;
