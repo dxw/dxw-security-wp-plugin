@@ -38,8 +38,9 @@ class dxw_security_Dashboard_Widget {
 
     self::get_counts($plugins);
 
-    $vulnerable_slug = dxw_security_Review_Data::$dxw_security_review_statuses["vulnerable"]["slug"];
-    $grey_slug = dxw_security_Review_Data::$dxw_security_review_statuses["not-found"]["slug"];
+    # TODO: These slugs are effectively duplicated information between this and the review_data class
+    $vulnerable_slug = 'vulnerable';
+    $grey_slug       = 'no-info';
 
 
     $first_vulnerable_plugin_link        = self::plugin_link(self::$first_vulnerable_slug);
