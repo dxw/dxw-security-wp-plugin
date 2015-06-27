@@ -2,9 +2,8 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/subscription_api_key_validator.class.php');
-require_once(dirname(__FILE__) . '/subscription_api_key_verifier.class.php');
 require_once(dirname(__FILE__) . '/models/subscription.class.php');
+require_once(dirname(__FILE__) . '/models/api_key.class.php');
 require_once(dirname(__FILE__) . '/subscription_activator.class.php');
 
 class dxw_security_Subscription_Activation_Form {
@@ -67,18 +66,17 @@ class dxw_security_Subscription_Activation_Form {
   }
 
   public static function validate_subscription_api_key($input) {
-    $output = trim($input);
+    $api_key = new dxw_security_API_Key($input, dxw_security_Subscription::$api_key_field);
 
-    // Don't save invalid api keys to the database:
-    // TODO: Should it instead return the old value? http://kovshenin.com/2012/the-wordpress-settings-api/
-    if ( self::is_invalid($output) || self::could_not_be_verified($output) ) {
-      $output = "";
-      dxw_security_Subscription_Activator::deactivate();
-    } else {
+    if ( $api_key->is_valid() ) {
       dxw_security_Subscription_Activator::activate($output);
+      return $api_key;
+    } else {
+      dxw_security_Subscription_Activator::deactivate();
+      // Don't save invalid api keys to the database:
+      // TODO: Should it instead return the old value? http://kovshenin.com/2012/the-wordpress-settings-api/
+      return "";
     }
-
-    return $output;
   }
 
   private static function email_link() {
@@ -87,23 +85,6 @@ class dxw_security_Subscription_Activation_Form {
     ?>
       <a href="mailto:<?php echo constant('DXW_SECURITY_EMAIL') ?>">
         <?php echo constant('DXW_SECURITY_EMAIL') ?></a><?php
-  }
-
-  private static function is_invalid($value) {
-    $validator = new dxw_security_Subscription_Api_Key_Validator($value, dxw_security_Subscription::$api_key_field);
-    $validator->validate();
-    return self::has_errors();
-  }
-
-  private static function could_not_be_verified($value) {
-    // This makes a call to the api, so only run it if the value has been successfully validated
-    dxw_security_Subscription_Api_Key_Verifier::verify($value, dxw_security_Subscription::$api_key_field);
-    return self::has_errors();
-  }
-
-  private static function has_errors() {
-    $settings_errors = get_settings_errors();
-    return !empty($settings_errors);
   }
 
   public static function render() {
@@ -116,5 +97,4 @@ class dxw_security_Subscription_Activation_Form {
     <?php
   }
 }
-
 ?>
