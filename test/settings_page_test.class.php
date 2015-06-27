@@ -18,7 +18,7 @@ class dxw_security_Settings_Page_Test extends PHPUnit_Framework_TestCase {
   }
 
   public function test_render() {
-    dxw_security_Settings_Page::render();
+    dxw_security_Settings_Page::render_content();
   }
 
   public function test_url() {

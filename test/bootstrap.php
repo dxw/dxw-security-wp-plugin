@@ -25,6 +25,10 @@ function get_transient() {}
 
 function is_admin() { return true; }
 
+function add_settings_section($foo, $bar, $baz, $qux) {}
+function add_settings_field($foo, $bar, $baz, $qux, $fux) {}
+function register_setting($foo, $bar, $baz) {}
+
 // Until we add proper mocking, this will have to do for all tests:
 function get_plugins() {
   $plugin_data = array(

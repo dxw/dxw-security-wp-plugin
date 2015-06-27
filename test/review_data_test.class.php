@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../lib/review_data.class.php');
+require_once(dirname(__FILE__) . '/../lib/views/review_data.class.php');
 
 // WordPress Function Mocks:
 function esc_url($url) {
@@ -9,11 +9,16 @@ function esc_url($url) {
 
 class dxw_security_Review_Data_Test extends PHPUnit_Framework_TestCase {
   private function review_data() {
-    return new dxw_security_Review_Data("1.2.3", "https://foo.com", "it is awful!", "kill it with fire!");
+    $review = (object) array(
+      "review_link" => "https://foo.com",
+      "reason"      => "it is awful!",
+      "action"      => "kill it with fire!",
+    );
+    return new dxw_security_Review_Data($review);
   }
 
-  public function test_render() {
-    $this->review_data()->render();
+  public function test_render_body() {
+    $this->review_data()->body->render();
   }
 
   public function test_title() {
@@ -33,7 +38,7 @@ class dxw_security_Review_Data_Test extends PHPUnit_Framework_TestCase {
   }
 
   public function test_render_no_review() {
-    $this->review_data_no_review()->render();
+    $this->review_data_no_review()->body->render();
   }
 
   public function test_title_no_review() {
