@@ -2,7 +2,7 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/subscription_link.class.php');
+require_once(dirname(__FILE__) . '/views/subscription_link.class.php');
 
 class dxw_security_Alert_Subscription_Banner {
   public static function setup() {
