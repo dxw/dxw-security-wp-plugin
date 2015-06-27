@@ -3,8 +3,10 @@
 defined('ABSPATH') OR exit;
 
 class dxw_security_Plugin_Recommendation_Dialog {
-  private $name;
-  private $review_data;
+  private $id;
+  private $title;
+  private $description;
+  private $body;
   private $slug;
 
   public function __construct($id, $review_data) {

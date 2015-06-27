@@ -5,7 +5,6 @@ defined('ABSPATH') OR exit;
 class dxw_security_Plugin_Recommendation_Panel {
   private $name;
   private $version;
-  private $review_data;
   private $slug;
   private $title;
   private $dialog_id;
@@ -13,7 +12,6 @@ class dxw_security_Plugin_Recommendation_Panel {
   public function __construct($name, $version, $review_data, $dialog_id) {
     $this->name        = $name;
     $this->version     = $version;
-    $this->review_data = $review_data;
     $this->title       = $review_data->title; // Legitimately includes html - defined within the code of this plugin
     $this->slug        = $review_data->slug;
     $this->dialog_id   = $dialog_id;
