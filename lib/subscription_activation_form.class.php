@@ -7,31 +7,36 @@ require_once(dirname(__FILE__) . '/models/api_key.class.php');
 require_once(dirname(__FILE__) . '/subscription_activator.class.php');
 
 class dxw_security_Subscription_Activation_Form {
+  private $page_slug;
 
-  public static function setup() {
+  public function __construct($page_slug) {
+    $this->page_slug   = $page_slug;
+  }
+
+  public function setup() {
     add_settings_section(
       "activate_subscription",
-      self::section_heading(),
+      $this->section_heading(),
       array(get_called_class(), 'section_text'),
-      "mongoose-key-config"
+      $this->page_slug
     );
 
     add_settings_field(
       dxw_security_Subscription::$api_key_field,
-      self::field_label(),
+      $this->field_label(),
       array(get_called_class(),'subscription_api_key_input_field'),
-      'mongoose-key-config',
+      $this->page_slug,
       "activate_subscription"
     );
 
     register_setting(
-      'mongoose-key-config',
+      $this->page_slug,
       dxw_security_Subscription::$api_key_field,
       array(get_called_class(),'validate_subscription_api_key')
     );
   }
 
-  public static function section_heading() {
+  private function section_heading() {
     if ( dxw_security_Subscription::is_active() ) {
       return "Your subscription is active";
     } else {
@@ -44,7 +49,7 @@ class dxw_security_Subscription_Activation_Form {
       ?>
         <p>We'll notify you by email if we any security issues are with plugins you have installed.</p>
         <p>We'll use the email address you provided when you registered. If you would like to change this,
-          or if you have any problems or comments, please contact <?php self::email_link() ?>.</p>
+          or if you have any problems or comments, please contact <?php $this->email_link() ?>.</p>
       <?php
     } else {
       ?>
@@ -53,7 +58,7 @@ class dxw_security_Subscription_Activation_Form {
     }
   }
 
-  public static function field_label() {
+  private function field_label() {
     if ( dxw_security_Subscription::is_active() ) {
       return "Your API key:";
     } else {
@@ -79,22 +84,12 @@ class dxw_security_Subscription_Activation_Form {
     }
   }
 
-  private static function email_link() {
+  private function email_link() {
     // The closing tags need to be up against the end to avoid spaces between
     // the email and the full stop in the output
     ?>
       <a href="mailto:<?php echo constant('DXW_SECURITY_EMAIL') ?>">
         <?php echo constant('DXW_SECURITY_EMAIL') ?></a><?php
-  }
-
-  public static function render() {
-    ?>
-    <form action="options.php" method="POST">
-      <?php settings_fields('mongoose-key-config') ?>
-      <?php do_settings_sections('mongoose-key-config') ?>
-      <?php submit_button("Save", "secondary") ?>
-    </form>
-    <?php
   }
 }
 ?>
