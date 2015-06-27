@@ -9,32 +9,43 @@ function esc_url($url) {
 
 class dxw_security_Review_Data_Test extends PHPUnit_Framework_TestCase {
   private function review_data() {
-    return new dxw_security_Review_Data("1.2.3", "vulnerable", "https://foo.com", "it is awful!", "kill it with fire!");
-  }
-
-  public function test_vulnerable_slug() {
-    $this->assertNotEmpty(dxw_security_Review_Data::$dxw_security_review_statuses["vulnerable"]["slug"]);
-  }
-
-  public function test_not_found_slug() {
-    $this->assertNotEmpty(dxw_security_Review_Data::$dxw_security_review_statuses["not-found"]["slug"]);
+    return new dxw_security_Review_Data("1.2.3", "https://foo.com", "it is awful!", "kill it with fire!");
   }
 
   public function test_render() {
     $this->review_data()->render();
   }
 
-  public function test_heading() {
-    $this->review_data()->heading();
+  public function test_title() {
+    $actual   = $this->review_data()->title;
+    $expected = "<span class='icon-vulnerable' title='Vulnerable'></span> Vulnerable";
+    $this->assertEquals($actual, $expected);
   }
 
-  public function test_icon() {
-    $this->review_data()->icon();
+  public function test_slug() {
+    $actual   = $this->review_data()->slug;
+    $expected = "vulnerable";
+    $this->assertEquals($actual, $expected);
   }
 
-  public function test_version() {
-    $this->review_data()->version();
+  private function review_data_no_review() {
+    return new dxw_security_Review_Data_No_Review();
   }
 
+  public function test_render_no_review() {
+    $this->review_data_no_review()->render();
+  }
+
+  public function test_title_no_review() {
+    $actual   = $this->review_data_no_review()->title;
+    $expected = "<span class='icon-no-info' title='No known vulnerabilities'></span> No known vulnerabilities";
+    $this->assertEquals($actual, $expected);
+  }
+
+  public function test_slug_no_review() {
+    $actual   = $this->review_data_no_review()->slug;
+    $expected = "no-info";
+    $this->assertEquals($actual, $expected);
+  }
 }
 ?>

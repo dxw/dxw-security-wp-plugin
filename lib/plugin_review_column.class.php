@@ -58,8 +58,7 @@ class dxw_security_Plugin_Review_Column {
   }
 
   private static function handle_api_not_found($name, $installed_version) {
-    $review_data = new dxw_security_Review_Data($installed_version, "not-found");
-    // TODO - it's a bit odd that we're creating a class which implies that the plugin has been reviewed...
+    $review_data = new dxw_security_Review_Data_No_Review();
     return new dxw_security_Plugin_Recommendation($name, $installed_version, $review_data);
   }
 
@@ -70,7 +69,7 @@ class dxw_security_Plugin_Review_Column {
     $reason = $review->reason;
     $action = $review->action;
     $link = $review->review_link;
-    $review_data = new dxw_security_Review_Data($version, $status, $link, $reason, $action);
+    $review_data = new dxw_security_Review_Data($version, $link, $reason, $action);
 
     return new dxw_security_Plugin_Recommendation($name, $installed_version, $review_data);
   }
