@@ -11,27 +11,17 @@ class dxw_security_Review_Data {
   private $action;
 
   public $title;
-  public $heading;
+  public $linked_title;
   public $description;
   public $body;
 
   public function __construct($version, $link, $reason, $action) {
-    $this->version = $version;
-    $this->link = $link;
-
-    $this->slug = "vulnerable";
-
-    $title = new dxw_security_Review_Data_Title("Vulnerable", $this->slug);
-    $this->title = $title->html();
-    $this->heading = new dxw_security_Review_Data_Linked_Heading($title, $link);
-    $this->description = new dxw_security_Review_Data_Description("This plugin has a proven vulnerability. It might be safe to use under certain conditions but you should very carefully consider the details of the vulnerability before using it.");
-    $this->body = new dxw_security_Review_Data_Body($link, $reason, $action);
-  }
-
-  public function render() {
-    $this->heading->render();
-    $this->description->render();
-    $this->body->render();
+    $this->version      = $version;
+    $this->slug         = "vulnerable";
+    $this->title        = new dxw_security_Review_Data_Title("Vulnerable", $this->slug);
+    $this->linked_title = new dxw_security_Link($this->title, $link);
+    $this->description  = "This plugin has a proven vulnerability. It might be safe to use under certain conditions but you should very carefully consider the details of the vulnerability before using it.";
+    $this->body         = new dxw_security_Review_Data_Body($link, $reason, $action);
   }
 }
 
@@ -40,83 +30,52 @@ class dxw_security_Review_Data_No_Review {
   public $slug;
 
   public $title;
-  public $heading;
+  public $linked_title;
   public $description;
   public $body;
 
   public function __construct() {
-    $this->slug = "no-info";
-
-    $title = new dxw_security_Review_Data_Title("No known vulnerabilities", $this->slug);
-    $this->title = $title->html();
-    $this->heading = new dxw_security_Review_Data_Heading($title);
-    $this->description = new dxw_security_Review_Data_Description("We do not know of any security issues with this plugin.");
-    $this->body = new dxw_security_Null_View;
-  }
-
-  public function render() {
-    $this->heading->render();
-    $this->description->render();
-    $this->body->render();
+    $this->slug         = "no-info";
+    $this->title        = new dxw_security_Review_Data_Title("No known vulnerabilities", $this->slug);
+    $this->linked_title = $this->title;
+    $this->description  = "We do not know of any security issues with this plugin.";
+    $this->body         = new dxw_security_Null_View;
   }
 }
 
 
-
 class dxw_security_Review_Data_Title {
+  private $message;
+  private $slug;
+
   public function __construct($message, $slug) {
     $this->message = $message;
     $this->slug = $slug;
   }
 
-  public function html() {
+  public function __toString() {
     return "{$this->icon()} {$this->message}";
   }
 
-  public function icon() {
+  private function icon() {
     return "<span class='icon-{$this->slug}' title='{$this->message}'></span>";
   }
 }
 
-class dxw_security_Review_Data_Heading {
-  private $title;
-
-  public function __construct($title) {
-    $this->title = $title->html();
-  }
-
-  public function render() {
-    echo("<h2>{$this->title}</h2>");
-  }
-}
-
-class dxw_security_Review_Data_Linked_Heading {
-  private $title;
+class dxw_security_Link {
+  private $html;
   private $link;
 
-  public function __construct($title, $link) {
-    $this->title = $title->html();
+  public function __construct($html, $link) {
+    $this->html = $html;
     $this->link  = $link;
   }
 
-  public function render() {
+  public function __toString() {
     $link = esc_url($this->link);
-    echo("<h2><a href='{$link}'>{$this->title}</a></h2>");
+    return "<a href='{$link}'>{$this->html}</a>";
   }
 }
-
-class dxw_security_Review_Data_Description {
-  private $description;
-
-  public function __construct($description) {
-    $this->description = $description;
-  }
-
-  public function render() {
-    echo("<p class='review-status-description'>{$this->description}</p>");
-  }
-}
-
 
 class dxw_security_Review_Data_Body {
   private $link;
