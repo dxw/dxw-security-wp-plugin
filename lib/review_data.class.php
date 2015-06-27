@@ -3,32 +3,24 @@
 defined('ABSPATH') OR exit;
 
 class dxw_security_Review_Data {
-  public $version;
   public $slug;
-
-  private $link;
-  private $reason;
-  private $action;
-
   public $title;
   public $linked_title;
   public $description;
   public $body;
 
-  public function __construct($version, $link, $reason, $action) {
-    $this->version      = $version;
+  public function __construct($review) {
     $this->slug         = "vulnerable";
     $this->title        = new dxw_security_Review_Data_Title("Vulnerable", $this->slug);
-    $this->linked_title = new dxw_security_Link($this->title, $link);
+    $this->linked_title = new dxw_security_Link($this->title, $review->review_link);
     $this->description  = "This plugin has a proven vulnerability. It might be safe to use under certain conditions but you should very carefully consider the details of the vulnerability before using it.";
-    $this->body         = new dxw_security_Review_Data_Body($link, $reason, $action);
+    $this->body         = new dxw_security_Review_Data_Body($review->review_link, $review->reason, $review->action);
   }
 }
 
 
 class dxw_security_Review_Data_No_Review {
   public $slug;
-
   public $title;
   public $linked_title;
   public $description;

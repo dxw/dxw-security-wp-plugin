@@ -63,13 +63,7 @@ class dxw_security_Plugin_Review_Column {
   }
 
   private static function handle_api_response($review, $name, $installed_version) {
-
-    $version = $review->version;
-    $status = $review->recommendation;
-    $reason = $review->reason;
-    $action = $review->action;
-    $link = $review->review_link;
-    $review_data = new dxw_security_Review_Data($version, $link, $reason, $action);
+    $review_data = new dxw_security_Review_Data($review);
 
     return new dxw_security_Plugin_Recommendation($name, $installed_version, $review_data);
   }
