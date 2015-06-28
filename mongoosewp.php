@@ -29,12 +29,13 @@ require(dirname(__FILE__) . '/lib/update_checker.class.php');
 require_once(dirname(__FILE__) . '/lib/activation_checker.class.php');
 
 require_once(dirname(__FILE__) . '/lib/models/user.class.php');
+require_once(dirname(__FILE__) . '/lib/models/options.class.php');
 
 class dxw_Security {
   public function __construct() {
     add_action('load-index.php', array($this, 'enqueue_scripts'));
     add_action('load-plugins.php', array($this, 'enqueue_scripts'));
-    add_action('load-settings_page_' . dxw_security_Settings_Page::$page_slug, array($this, 'enqueue_scripts'));
+    add_action('load-settings_page_' . dxw_security_Options::$page_slug, array($this, 'enqueue_scripts'));
 
     add_action('admin_init', array("dxw_security_Plugin_Review_Column", 'setup'));
     add_action('admin_init', array("dxw_security_Dashboard_Widget", 'setup'));
@@ -68,7 +69,7 @@ class dxw_Security {
 
   public function activation_redirect($plugin) {
     if( $plugin == plugin_basename( __FILE__ ) ) {
-      exit( wp_redirect( admin_url( dxw_security_Settings_Page::url() ) ) );
+      exit( wp_redirect( admin_url( dxw_security_Options::url() ) ) );
     }
   }
 }
