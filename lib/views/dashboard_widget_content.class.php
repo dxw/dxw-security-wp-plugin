@@ -3,7 +3,8 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/../models/user.class.php');
-require_once(dirname(__FILE__) . '/subscription_link.class.php');
+require_once(dirname(__FILE__) . '/subscribe_button.class.php');
+require_once(dirname(__FILE__) . '/../settings_page.class.php');
 
 
 class dxw_security_Dashboard_Widget_Content {
@@ -54,13 +55,14 @@ class dxw_security_Dashboard_Widget_Content {
   }
 
   private static function subscription_link() {
+    $button = new dxw_security_Subscribe_Button(dxw_security_Settings_Page::url())
     ?>
       <div id="dxw_security_alert_subscription_link">
         <h4>Security alerts</h4>
         <p>
           Want to get notified of security issues with your plugins?
         </p>
-        <?php dxw_security_Subscription_Link::render() ?>
+        <?php $button->render() ?>
       </div>
     <?php
   }
