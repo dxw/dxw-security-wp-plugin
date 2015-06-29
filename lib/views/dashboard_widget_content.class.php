@@ -101,4 +101,11 @@ class dxw_security_Dashboard_Widget_Content {
     return "{$this->plugins_page_url}#{$plugin_slug}";
   }
 }
+
+class dxw_security_Dashboard_Widget_Content_No_Plugins {
+  public function render() {
+    echo "<p>There are no plugins installed on this site.</p>";
+  }
+}
+
 ?>

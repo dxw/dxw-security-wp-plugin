@@ -30,17 +30,16 @@ class dxw_security_Dashboard_Widget {
     $number_of_plugins = count($plugins);
 
     if ( $number_of_plugins == 0 ) {
-      echo "<p>There are no plugins installed on this site.</p>";
-      return;
+      $content = new dxw_security_Dashboard_Widget_Content_No_Plugins();
+    } else {
+      self::get_counts($plugins);
+
+      $vulnerable_data   = array('count' => self::$vulnerable,      'plugin' => self::$first_vulnerable_slug);
+      $not_reviewed_data = array('count' => self::$not_reviewed,    'plugin' => self::$first_not_reviewed_slug);
+      $errored_data      = array('count' => self::$failed_requests, 'plugin' => self::$first_failed_request_slug);
+
+      $content = new dxw_security_Dashboard_Widget_Content($number_of_plugins, $vulnerable_data, $not_reviewed_data, $errored_data);
     }
-
-    self::get_counts($plugins);
-
-    $vulnerable_data   = array('count' => self::$vulnerable,      'plugin' => self::$first_vulnerable_slug);
-    $not_reviewed_data = array('count' => self::$not_reviewed,    'plugin' => self::$first_not_reviewed_slug);
-    $errored_data      = array('count' => self::$failed_requests, 'plugin' => self::$first_failed_request_slug);
-
-    $content = new dxw_security_Dashboard_Widget_Content($number_of_plugins, $vulnerable_data, $not_reviewed_data, $errored_data);
     $content->render();
   }
 
