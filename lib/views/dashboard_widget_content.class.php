@@ -11,23 +11,26 @@ class dxw_security_Dashboard_Widget_Content {
   private $number_of_plugins;
   private $vulnerable_data;
   private $not_reviewed_data;
-  private $errored_data;
+  private $failed_data;
   private $plugins_page_url;
 
-  public function __construct($number_of_plugins, $vulnerable_data, $not_reviewed_data, $errored_data) {
+  public function __construct($number_of_plugins, $plugin_status_counts) {
     $this->number_of_plugins = $number_of_plugins;
 
     // Is this reliable?
     $this->plugins_page_url  = "plugins.php";
 
-    $this->vulnerable                       = $vulnerable_data['count'];
-    $this->first_vulnerable_plugin_link     = $this->plugin_link($vulnerable_data['plugin']);
+    $vulnerable_data = $plugin_status_counts['vulnerable'];
+    $this->vulnerable                       = $vulnerable_data->count;
+    $this->first_vulnerable_plugin_link     = $this->plugin_link($vulnerable_data->first_plugin_slug);
 
-    $this->not_reviewed                     = $not_reviewed_data['count'];
-    $this->first_not_reviewed_plugin_link   = $this->plugin_link($not_reviewed_data['plugin']);
+    $not_reviewed_data = $plugin_status_counts['not_reviewed'];
+    $this->not_reviewed                     = $not_reviewed_data->count;
+    $this->first_not_reviewed_plugin_link   = $this->plugin_link($not_reviewed_data->first_plugin_slug);
 
-    $this->failed_requests                  = $errored_data['count'];
-    $this->first_failed_request_plugin_link = $this->plugin_link($errored_data['plugin']);
+    $failed_data = $plugin_status_counts['failed'];
+    $this->failed_requests                  = $failed_data->count;
+    $this->first_failed_request_plugin_link = $this->plugin_link($failed_data->first_plugin_slug);
 
     # TODO: These slugs are effectively duplicated information between this and the review_data class
     $this->vulnerable_slug = 'vulnerable';
