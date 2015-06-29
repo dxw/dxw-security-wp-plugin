@@ -9,8 +9,7 @@ require_once(dirname(__FILE__) . '/views/settings_page_content.class.php');
 class dxw_security_Settings_Page {
   public static function setup() {
     add_options_page('Mongoose', 'Mongoose', 'manage_options', dxw_security_Options::$page_slug , array(get_called_class(), 'render_content') );
-    $form = new dxw_security_Subscription_Activation_Form(dxw_security_Options::$page_slug);
-    $form->setup();
+    dxw_security_Subscription_Activation_Form::setup();
   }
 
   public static function render_content() {

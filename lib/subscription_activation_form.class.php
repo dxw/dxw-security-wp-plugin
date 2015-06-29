@@ -4,18 +4,15 @@ defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/models/subscription.class.php');
 require_once(dirname(__FILE__) . '/models/api_key.class.php');
+require_once(dirname(__FILE__) . '/models/options.class.php');
 require_once(dirname(__FILE__) . '/subscription_activator.class.php');
 require_once(dirname(__FILE__) . '/views/subscription_activation_form_content.class.php');
 
 class dxw_security_Subscription_Activation_Form {
-  private $page_slug;
-
-  public function __construct($page_slug) {
-    $this->page_slug   = $page_slug;
-  }
-
-  public function setup() {
+  public static function setup() {
     $api_key_field = dxw_security_Subscription::$api_key_field;
+    $page_slug     = dxw_security_Options::$page_slug;
+    $option_group = "activate_subscription";
 
     if ( dxw_security_Subscription::is_active() ) {
       $view = new dxw_security_Subscription_Activation_Form_Content_Active;
@@ -24,22 +21,22 @@ class dxw_security_Subscription_Activation_Form {
     }
 
     add_settings_section(
-      "activate_subscription",
+      $option_group,
       $view->section_heading(),
       array(get_class($view), 'section_text'),
-      $this->page_slug
+      $page_slug
     );
 
     add_settings_field(
       $api_key_field,
       $view->field_label(),
       array(get_class($view),'subscription_api_key_input_field'),
-      $this->page_slug,
-      "activate_subscription"
+      $page_slug,
+      $option_group
     );
 
     register_setting(
-      $this->page_slug,
+      $page_slug,
       $api_key_field,
       array(get_called_class(),'validate_subscription_api_key')
     );
