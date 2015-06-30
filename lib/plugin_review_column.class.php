@@ -35,9 +35,22 @@ class dxw_security_Plugin_Review_Column {
     $plugin_slug        = $plugin_file_object->plugin_slug;
 
     $fetcher = new dxw_security_Plugin_Recommendation_Fetcher($name, $installed_version, $plugin_slug);
-    $recommendation = $fetcher->recommendation();
-
+    $recommendation = self::fetch_with_error_limiting($fetcher);
     $recommendation->render();
+  }
+
+  private static function fetch_with_error_limiting($fetcher, $error_limit=DXW_SECURITY_FAILURE_lIMIT) {
+    // Stop making requests after a certain number of failures:
+    if (self::$failed_requests > $error_limit) {
+      return $fetcher->handle_api_fatal_error();
+    } else {
+      try {
+        return $fetcher->fetch();
+      } catch (\Exception $e) {
+        self::$failed_requests++;
+        return $fetcher->handle_api_error($e);
+      }
+    }
   }
 }
 
