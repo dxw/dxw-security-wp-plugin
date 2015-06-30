@@ -2,6 +2,9 @@
 
 defined('ABSPATH') OR exit;
 
+require_once(dirname(__FILE__) . '/link.class.php');
+require_once(dirname(__FILE__) . '/null_view.class.php');
+
 class dxw_security_Review_Data {
   public $slug;
   public $title;
@@ -54,21 +57,6 @@ class dxw_security_Review_Data_Title {
   }
 }
 
-class dxw_security_Link {
-  private $html;
-  private $link;
-
-  public function __construct($html, $link) {
-    $this->html = $html;
-    $this->link  = $link;
-  }
-
-  public function __toString() {
-    $link = esc_url($this->link);
-    return "<a href='{$link}'>{$this->html}</a>";
-  }
-}
-
 class dxw_security_Review_Data_Body {
   private $link;
   private $reason;
@@ -109,10 +97,6 @@ class dxw_security_Review_Data_Body {
       echo("<a href='{$link}' class='read-more button-primary'> Read more...</a>");
     }
   }
-}
-
-class dxw_security_Null_View {
-  public function render() {}
 }
 
 ?>
