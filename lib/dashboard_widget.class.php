@@ -23,7 +23,7 @@ class dxw_security_Dashboard_Widget {
     if ( $number_of_plugins == 0 ) {
       $content = new dxw_security_Dashboard_Widget_Content_No_Plugins();
     } else {
-      $counter = new dxw_security_Plugin_Status_Counter();
+      $counter = new dxw_security_Plugin_Statuses_Counter();
       $plugin_status_counts = $counter->get_counts($plugins);
 
       $content = new dxw_security_Dashboard_Widget_Content($number_of_plugins, $plugin_status_counts);
