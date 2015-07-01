@@ -8,37 +8,25 @@ require_once(dirname(__FILE__) . '/views/plugin_recommendation.class.php');
 require_once(dirname(__FILE__) . '/views/plugin_recommendation_error.class.php');
 
 class dxw_security_Plugin_Recommendation_Fetcher {
+  private $api;
   private $name;
   private $installed_version;
-  private $plugin_slug;
 
   public function __construct($name, $installed_version, $plugin_slug) {
+    $this->api               = new dxw_security_Advisories_API($plugin_slug, $installed_version);
     $this->name              = $name;
     $this->installed_version = $installed_version;
-    $this->plugin_slug       = $plugin_slug;
   }
 
   public function fetch() {
-    $api = new dxw_security_Advisories_API($this->plugin_slug, $this->installed_version);
-
     try {
-      $review = $api->call();
-      $recommendation = $this->handle_api_response($review, $this->name, $this->installed_version);
+      $review = $this->api->call();
+      $review_data = new dxw_security_Review_Data($review);
     } catch (dxw_security_API_NotFound $e) {
-      $recommendation = $this->handle_api_not_found($this->name, $this->installed_version);
+      $review_data = new dxw_security_Review_Data_No_Review();
     }
 
-    return $recommendation;
-  }
-
-  private function handle_api_not_found($name, $installed_version) {
-    $review_data = new dxw_security_Review_Data_No_Review();
-    return new dxw_security_Plugin_Recommendation($name, $installed_version, $review_data);
-  }
-
-  private function handle_api_response($review, $name, $installed_version) {
-    $review_data = new dxw_security_Review_Data($review);
-    return new dxw_security_Plugin_Recommendation($name, $installed_version, $review_data);
+    return new dxw_security_Plugin_Recommendation($this->name, $this->installed_version, $review_data);
   }
 
   public function handle_api_error($error) {
