@@ -21,32 +21,61 @@ class dxw_security_Review_Fetcher {
 
   private static function fetch_review($plugin_file, $plugin_data) {
     $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
-    $plugin_version = $plugin_data['Version'];
+    $installed_version  = $plugin_data['Version'];
+    $plugin_slug        = $plugin_file_object->plugin_slug;
 
-    // TODO: this pattern is duplicated in the security column code and dashboard widget
-    //    It should probably be factored out into another class
-    // Stop making requests after a certain number of failures:
-    if (self::$failed_requests > DXW_SECURITY_FAILURE_lIMIT) {
-      $recommendation = self::handle_api_fatal_error();
-    } else {
-      $api = new dxw_security_Advisories_API($plugin_file_object->plugin_slug, $plugin_version);
-
-      try {
-        $reviews = $api->call();
-      } catch (\Exception $e) {
-        self::handle_api_error($e);
-      }
-    }
+    $fetcher = new dxw_security_Plugin_Single_Review_Fetcher($plugin_slug, $installed_version);
+    self::fetch_review_with_error_limiting($fetcher);
   }
 
-  private static function handle_api_error() {
-    self::$failed_requests++;
+  private static function fetch_review_with_error_limiting($fetcher) {
+    $adapted_fetcher = new dxw_security_Single_Review_Fetcher_Adaptor($fetcher);
+    $limited_fetcher = new dxw_security_Error_Limiter($adapted_fetcher, self::$failed_requests);
+
+    $limited_fetcher->call();
   }
-  private static function handle_api_fatal_error() {
+}
+
+class dxw_security_Plugin_Single_Review_Fetcher {
+  private $api;
+
+  public function __construct($plugin_slug, $installed_version) {
+    $this->api = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+  }
+
+  public function fetch() {
+    $this->api->call();
+  }
+
+  public function handle_api_error() {}
+  public function handle_api_fatal_error() {
     // In this case we won't get stats, but the user's experience won't be impacted
     // except for slow loading the next time they visit the plugins page (because
     // the reviews won't be cached), at which point they'll see an error,
     // so it's probably OK to do nothing here.
   }
 }
+
+// TODO: This is identical to the recommendation fetcher adaptor
+class dxw_security_Single_Review_Fetcher_Adaptor {
+  private $fetcher;
+
+  public function __construct($fetcher) {
+    $this->fetcher = $fetcher;
+  }
+
+  public function call() {
+    return $this->fetcher->fetch();
+  }
+
+  public function handle_error($error) {
+    return $this->fetcher->handle_api_error($error);
+  }
+
+  public function handle_fatal_error() {
+    return $this->fetcher->handle_api_fatal_error();
+  }
+}
+
+
 ?>
