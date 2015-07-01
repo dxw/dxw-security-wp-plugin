@@ -3,6 +3,7 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/plugin_recommendation_fetcher.class.php');
+require_once(dirname(__FILE__) . '/error_limiter.class.php');
 require_once(dirname(__FILE__) . '/models/plugin_file.class.php');
 
 
@@ -35,22 +36,36 @@ class dxw_security_Plugin_Review_Column {
     $plugin_slug        = $plugin_file_object->plugin_slug;
 
     $fetcher = new dxw_security_Plugin_Recommendation_Fetcher($name, $installed_version, $plugin_slug);
-    $recommendation = self::fetch_with_error_limiting($fetcher);
+    $recommendation = self::fetch_recommendation_with_error_limiting($fetcher);
     $recommendation->render();
   }
 
-  private static function fetch_with_error_limiting($fetcher, $error_limit=DXW_SECURITY_FAILURE_lIMIT) {
-    // Stop making requests after a certain number of failures:
-    if (self::$failed_requests > $error_limit) {
-      return $fetcher->handle_api_fatal_error();
-    } else {
-      try {
-        return $fetcher->fetch();
-      } catch (\Exception $e) {
-        self::$failed_requests++;
-        return $fetcher->handle_api_error($e);
-      }
-    }
+  private static function fetch_recommendation_with_error_limiting($fetcher) {
+   $adapted_fetcher = new dxw_security_Fetcher_Adaptor($fetcher);
+   $limited_fetcher = new dxw_security_Error_Limiter($adapted_fetcher, self::$failed_requests);
+
+   return $limited_fetcher->call();
+  }
+}
+
+
+class dxw_security_Fetcher_Adaptor {
+  private $fetcher;
+
+  public function __construct($fetcher) {
+    $this->fetcher = $fetcher;
+  }
+
+  public function call() {
+    return $this->fetcher->fetch();
+  }
+
+  public function handle_error($error) {
+    return $this->fetcher->handle_api_error($error);
+  }
+
+  public function handle_fatal_error() {
+    return $this->fetcher->handle_api_fatal_error();
   }
 }
 
