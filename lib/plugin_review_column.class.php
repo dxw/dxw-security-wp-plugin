@@ -6,6 +6,10 @@ require_once(dirname(__FILE__) . '/plugin_recommendation_fetcher.class.php');
 require_once(dirname(__FILE__) . '/error_limiter.class.php');
 require_once(dirname(__FILE__) . '/models/plugin_file.class.php');
 
+require_once(dirname(__FILE__) . '/views/plugin_recommendation.class.php');
+require_once(dirname(__FILE__) . '/views/plugin_recommendation_error.class.php');
+
+
 
 class dxw_security_Plugin_Review_Column {
   // Track the number of failed requests so that we can stop trying after a certain number.
@@ -37,19 +41,34 @@ class dxw_security_Plugin_Review_Column {
 
     $api = new dxw_security_Advisories_API($plugin_slug, $installed_version);
 
-    $fetcher = new dxw_security_Plugin_Recommendation_Fetcher($name, $installed_version, $api);
-    $recommendation = self::fetch_recommendation_with_error_limiting($fetcher);
+    $fetcher = new dxw_security_Plugin_Recommendation_Fetcher($api);
+    $review_data = self::fetch_recommendation_with_error_limiting($fetcher);
+
+    $recommendation = new dxw_security_Plugin_Recommendation($name, $installed_version, $review_data);
+
     $recommendation->render();
   }
 
   private static function fetch_recommendation_with_error_limiting($fetcher) {
-   $adapted_fetcher = new dxw_security_Fetcher_Adaptor($fetcher);
-   $limited_fetcher = new dxw_security_Error_Limiter($adapted_fetcher, self::$failed_requests);
+    $error_handler                 = new dxw_security_Recommendation_Error_Handler();
+    $counting_error_handler        = new dxw_security_Counting_Error_Handler($error_handler, self::$failed_requests);
+    $fatal_error_handler           = $error_handler;
 
-   return $limited_fetcher->call();
+    $callable_fetcher              = new dxw_security_Fetcher_Adaptor($fetcher);
+    $error_limited_fetcher         = new dxw_security_Error_Limited_Caller($callable_fetcher, $fatal_error_handler, self::$failed_requests);
+
+    $error_handled_limited_fetcher = new dxw_security_Error_Handled_Caller($error_limited_fetcher, $counting_error_handler);
+    return $error_handled_limited_fetcher->call();
   }
 }
 
+class dxw_security_Recommendation_Error_Handler {
+  public function handle($error=null) {
+    // TODO: Handle errors actually raised by us in the api class separately?
+    // TODO: in future we should provide some way for users to give us back some useful information when they get an error
+    return new dxw_security_Plugin_Recommendation_Error();
+  }
+}
 
 class dxw_security_Fetcher_Adaptor {
   private $fetcher;
@@ -60,14 +79,6 @@ class dxw_security_Fetcher_Adaptor {
 
   public function call() {
     return $this->fetcher->fetch();
-  }
-
-  public function handle_error($error) {
-    return $this->fetcher->handle_api_error($error);
-  }
-
-  public function handle_fatal_error() {
-    return $this->fetcher->handle_api_fatal_error();
   }
 }
 
