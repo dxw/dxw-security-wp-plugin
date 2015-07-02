@@ -40,27 +40,43 @@ class dxw_security_Plugin_Review_Column {
     $plugin_slug        = $plugin_file_object->plugin_slug;
 
     $api = new dxw_security_Advisories_API($plugin_slug, $installed_version);
-
-    $fetcher = new dxw_security_Plugin_Recommendation_Fetcher($api);
-    $review_data = self::fetch_recommendation_with_error_limiting($fetcher);
-
-    $recommendation = new dxw_security_Plugin_Recommendation($name, $installed_version, $review_data);
-
+    $recommendation = self::make_recommendation($name, $installed_version, $api);
     $recommendation->render();
   }
 
-  private static function fetch_recommendation_with_error_limiting($fetcher) {
-    $error_handler                 = new dxw_security_Recommendation_Error_Handler();
-    $counting_error_handler        = new dxw_security_Counting_Error_Handler($error_handler, self::$failed_requests);
-    $fatal_error_handler           = $error_handler;
+  private static function make_recommendation($name, $installed_version, $api) {
+    $review_fetcher       = new dxw_security_Plugin_Recommendation_Fetcher($api);
 
-    $callable_fetcher              = new dxw_security_Fetcher_Adaptor($fetcher);
-    $error_limited_fetcher         = new dxw_security_Error_Limited_Caller($callable_fetcher, $fatal_error_handler, self::$failed_requests);
+    $recommendation_maker = new dxw_security_Recommendation_Maker($name, $installed_version, $review_fetcher);
+    $error_handler        = new dxw_security_Recommendation_Error_Handler();
+    $fatal_error_handler  = $error_handler;
 
-    $error_handled_limited_fetcher = new dxw_security_Error_Handled_Caller($error_limited_fetcher, $counting_error_handler);
+    $error_handled_limited_fetcher = self::error_handled_limited_fetcher($recommendation_maker, $error_handler, $fatal_error_handler, self::$failed_requests);
+
     return $error_handled_limited_fetcher->call();
   }
+
+  private static function error_handled_limited_fetcher($fetcher, $error_handler, $fatal_error_handler, &$counter) {
+    $counting_error_handler        = new dxw_security_Counting_Error_Handler($error_handler, $counter);
+    $error_limited_fetcher         = new dxw_security_Error_Limited_Caller($fetcher, $fatal_error_handler, $counter);
+
+    return new dxw_security_Error_Handled_Caller($error_limited_fetcher, $counting_error_handler);
+  }
 }
+
+class dxw_security_Recommendation_Maker {
+  public function __construct($name, $installed_version, $review_fetcher) {
+    $this->name              = $name;
+    $this->installed_version = $installed_version;
+    $this->review_fetcher    = $review_fetcher;
+  }
+
+  public function call() {
+    $review_data = $this->review_fetcher->fetch();
+    return $recommendation = new dxw_security_Plugin_Recommendation($this->name, $this->installed_version, $review_data);
+  }
+}
+
 
 class dxw_security_Recommendation_Error_Handler {
   public function handle($error=null) {
