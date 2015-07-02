@@ -35,7 +35,9 @@ class dxw_security_Plugin_Review_Column {
     $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
     $plugin_slug        = $plugin_file_object->plugin_slug;
 
-    $fetcher = new dxw_security_Plugin_Recommendation_Fetcher($name, $installed_version, $plugin_slug);
+    $api = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+
+    $fetcher = new dxw_security_Plugin_Recommendation_Fetcher($name, $installed_version, $api);
     $recommendation = self::fetch_recommendation_with_error_limiting($fetcher);
     $recommendation->render();
   }

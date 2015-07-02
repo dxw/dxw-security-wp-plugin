@@ -2,7 +2,7 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/api.class.php');
+require_once(dirname(__FILE__) . '/api.class.php'); # Only needed for the dxw_security_API_NotFound class
 require_once(dirname(__FILE__) . '/views/review_data.class.php');
 require_once(dirname(__FILE__) . '/views/plugin_recommendation.class.php');
 require_once(dirname(__FILE__) . '/views/plugin_recommendation_error.class.php');
@@ -12,8 +12,8 @@ class dxw_security_Plugin_Recommendation_Fetcher {
   private $name;
   private $installed_version;
 
-  public function __construct($name, $installed_version, $plugin_slug) {
-    $this->api               = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+  public function __construct($name, $installed_version, $api) {
+    $this->api               = $api;
     $this->name              = $name;
     $this->installed_version = $installed_version;
   }

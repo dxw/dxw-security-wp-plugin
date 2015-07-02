@@ -30,7 +30,9 @@ class dxw_security_Plugin_Statuses_Counter {
     $plugin_slug        = $plugin_file_object->plugin_slug;
     $installed_version  = $data["Version"];
 
-    $status_counter = new dxw_security_Plugin_Status_Counter($plugin_slug, $installed_version, $this->counters);
+    $api = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+
+    $status_counter = new dxw_security_Plugin_Status_Counter($plugin_slug, $api, $this->counters);
     return $this->count_plugin_with_error_limiting($status_counter);
   }
 
@@ -68,8 +70,8 @@ class dxw_security_Plugin_Status_Counter {
   private $plugin_slug;
   private $counters;
 
-  public function __construct($plugin_slug, $installed_version, &$counters) {
-    $this->api               = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+  public function __construct($plugin_slug, $api, &$counters) {
+    $this->api               = $api;
     $this->plugin_slug       = $plugin_slug;
     $this->counters          = &$counters;
   }

@@ -24,7 +24,9 @@ class dxw_security_Review_Fetcher {
     $installed_version  = $plugin_data['Version'];
     $plugin_slug        = $plugin_file_object->plugin_slug;
 
-    $fetcher = new dxw_security_Plugin_Single_Review_Fetcher($plugin_slug, $installed_version);
+    $api = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+
+    $fetcher = new dxw_security_Plugin_Single_Review_Fetcher($api);
     self::fetch_review_with_error_limiting($fetcher);
   }
 
@@ -39,8 +41,8 @@ class dxw_security_Review_Fetcher {
 class dxw_security_Plugin_Single_Review_Fetcher {
   private $api;
 
-  public function __construct($plugin_slug, $installed_version) {
-    $this->api = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+  public function __construct($api) {
+    $this->api = $api;
   }
 
   public function fetch() {
