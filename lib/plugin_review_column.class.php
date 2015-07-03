@@ -3,13 +3,10 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/plugin_recommendation_fetcher.class.php');
+require_once(dirname(__FILE__) . '/plugin_review_fetcher.class.php');
+require_once(dirname(__FILE__) . '/api.class.php');
 require_once(dirname(__FILE__) . '/error_limiter.class.php');
 require_once(dirname(__FILE__) . '/models/plugin_file.class.php');
-
-require_once(dirname(__FILE__) . '/views/plugin_recommendation.class.php');
-require_once(dirname(__FILE__) . '/views/plugin_recommendation_error.class.php');
-
-
 
 class dxw_security_Plugin_Review_Column {
   // Track the number of failed requests so that we can stop trying after a certain number.
@@ -39,62 +36,31 @@ class dxw_security_Plugin_Review_Column {
     $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
     $plugin_slug        = $plugin_file_object->plugin_slug;
 
-    $api = new dxw_security_Advisories_API($plugin_slug, $installed_version);
-    $recommendation = self::make_recommendation($name, $installed_version, $api);
+    $api                    = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+    $review_fetcher         = new dxw_security_Plugin_Review_Fetcher($api);
+    $recommendation_fetcher = new dxw_security_Plugin_Recommendation_Fetcher($name, $installed_version, $review_fetcher);
+
+    // Decorate it with error limiting: stop calling after N errors:
+    $recommendation_fetcher = new dxw_security_Error_Limited_Caller(
+                                $recommendation_fetcher,
+                                new dxw_security_Plugin_Recommendation_Error_Handler(),
+                                self::$failed_requests
+                              );
+
+    // Count the errors to allow error limiting:
+    $error_handler          = new dxw_security_Counting_Error_Handler(
+                                new dxw_security_Plugin_Recommendation_Error_Handler(),
+                                self::$failed_requests
+                              );
+
+    // Decorate it with error *handling*:
+    $recommendation_fetcher = new dxw_security_Error_Handled_Caller(
+                                $recommendation_fetcher,
+                                $error_handler
+                              );
+
+    $recommendation = $recommendation_fetcher->call();
     $recommendation->render();
-  }
-
-  private static function make_recommendation($name, $installed_version, $api) {
-    $review_fetcher       = new dxw_security_Plugin_Recommendation_Fetcher($api);
-
-    $recommendation_maker = new dxw_security_Recommendation_Maker($name, $installed_version, $review_fetcher);
-    $error_handler        = new dxw_security_Recommendation_Error_Handler();
-    $fatal_error_handler  = $error_handler;
-
-    $error_handled_limited_fetcher = self::error_handled_limited_fetcher($recommendation_maker, $error_handler, $fatal_error_handler, self::$failed_requests);
-
-    return $error_handled_limited_fetcher->call();
-  }
-
-  private static function error_handled_limited_fetcher($fetcher, $error_handler, $fatal_error_handler, &$counter) {
-    $counting_error_handler        = new dxw_security_Counting_Error_Handler($error_handler, $counter);
-    $error_limited_fetcher         = new dxw_security_Error_Limited_Caller($fetcher, $fatal_error_handler, $counter);
-
-    return new dxw_security_Error_Handled_Caller($error_limited_fetcher, $counting_error_handler);
-  }
-}
-
-class dxw_security_Recommendation_Maker {
-  public function __construct($name, $installed_version, $review_fetcher) {
-    $this->name              = $name;
-    $this->installed_version = $installed_version;
-    $this->review_fetcher    = $review_fetcher;
-  }
-
-  public function call() {
-    $review_data = $this->review_fetcher->fetch();
-    return $recommendation = new dxw_security_Plugin_Recommendation($this->name, $this->installed_version, $review_data);
-  }
-}
-
-
-class dxw_security_Recommendation_Error_Handler {
-  public function handle($error=null) {
-    // TODO: Handle errors actually raised by us in the api class separately?
-    // TODO: in future we should provide some way for users to give us back some useful information when they get an error
-    return new dxw_security_Plugin_Recommendation_Error();
-  }
-}
-
-class dxw_security_Fetcher_Adaptor {
-  private $fetcher;
-
-  public function __construct($fetcher) {
-    $this->fetcher = $fetcher;
-  }
-
-  public function call() {
-    return $this->fetcher->fetch();
   }
 }
 

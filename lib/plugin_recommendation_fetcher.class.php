@@ -2,23 +2,28 @@
 
 defined('ABSPATH') OR exit;
 
-require_once(dirname(__FILE__) . '/api.class.php'); # Only needed for the dxw_security_API_NotFound class
-require_once(dirname(__FILE__) . '/views/review_data.class.php');
+require_once(dirname(__FILE__) . '/views/plugin_recommendation.class.php');
+require_once(dirname(__FILE__) . '/views/plugin_recommendation_error.class.php');
 
 class dxw_security_Plugin_Recommendation_Fetcher {
-  private $api;
-
-  public function __construct($api) {
-    $this->api = $api;
+  public function __construct($name, $installed_version, $review_fetcher) {
+    $this->name              = $name;
+    $this->installed_version = $installed_version;
+    $this->review_fetcher    = $review_fetcher;
   }
 
-  public function fetch() {
-    try {
-      $review = $this->api->call();
-      return new dxw_security_Review_Data($review);
-    } catch (dxw_security_API_NotFound $e) {
-      return new dxw_security_Review_Data_No_Review();
-    }
+  public function call() {
+    $review_data = $this->review_fetcher->fetch();
+    return $recommendation = new dxw_security_Plugin_Recommendation($this->name, $this->installed_version, $review_data);
+  }
+}
+
+
+class dxw_security_Plugin_Recommendation_Error_Handler {
+  public function handle($error=null) {
+    // TODO: Handle errors actually raised by us in the api class separately?
+    // TODO: in future we should provide some way for users to give us back some useful information when they get an error
+    return new dxw_security_Plugin_Recommendation_Error();
   }
 }
 
