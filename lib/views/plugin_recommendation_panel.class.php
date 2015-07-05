@@ -9,9 +9,9 @@ class dxw_security_Plugin_Recommendation_Panel {
   private $title;
   private $dialog_id;
 
-  public function __construct($name, $version, $review_data, $dialog_id) {
-    $this->name        = $name;
-    $this->version     = $version;
+  public function __construct($plugin, $review_data, $dialog_id) {
+    $this->name        = $plugin->name;
+    $this->version     = $plugin->version;
     $this->title       = $review_data->title; // Legitimately includes html - defined within the code of this plugin
     $this->slug        = $review_data->slug;
     $this->dialog_id   = $dialog_id;

@@ -10,9 +10,9 @@ class dxw_security_Plugin_Recommendation {
   private $panel;
   private $dialog;
 
-  public function __construct($name, $version, $review_data) {
-    $this->name = $name;
-    $this->panel  = new dxw_security_Plugin_Recommendation_Panel($name, $version, $review_data, $this->dialog_id());
+  public function __construct($plugin, $review_data) {
+    $this->name = $plugin->name;
+    $this->panel  = new dxw_security_Plugin_Recommendation_Panel($plugin, $review_data, $this->dialog_id());
     $this->dialog = new dxw_security_Plugin_Recommendation_Dialog($this->dialog_id(), $review_data);
   }
 

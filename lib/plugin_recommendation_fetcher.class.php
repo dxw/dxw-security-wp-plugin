@@ -6,15 +6,14 @@ require_once(dirname(__FILE__) . '/views/plugin_recommendation.class.php');
 require_once(dirname(__FILE__) . '/views/plugin_recommendation_error.class.php');
 
 class dxw_security_Plugin_Recommendation_Fetcher {
-  public function __construct($name, $installed_version, $review_fetcher) {
-    $this->name              = $name;
-    $this->installed_version = $installed_version;
-    $this->review_fetcher    = $review_fetcher;
+  public function __construct($plugin, $review_fetcher) {
+    $this->plugin         = $plugin;
+    $this->review_fetcher = $review_fetcher;
   }
 
   public function call() {
     $review_data = $this->review_fetcher->fetch();
-    return $recommendation = new dxw_security_Plugin_Recommendation($this->name, $this->installed_version, $review_data);
+    return $recommendation = new dxw_security_Plugin_Recommendation($this->plugin, $review_data);
   }
 }
 
