@@ -12,7 +12,7 @@ class dxw_security_Plugin_Review_Fetcher {
     $this->api = $api;
   }
 
-  public function fetch() {
+  public function call() {
     try {
       $review = $this->api->call();
       return new dxw_security_Review_Data($review);

@@ -66,23 +66,23 @@ class dxw_security_Error_Limited_Caller {
   private $callable;
   private $error_count;
   private $error_limit;
-  private $fatal_error_handler;
 
-  function __construct($callable, $fatal_error_handler, $error_count, $error_limit=DXW_SECURITY_FAILURE_lIMIT) {
+  function __construct($callable, $error_count, $error_limit=DXW_SECURITY_FAILURE_lIMIT) {
     $this->callable            = $callable;
     $this->error_count         = $error_count;
     $this->error_limit         = $error_limit;
-    $this->fatal_error_handler = $fatal_error_handler;
   }
 
   public function call() {
     if ($this->error_count > $this->error_limit) {
-      return $this->fatal_error_handler->handle();
+      throw new dxw_security_Retry_Error("Exceeded error limit");
     } else {
       return $this->callable->call();
     }
   }
 }
+class dxw_security_Retry_Error extends \Exception { }
+
 
 
 // Counts the number of errors which are passed to it
@@ -102,5 +102,11 @@ class dxw_security_Counting_Error_Handler {
   }
 }
 
+// Re-throws the exception
+class dxw_security_Raising_Error_Handler {
+  public function handle($error) {
+    throw $error;
+  }
+}
 
 ?>

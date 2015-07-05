@@ -12,18 +12,14 @@ class dxw_security_Plugin_Recommendation_Fetcher {
   }
 
   public function call() {
-    $review_data = $this->review_fetcher->fetch();
-    return $recommendation = new dxw_security_Plugin_Recommendation($this->plugin, $review_data);
+    try {
+      $review_data = $this->review_fetcher->call();
+      return new dxw_security_Plugin_Recommendation($this->plugin, $review_data);
+    } catch (\Exception $e) {
+      // TODO: Handle errors actually raised by us in the api class separately?
+      // TODO: in future we should provide some way for users to give us back some useful information when they get an error
+      return new dxw_security_Plugin_Recommendation_Error();
+    }
   }
 }
-
-
-class dxw_security_Plugin_Recommendation_Error_Handler {
-  public function handle($error=null) {
-    // TODO: Handle errors actually raised by us in the api class separately?
-    // TODO: in future we should provide some way for users to give us back some useful information when they get an error
-    return new dxw_security_Plugin_Recommendation_Error();
-  }
-}
-
 ?>
