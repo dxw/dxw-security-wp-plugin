@@ -21,7 +21,7 @@ class dxw_security_Review_Fetcher {
   }
 
   private static function fetch_review($plugin) {
-    $api = new dxw_security_Advisories_API($plugin->slug, $plugin->version);
+    $api = new dxw_security_Advisories_API($plugin);
 
     $fetcher = new dxw_security_Plugin_Single_Review_Fetcher($api);
     self::fetch_review_with_error_limiting($fetcher);

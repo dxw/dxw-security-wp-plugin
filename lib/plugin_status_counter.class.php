@@ -27,9 +27,7 @@ class dxw_security_Plugin_Statuses_Counter {
   }
 
   private function count_plugin($plugin) {
-
-    Whippet::print_r($plugin);
-    $api = new dxw_security_Advisories_API($plugin->slug, $plugin->version);
+    $api = new dxw_security_Advisories_API($plugin);
 
     $status_counter = new dxw_security_Plugin_Status_Counter($plugin->slug, $api, $this->counters);
     return $this->count_plugin_with_error_limiting($status_counter);

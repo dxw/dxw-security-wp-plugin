@@ -9,9 +9,9 @@ class dxw_security_Advisories_API extends dxw_security_Cached_API {
   private $plugin_slug;
   private $plugin_version;
 
-  public function __construct($plugin_slug, $plugin_version) {
-    $this->plugin_slug    = $plugin_slug;
-    $this->plugin_version = $plugin_version;
+  public function __construct($plugin) {
+    $this->plugin_slug    = $plugin->slug;
+    $this->plugin_version = $plugin->version;
   }
 
   // TODO: Currently this only handles directory plugins

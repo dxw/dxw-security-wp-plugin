@@ -31,7 +31,7 @@ class dxw_security_Plugin_Review_Column {
   }
 
   private static function data($plugin) {
-    $api                    = new dxw_security_Advisories_API($plugin->slug, $plugin->version);
+    $api                    = new dxw_security_Advisories_API($plugin);
     $review_fetcher         = new dxw_security_Plugin_Review_Fetcher($api);
     $recommendation_fetcher = new dxw_security_Plugin_Recommendation_Fetcher($plugin->name, $plugin->version, $review_fetcher);
 
