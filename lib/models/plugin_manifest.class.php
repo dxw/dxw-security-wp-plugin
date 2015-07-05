@@ -3,6 +3,7 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/../plugin_getter.class.php');
+require_once(dirname(__FILE__) . '/plugin.class.php');
 
 class dxw_security_Plugin_Manifest {
   private $manifest; // An array of plugin slugs and versions
@@ -18,10 +19,10 @@ class dxw_security_Plugin_Manifest {
   }
 
   private function create_manifest($plugin_path, $plugin_data) {
-    $plugin_file = new dxw_security_Plugin_File($plugin_path);
+    $plugin = new dxw_security_Plugin($plugin_path, $plugin_data);
     return array(
-      "slug" => $plugin_file->plugin_slug,
-      "version" => $plugin_data["Version"]
+      "slug"    => $plugin->slug,
+      "version" => $plugin->version,
     );
   }
 }

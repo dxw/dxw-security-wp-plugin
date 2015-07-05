@@ -6,7 +6,7 @@ require_once(dirname(__FILE__) . '/plugin_recommendation_fetcher.class.php');
 require_once(dirname(__FILE__) . '/plugin_review_fetcher.class.php');
 require_once(dirname(__FILE__) . '/api.class.php');
 require_once(dirname(__FILE__) . '/error_limiter.class.php');
-require_once(dirname(__FILE__) . '/models/plugin_file.class.php');
+require_once(dirname(__FILE__) . '/models/plugin.class.php');
 
 class dxw_security_Plugin_Review_Column {
   // Track the number of failed requests so that we can stop trying after a certain number.
@@ -25,20 +25,15 @@ class dxw_security_Plugin_Review_Column {
 
   public static function manage_plugins_custom_column($column_name, $plugin_file, $plugin_data) {
     if($column_name == 'security_review') {
-      self::data($plugin_file, $plugin_data);
+      $plugin = new dxw_security_Plugin($plugin_file, $plugin_data);
+      self::data($plugin);
     }
   }
 
-  private static function data($plugin_file, $plugin_data) {
-    $name              = $plugin_data['Name'];
-    $installed_version = $plugin_data['Version'];
-
-    $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
-    $plugin_slug        = $plugin_file_object->plugin_slug;
-
-    $api                    = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+  private static function data($plugin) {
+    $api                    = new dxw_security_Advisories_API($plugin->slug, $plugin->version);
     $review_fetcher         = new dxw_security_Plugin_Review_Fetcher($api);
-    $recommendation_fetcher = new dxw_security_Plugin_Recommendation_Fetcher($name, $installed_version, $review_fetcher);
+    $recommendation_fetcher = new dxw_security_Plugin_Recommendation_Fetcher($plugin->name, $plugin->version, $review_fetcher);
 
     // Decorate it with error limiting: stop calling after N errors:
     $recommendation_fetcher = new dxw_security_Error_Limited_Caller(

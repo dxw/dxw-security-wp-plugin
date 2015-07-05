@@ -3,7 +3,7 @@
 defined('ABSPATH') OR exit;
 
 require_once(dirname(__FILE__) . '/api.class.php');
-require_once(dirname(__FILE__) . '/models/plugin_file.class.php');
+require_once(dirname(__FILE__) . '/models/plugin.class.php');
 
 class dxw_security_Plugin_Statuses_Counter {
   private $failed_requests = 0;
@@ -18,21 +18,20 @@ class dxw_security_Plugin_Statuses_Counter {
   }
 
   public function get_counts($plugins) {
-    foreach($plugins as $plugin_file => $data) {
-      $this->count_plugin($plugin_file, $data);
+    foreach($plugins as $plugin_file => $plugin_data) {
+      $plugin = new dxw_security_Plugin($plugin_file, $plugin_data);
+      $this->count_plugin($plugin);
     }
 
     return $this->counters;
   }
 
-  private function count_plugin($plugin_file, $data) {
-    $plugin_file_object = new dxw_security_Plugin_File($plugin_file);
-    $plugin_slug        = $plugin_file_object->plugin_slug;
-    $installed_version  = $data["Version"];
+  private function count_plugin($plugin) {
 
-    $api = new dxw_security_Advisories_API($plugin_slug, $installed_version);
+    Whippet::print_r($plugin);
+    $api = new dxw_security_Advisories_API($plugin->slug, $plugin->version);
 
-    $status_counter = new dxw_security_Plugin_Status_Counter($plugin_slug, $api, $this->counters);
+    $status_counter = new dxw_security_Plugin_Status_Counter($plugin->slug, $api, $this->counters);
     return $this->count_plugin_with_error_limiting($status_counter);
   }
 
