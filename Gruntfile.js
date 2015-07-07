@@ -50,7 +50,7 @@ module.exports = function(grunt) {
             nonull: true,
             files: [
               { src: ['assets/*'], dest: 'build/', filter: 'isFile' },
-              { src: ['assets/fonts/**', 'mongoosewp.php', 'lib/*', 'readme.txt'], dest: 'build/' },
+              { src: ['assets/fonts/**', 'mongoosewp.php', 'lib/**', 'readme.txt'], dest: 'build/' },
             ]
           }
         },
