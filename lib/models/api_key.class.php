@@ -12,7 +12,7 @@ class dxw_security_API_Key {
   }
 
   public function is_valid() {
-    ! ( $this->is_invalid() || $this->could_not_be_verified() );
+    return ! ( $this->is_invalid() || $this->could_not_be_verified() );
   }
 
   public function __toString() {

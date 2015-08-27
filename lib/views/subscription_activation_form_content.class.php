@@ -13,7 +13,7 @@ class dxw_security_Subscription_Activation_Form_Content_Active {
     ?>
       <p>We'll notify you by email if we any security issues are with plugins you have installed.</p>
       <p>We'll use the email address you provided when you registered. If you would like to change this,
-        or if you have any problems or comments, please contact <?php $this->email_link() ?>.</p>
+        or if you have any problems or comments, please contact <?php self::email_link() ?>.</p>
     <?php
   }
 
