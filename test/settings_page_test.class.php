@@ -9,10 +9,6 @@ function do_settings_sections() {}
 function submit_button() {}
 
 class dxw_security_Settings_Page_Test extends PHPUnit_Framework_TestCase {
-  public function test_page_slug() {
-    $this->assertNotEmpty(dxw_security_Settings_Page::$page_slug);
-  }
-
   public function test_setup() {
     dxw_security_Settings_Page::setup();
   }
@@ -20,9 +16,6 @@ class dxw_security_Settings_Page_Test extends PHPUnit_Framework_TestCase {
   public function test_render() {
     dxw_security_Settings_Page::render_content();
   }
-
-  public function test_url() {
-    $this->assertNotEmpty(dxw_security_Settings_Page::url());;
-  }
 }
+
 ?>
